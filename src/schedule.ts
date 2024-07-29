@@ -49,9 +49,9 @@ const SCHEDULE: JobConfig[] = [
     disabled: true,
     run: () => {
       return grillzone.run({
-        from: new Date("01-01-2024"),
+        from: new Date("08-01-2024"),
         to: new Date("12-31-2024"),
-        areas: [0, 1, 2, 3, 4],
+        areas: [0, 1, 2, 4, 8, 9, 10, 10, 13, 14, 15],
       });
     },
   },
