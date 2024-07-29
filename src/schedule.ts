@@ -45,8 +45,8 @@ const SCHEDULE: JobConfig[] = [
   {
     id: "grillzone",
     name: "Grillzone area search",
-    cron: "0 */1 * * * *",
-    disabled: true,
+    cron: "0 */15 * * * *",
+    disabled: false,
     run: () => {
       return grillzone.run({
         from: new Date("08-01-2024"),
