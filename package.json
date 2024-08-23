@@ -8,8 +8,8 @@
     "migrate": "drizzle-kit migrate",
     "predev": "drizzle-kit generate && drizzle-kit migrate",
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
-    "start": "NODE_ENV=production node dist/index.js",
-    "start:prod": "npm run build && NODE_ENV=production node dist/src/index.js",
+    "start": "node --env-file=.env dist/index.js",
+    "start:prod": "npm run build && node --env-file=.env dist/src/index.js",
     "test": "jest"
   },
   "engines": {
