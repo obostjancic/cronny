@@ -6,7 +6,8 @@ import * as Sentry from "@sentry/node";
 import { JobConfig, Run } from "../types";
 import path from "path";
 import { promises as fs } from "fs";
-const dataDirPath = "./.data";
+
+export const dataDirPath = "./.data";
 
 const sqlite = new Database(path.join(dataDirPath, "sqlite.db"));
 export const db = drizzle(sqlite);
@@ -58,6 +59,17 @@ export async function getLastRun(jobId: string): Promise<Run | undefined> {
     .limit(1);
 
   return savedRuns[0];
+}
+
+export async function getPreviousRun(runId: string): Promise<Run | undefined> {
+  const savedRuns = await db
+    .select()
+    .from(runs)
+    .where(eq(runs.jobId, runId))
+    .orderBy(desc(runs.start))
+    .limit(2);
+
+  return savedRuns[1];
 }
 
 export async function getSchedule(): Promise<JobConfig[]> {

@@ -40,6 +40,7 @@
     "lowdb": "^7.0.1",
     "node-html-parser": "^6.1.13",
     "playwright": "^1.45.3",
+    "rss-parser": "^3.13.0",
     "uuid": "^10.0.0"
   }
 }

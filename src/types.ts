@@ -11,7 +11,7 @@ type JobConfigBase = {
 };
 
 export type NotificationConfig = {
-  transport: "email" | "slack" | "telegram" | "whatsapp" | "webhook";
+  transport: "file" | "email" | "slack" | "telegram" | "whatsapp" | "webhook";
   params: Record<string, unknown>;
 };
 

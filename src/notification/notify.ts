@@ -1,7 +1,8 @@
-import { getLastRun } from "./db/schema";
-import { Run, NotificationConfig } from "./types";
-import logger from "./utils/logger";
-import { sendWhatsappMessage } from "./utils/whatsapp";
+import { getLastRun, getPreviousRun } from "../db/schema";
+import { NotificationConfig, Run } from "../types";
+import { notifyLogFile } from "./log-file";
+import logger from "../utils/logger";
+import { sendWhatsappMessage } from "./whatsapp";
 
 export async function notifyRun(run: Run): Promise<void> {
   if (run.status === "success" && run.config.notify?.onSuccess) {
@@ -20,26 +21,27 @@ async function notifySuccess(run: Run): Promise<void> {
     run.config.notify!.onSuccess!;
 
   if (onResultChangeOnly) {
-    const lastRun = await getLastRun(run.config.jobId);
+    const prevRun = await getPreviousRun(run.config.jobId);
 
     const resultDiff = run.results?.filter(
       (result) =>
-        !lastRun?.results?.some(
+        !(prevRun?.results || []).some(
           (prevResult) => JSON.stringify(prevResult) === JSON.stringify(result)
         )
     );
-
-    if (resultDiff && resultDiff.length > 0) {
-      const message = `${run.config.name}: ${resultDiff.length} new results found!`;
-
-      await notify(transport, params, message);
+    if (!resultDiff || resultDiff.length === 0) {
+      logger.debug(`${run.config.name}: No new results found!`);
+      return;
     }
+
+    const message = `${run.config.name}: ${resultDiff.length} new results found!`;
+    await notify({ transport, params, message, results: resultDiff });
   } else {
     const message = `${run.config.name}: ${
       run.results?.length ?? 0
     } results found!`;
 
-    await notify(transport, params, message);
+    await notify({ transport, params, message, results: run.results });
   }
 }
 
@@ -48,17 +50,26 @@ async function notifyFailure(run: Run): Promise<void> {
 
   const message = `${run.config.name} failed!`;
 
-  await notify(transport, params, message);
+  await notify({ transport, params, message, results: null });
 }
 
-async function notify(
-  transport: NotificationConfig["transport"],
-  params: Record<string, unknown>,
-  message: string
-): Promise<void> {
+async function notify({
+  transport,
+  params,
+  results,
+  message,
+}: {
+  transport: NotificationConfig["transport"];
+  params: Record<string, unknown>;
+  results: unknown[] | null;
+  message: string;
+}): Promise<void> {
   logger.debug(`Notifying via ${transport}`, message);
 
   switch (transport) {
+    case "file":
+      notifyLogFile(params.path as string, results!);
+      break;
     case "email":
       // sendEmail(params, message);
       break;

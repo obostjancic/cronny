@@ -1,6 +1,6 @@
 import axios from "axios";
-import logger from "./logger";
-import { getEnv, isProd } from "./env";
+import logger from "../utils/logger";
+import { getEnv, isProd } from "../utils/env";
 
 const PRESUMED_WHATSAPP_MESSAGE_LENGTH = 738;
 

@@ -1,5 +1,5 @@
 import { SavedRun, saveRun, updateRun } from "./db/schema";
-import { notifyRun } from "./notify";
+import { notifyRun } from "./notification/notify";
 import { JobConfig, Runner } from "./types";
 import { iso } from "./utils/date";
 import logger from "./utils/logger";
