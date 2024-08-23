@@ -1,12 +1,18 @@
-import * as Sentry from "@sentry/node";
 type JobConfigBase = {
-  run: () => Promise<any[]>;
-  id: string;
+  jobId: string;
+  strategy: string;
   name: string;
-  disabled?: boolean;
+  enabled?: boolean;
+  params?: Record<string, unknown>;
   notify?: {
-    channel: "whatsapp";
+    onSuccess?: NotificationConfig & { onResultChangeOnly: boolean };
+    onFailure?: NotificationConfig;
   };
+};
+
+export type NotificationConfig = {
+  transport: "email" | "slack" | "telegram" | "whatsapp" | "webhook";
+  params: Record<string, unknown>;
 };
 
 export type JobConfig =
@@ -20,25 +26,15 @@ export type JobConfig =
     });
 
 export type Run<T = any> = {
-  config: JobConfig;
+  id?: number;
+  jobId: string;
   start: string;
+  end: string | null;
   status: "running" | "success" | "failure";
-  span: Sentry.Span;
-  results?: T[];
-  error?: Error;
+  config: JobConfig;
+  results: T[] | null;
 };
 
-export type Job = {
-  id: string;
-  name?: string;
-  runs: FinishedRun[];
-};
-
-export type FinishedRun<T = any> = {
-  id: string;
-  start: string;
-  end: string;
-  status: "success" | "failure";
-  params?: Record<string, unknown>;
-  results?: T[];
-};
+export type Runner<T = any> = (
+  params?: Record<string, unknown>
+) => Promise<T[] | null>;

@@ -1,7 +1,13 @@
+import {
+  getJob,
+  getJobRuns,
+  getLastRun,
+  getRun,
+  getSchedule,
+} from "./db/schema";
 import "./instrument";
-import { getSchedule, scheduleRuns } from "./schedule";
-import * as db from "./db";
 import express, { Request, Response } from "express";
+import { scheduleRuns } from "./schedule";
 
 const app = express();
 const port = 3000;
@@ -19,24 +25,23 @@ app.get("/api/jobs", (_: Request, res: Response) => {
 });
 
 app.get("/api/jobs/:id", async (req: Request, res: Response) => {
-  const job = await db.getJob(req.params.id);
+  const job = await getJob(req.params.id);
   res.json(job);
 });
 
 app.get("/api/jobs/:jobId/runs", async (req: Request, res: Response) => {
-  const job = await db.getJob(req.params.jobId);
-  res.json(job.runs);
+  const runs = await getJobRuns(req.params.jobId);
+  res.json(runs);
 });
 
 app.get("/api/jobs/:jobId/runs/:runId", async (req: Request, res: Response) => {
   if (req.params.runId === "latest") {
-    const run = await db.getLastRun(req.params.jobId);
+    const run = await getLastRun(req.params.jobId);
     res.json(run);
     return;
   }
-  const runs = await db.getJob(req.params.jobId);
-  const run = runs.runs.find((r) => r.id === req.params.runId);
-  
+  const run = await getRun(+req.params.jobId);
+
   res.json(run);
 });
 

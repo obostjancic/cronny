@@ -1,4 +1,4 @@
-import { isProd } from "./utils/env";
+import { getEnv, isProd } from "./utils/env";
 
 const Sentry = require("@sentry/node");
 const { nodeProfilingIntegration } = require("@sentry/profiling-node");
@@ -12,5 +12,5 @@ Sentry.init({
   // Set sampling rate for profiling - this is relative to tracesSampleRate
   profilesSampleRate: 1.0,
   enabled: isProd,
-  environment: process.env.NODE_ENV,
+  environment: getEnv("NODE_ENV"),
 });

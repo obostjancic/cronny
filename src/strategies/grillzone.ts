@@ -30,7 +30,6 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
       const areaResults = await checkAreas(params.areas, page, month);
       results.push(areaResults);
     }
-
     return results.flat();
   } catch (e) {
     logger.log("Error fetching grill areas", e);
@@ -284,8 +283,11 @@ const padLeft = (str: string, length = 6, pad = " "): string => {
 
 const getMonthNamesInInterval = (start: Date, end: Date) => {
   const months: string[] = [];
+
   const date = new Date(start);
-  while (date <= end) {
+  const endDate = new Date(end);
+
+  while (date <= endDate) {
     months.push(
       date.toLocaleString("default", { month: "long" }).toLowerCase()
     );

@@ -1,79 +1,51 @@
-import * as Sentry from "@sentry/node";
-import logger from "./utils/logger";
-import * as db from "./db";
+import { SavedRun, saveRun, updateRun } from "./db/schema";
+import { notifyRun } from "./notify";
+import { JobConfig, Runner } from "./types";
 import { iso } from "./utils/date";
-import { notify } from "./utils/notify";
-import { formatJSONArray } from "./utils/format";
-import { FinishedRun, JobConfig, Run } from "./types";
+import logger from "./utils/logger";
 
-export async function executeRun(config: JobConfig): Promise<FinishedRun> {
-  const run = startRun(config);
+export async function executeRun(
+  config: JobConfig,
+  runner: Runner
+): Promise<void> {
+  let run = await startRun(config);
+  let results = null;
   try {
-    run.results = await config.run();
-
-    if (config.notify) {
-      await notifyRun(run);
-    }
+    results = await runner(run.config.params);
   } catch (e) {
-    run.error = e as Error;
+    logger.error(`Error running job ${run.config.name}`, e);
+    run.results = null;
   } finally {
-    return await finishRun(run);
+    run = await finishRun(run.id, results);
   }
+
+  notifyRun(run);
 }
 
-function startRun(config: JobConfig): Run {
-  logger.debug(`Starting run for job ${config.name}`);
+async function startRun(config: JobConfig) {
+  logger.debug(`Starting run for ${config.name}`);
 
-  return {
-    config,
+  return saveRun({
+    jobId: config.jobId,
     start: iso(),
+    end: null,
     status: "running",
-    span: Sentry.startInactiveSpan({ name: config.name }),
-  };
+    results: null,
+    config: config,
+  });
 }
 
-async function finishRun(run: Run): Promise<FinishedRun> {
-  const isSuccess = !run.error;
-  if (isSuccess) {
-    logger.debug(`Run for job ${run.config.name} finished, result`);
-  } else {
-    logger.error(`Error running job ${run.config.name}`, run.error);
-  }
+async function finishRun(
+  runId: number,
+  results: any[] | null
+): Promise<SavedRun> {
+  const isSuccess = !!results;
 
-  const savedRun = await db.saveJobRun(run.config.id, {
-    start: run.start,
+  const savedRun = await updateRun(runId, {
     end: iso(),
-    results: run.results,
+    results: results,
     status: isSuccess ? "success" : "failure",
   });
 
-  run.span.end();
   return savedRun;
-}
-
-async function notifyRun(run: Run): Promise<void> {
-  const previousRun = await db.getLastRun(run.config.id);
-
-  if (!previousRun) {
-    logger.debug(`No previous run found for ${run.config.name}`);
-    return;
-  }
-
-  const previousResults = previousRun.results ?? [];
-  const currentResults = run.results ?? [];
-
-  const newResults = currentResults.filter(
-    (result) =>
-      !previousResults.some(
-        (prevResult) => JSON.stringify(prevResult) === JSON.stringify(result)
-      )
-  );
-
-  if (newResults.length > 0) {
-    notify(
-      `New results found for ${run.config.name}`,
-      formatJSONArray(newResults)
-    );
-    logger.debug(`New results found for ${run.config.name}`, newResults);
-  }
 }

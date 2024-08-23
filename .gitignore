@@ -6,3 +6,7 @@ node_modules/
 .env
 .db.json
 /dist
+/.data
+.data/*
+schedule.json
+sqlite.db
