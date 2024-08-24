@@ -1,12 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = run;
-const node_html_parser_1 = require("node-html-parser");
-const logger_1 = __importDefault(require("../utils/logger"));
-async function run(params) {
+import { parse } from "node-html-parser";
+import logger from "../utils/logger.js";
+export async function run(params) {
     return await fetchWillhabenSearch(params);
 }
 async function fetchWillhabenSearch({ url, }) {
@@ -14,12 +8,12 @@ async function fetchWillhabenSearch({ url, }) {
     return extractResultList(html);
 }
 async function fetchHtml(url) {
-    logger_1.default.debug(`Fetching ${url}`);
+    logger.debug(`Fetching ${url}`);
     const response = await fetch(url);
     return response.text();
 }
 function extractResultList(html) {
-    const script = (0, node_html_parser_1.parse)(html).querySelector("body > script");
+    const script = parse(html).querySelector("body > script");
     if (!script) {
         throw new Error("No script found in page");
     }

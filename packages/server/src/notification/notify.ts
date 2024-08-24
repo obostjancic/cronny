@@ -1,8 +1,8 @@
-import { getLastRun, getPreviousRun } from "../db/schema";
-import { NotificationConfig, Run } from "../../../types/Job";
-import { notifyLogFile } from "./log-file";
+import { getLastRun, getPreviousRun } from "../db/schema.js";
+import { NotificationConfig, Run } from "@cronny/types/Job.js";
+import { notifyLogFile } from "./log-file.js";
 import logger from "../utils/logger.js";
-import { sendWhatsappMessage } from "./whatsapp";
+import { sendWhatsappMessage } from "./whatsapp.js";
 
 export async function notifyRun(run: Run): Promise<void> {
   if (run.status === "success" && run.config.notify?.onSuccess) {

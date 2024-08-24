@@ -1,4 +1,4 @@
-import { dataDirPath } from "../db/schema";
+import { dataDirPath } from "../db/schema.js";
 import { promises as fs } from "fs";
 import path from "path";
 

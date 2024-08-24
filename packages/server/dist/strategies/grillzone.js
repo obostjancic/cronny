@@ -1,27 +1,20 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = run;
-exports.fetchCurrentGrillareaState = fetchCurrentGrillareaState;
-const test_1 = require("@playwright/test");
-const date_fns_1 = require("date-fns");
-const locale_1 = require("date-fns/locale");
-const logger_1 = __importDefault(require("../utils/logger"));
-const request_1 = require("../utils/request");
-const env_1 = require("../utils/env");
-async function run(params) {
+import { chromium } from "@playwright/test";
+import { format, parse } from "date-fns";
+import { de } from "date-fns/locale";
+import logger from "../utils/logger.js";
+import { sleep } from "../utils/request.js";
+import { isProd } from "../utils/env.js";
+export async function run(params) {
     return await fetchCurrentGrillareaState(params);
 }
-async function fetchCurrentGrillareaState(params) {
-    const browser = await test_1.chromium.launch({
-        headless: env_1.isProd,
+export async function fetchCurrentGrillareaState(params) {
+    const browser = await chromium.launch({
+        headless: isProd,
     });
-    (0, request_1.sleep)(1000);
+    sleep(1000);
     const page = await browser.newPage();
     try {
-        logger_1.default.log("Fetching https://mein.wien.gv.at/grillplatz");
+        logger.log("Fetching https://mein.wien.gv.at/grillplatz");
         const results = [];
         for (const month of getMonthNamesInInterval(params.from, params.to)) {
             const areaResults = await checkAreas(params.areas, page, month);
@@ -30,7 +23,7 @@ async function fetchCurrentGrillareaState(params) {
         return results.flat();
     }
     catch (e) {
-        logger_1.default.log("Error fetching grill areas", e);
+        logger.log("Error fetching grill areas", e);
         throw e;
     }
     finally {
@@ -43,14 +36,14 @@ async function checkAreas(areas, page, month) {
     await page.goto(grillPlatzReserveUrl, {
         waitUntil: "networkidle",
     });
-    await (0, request_1.sleep)();
+    await sleep();
     const rows = await page.$$("#BuchbareGrillplaetze_grpGrid_gdResult > tbody > tr");
     rows.shift();
     for (const area of rows) {
         const areaRow = await area.$$("td");
         const areaCheckbox = await areaRow[0].$("input");
         if (!areaCheckbox) {
-            logger_1.default.error("No checkbox found for area");
+            logger.error("No checkbox found for area");
             continue;
         }
         const areaNumber = Number(await areaRow[1].innerText());
@@ -58,7 +51,7 @@ async function checkAreas(areas, page, month) {
             await areaCheckbox.click();
         }
     }
-    await (0, request_1.sleep)();
+    await sleep();
     const selectAreasButtonId = "#btngroupBottom_cmdSelectGrillplatz_input";
     const selectAreas = await page.$(selectAreasButtonId);
     if (!selectAreas) {
@@ -66,7 +59,7 @@ async function checkAreas(areas, page, month) {
     }
     await selectAreas.click();
     await page.waitForLoadState("networkidle");
-    await (0, request_1.sleep)();
+    await sleep();
     const startDateId = "#Groupofcontrols1_txtDatumVon_input";
     const startDateElement = await page.$(startDateId);
     if (!startDateElement) {
@@ -79,7 +72,7 @@ async function checkAreas(areas, page, month) {
         throw new Error("No end date element found");
     }
     await fillDate(endDateElement, to);
-    await (0, request_1.sleep)();
+    await sleep();
     const proceedButtonId = "#grp1_cmdWeiter_input";
     const proceedButton = await page.$(proceedButtonId);
     if (!proceedButton) {
@@ -88,18 +81,18 @@ async function checkAreas(areas, page, month) {
     await proceedButton.click();
     await page.waitForLoadState("networkidle");
     const areaResults = await collectAreaResults(page);
-    logger_1.default.log(`Found ${areaResults?.length ?? 0} results for interval: ${toString(from)} - ${toString(to)}`);
+    logger.log(`Found ${areaResults?.length ?? 0} results for interval: ${toString(from)} - ${toString(to)}`);
     return areaResults;
 }
 async function collectAreaResults(page) {
-    await (0, request_1.sleep)();
+    await sleep();
     const areaOpts = await page.$$("#GroupGrillplatz_cboGrillplatz_input > option");
-    await (0, request_1.sleep)();
+    await sleep();
     let results = [];
     for (const areaOptIdx of areaOpts.map((_, i) => i)) {
-        await (0, request_1.sleep)();
+        await sleep();
         await page.waitForLoadState("networkidle");
-        await (0, request_1.sleep)();
+        await sleep();
         const areaDropdownId = "#GroupGrillplatz_cboGrillplatz_input";
         const areaDropdown = await page.$(areaDropdownId);
         if (!areaDropdown) {
@@ -115,10 +108,10 @@ async function collectAreaResults(page) {
         }
         await confirmButton.click();
         await page.waitForLoadState("networkidle");
-        await (0, request_1.sleep)();
+        await sleep();
         // get name of area
         const selectedArea = await text(page.$("#GroupGrillplatz_cboGrillplatz_input > option[selected='selected']"));
-        await (0, request_1.sleep)();
+        await sleep();
         const calenderTable = await page.$("#GroupKalender_calH");
         if (!calenderTable) {
             throw new Error("No calender table found");
@@ -144,7 +137,7 @@ const fillDate = async (dateElement, targetDate) => {
     await dateElement.press("Enter", { delay: 100 });
 };
 const toDate = (dayStr) => {
-    const parsedDay = (0, date_fns_1.parse)(dayStr, "dd. LLLL", 0, { locale: locale_1.de });
+    const parsedDay = parse(dayStr, "dd. LLLL", 0, { locale: de });
     parsedDay.setFullYear(2024);
     return parsedDay;
 };
@@ -166,7 +159,7 @@ const numOfDaysAvailable = (str) => {
     return Number(extractedDays);
 };
 const text = async (promise) => promise.then((el) => el?.innerText());
-const toString = (date) => (0, date_fns_1.format)(date, "dd.MM.yyyy", { locale: locale_1.de });
+const toString = (date) => format(date, "dd.MM.yyyy", { locale: de });
 const groupBy = (array, key) => {
     return array.reduce((acc, item) => {
         (acc[item[key]] = acc[item[key]] || []).push(item);
