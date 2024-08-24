@@ -1,46 +1,23 @@
 {
   "name": "cronny",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "migrate": "drizzle-kit migrate",
-    "predev": "drizzle-kit generate && drizzle-kit migrate",
-    "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
-    "start": "node --env-file=.env dist/index.js",
-    "start:prod": "npm run build && node --env-file=.env dist/src/index.js",
-    "test": "jest"
+    "dev": "concurrently \"yarn workspace @cronny/client dev\" \"yarn workspace @cronny/server dev\"",
+    "debug": "concurrently \"yarn workspace @cronny/client dev\" \"yarn workspace @cronny/server debug\"",
+    "build": "yarn workspace @cronny/client build",
+    "start": "yarn workspace @cronny/server migrate && yarn workspace @cronny/server start"
   },
-  "engines": {
-    "node": ">=20.6.0"
+  "volta": {
+    "yarn": "1.22.19",
+    "node": "20.16.0"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.45.3",
-    "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^20.14.12",
-    "drizzle-kit": "^0.24.1",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.17.0",
-    "typescript": "^5.5.4"
-  },
-  "dependencies": {
-    "@sentry/node": "^8.20.0",
-    "@sentry/profiling-node": "^8.20.0",
-    "@types/express": "^4.17.21",
-    "@types/uuid": "^10.0.0",
-    "axios": "^1.7.2",
-    "better-sqlite3": "^11.2.1",
-    "cron": "^3.1.7",
-    "date-fns": "^3.6.0",
-    "drizzle-orm": "^0.33.0",
-    "express": "^4.19.2",
-    "lowdb": "^7.0.1",
-    "node-html-parser": "^6.1.13",
-    "playwright": "^1.45.3",
-    "rss-parser": "^3.13.0",
-    "uuid": "^10.0.0"
+    "concurrently": "^8.2.2"
   }
 }
