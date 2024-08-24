@@ -1,6 +1,9 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { Container, Flex, Table } from "@mantine/core";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useGetRuns } from "../../../../api/useGetRuns";
-import { JsonInput, Table } from "@mantine/core";
+import { formatDateTime, formatDuration } from "../../../../utils/date/date";
+import { ExpandableRow } from "../../../../components/ExpandableRow";
+import { CodeHighlight } from "@mantine/code-highlight";
 import { formatJSON } from "../../../../utils/json";
 
 export const Route = createFileRoute("/jobs/$jobId/runs/")({
@@ -12,50 +15,52 @@ function JobDetails() {
   const runs = useGetRuns(jobId);
 
   return (
-    <div>
+    <Container fluid>
       <h1>Job {jobId}</h1>
-      <Table striped highlightOnHover withTableBorder>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th>Config</th>
-            <th>Results</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table stickyHeader striped highlightOnHover withTableBorder>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Id</Table.Th>
+            <Table.Th>Start</Table.Th>
+            <Table.Th>Duration</Table.Th>
+            <Table.Th>Status</Table.Th>
+            <Table.Th>No. of results</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
           {runs.data?.map((run) => (
-            <tr key={run.id}>
-              <td>
+            <ExpandableRow
+              key={run.id}
+              details={
+                <Flex gap="md" direction="column">
+                  <CodeHighlight
+                    withCopyButton
+                    language="json"
+                    code={formatJSON(run.config)}
+                    contentEditable={false}
+                  />
+                  <CodeHighlight
+                    withCopyButton
+                    language="json"
+                    code={formatJSON(run.results)}
+                    contentEditable={false}
+                  />
+                </Flex>
+              }
+            >
+              <Table.Td>
                 <Link to={`/jobs/${jobId}/runs/${run.id}`} key={run.id}>
                   {run.id}
                 </Link>
-              </td>
-              <td>{run.start}</td>
-              <td>{run.end}</td>
-              <td>{run.status}</td>
-              <td>
-                <JsonInput
-                  value={formatJSON(run.config)}
-                  formatOnBlur
-                  maxRows={3}
-                  autosize
-                />
-              </td>
-              <td>
-                <JsonInput
-                  value={formatJSON(run.results as any)}
-                  formatOnBlur
-                  maxRows={3}
-                  autosize
-                />
-              </td>
-            </tr>
+              </Table.Td>
+              <Table.Td>{formatDateTime(run.start)}</Table.Td>
+              <Table.Td>{formatDuration(run.start, run.end)}</Table.Td>
+              <Table.Td>{run.status}</Table.Td>
+              <Table.Td>{run.results?.length}</Table.Td>
+            </ExpandableRow>
           ))}
-        </tbody>
+        </Table.Tbody>
       </Table>
-    </div>
+    </Container>
   );
 }

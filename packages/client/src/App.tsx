@@ -1,9 +1,10 @@
 import { createTheme, MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import "@mantine/core/styles.css";
+import "@mantine/code-highlight/styles.css";
 import "./App.css";
 
 const router = createRouter({ routeTree, defaultPreload: "intent" });

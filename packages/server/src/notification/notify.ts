@@ -1,8 +1,10 @@
 import { getLastRun, getPreviousRun } from "../db/schema.js";
-import { NotificationConfig, Run } from "@cronny/types/Job.js";
+import { NotificationConfig, Run, JSONObject } from "@cronny/types";
+
 import { notifyLogFile } from "./log-file.js";
 import logger from "../utils/logger.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
+import { getEnv } from "../utils/env.js";
 
 export async function notifyRun(run: Run): Promise<void> {
   if (run.status === "success" && run.config.notify?.onSuccess) {
@@ -34,14 +36,19 @@ async function notifySuccess(run: Run): Promise<void> {
       return;
     }
 
-    const message = `${run.config.name}: ${resultDiff.length} new results found!`;
-    await notify({ transport, params, message, results: resultDiff });
+    await notify({
+      transport,
+      params,
+      message: constructMessage(run),
+      results: resultDiff,
+    });
   } else {
-    const message = `${run.config.name}: ${
-      run.results?.length ?? 0
-    } results found!`;
-
-    await notify({ transport, params, message, results: run.results });
+    await notify({
+      transport,
+      params,
+      message: constructMessage(run),
+      results: run.results,
+    });
   }
 }
 
@@ -60,7 +67,7 @@ async function notify({
   message,
 }: {
   transport: NotificationConfig["transport"];
-  params: Record<string, unknown>;
+  params: JSONObject;
   results: unknown[] | null;
   message: string;
 }): Promise<void> {
@@ -89,4 +96,14 @@ async function notify({
     default:
       logger.error(`Unsupported transport: ${transport}`);
   }
+}
+
+function constructMessage(run: Run): string {
+  const resultsCount = run.results?.length ?? 0;
+
+  return `${run.config.name}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+}
+
+function getRunResultsUrl(run: Run): string {
+  return `${getEnv("BASE_URL")}/jobs/${run.jobId}/runs/${run.id}`;
 }

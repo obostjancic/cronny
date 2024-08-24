@@ -3,9 +3,10 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { desc, eq } from "drizzle-orm";
 import * as Sentry from "@sentry/node";
-import { JobConfig, Run } from "@cronny/types/Job.js";
+import { JobConfig, JSONArray, Run } from "@cronny/types";
 import path from "path";
 import { promises as fs } from "fs";
+import { JSONObject } from "@cronny/types";
 
 export const dataDirPath = "./.data";
 
@@ -19,7 +20,7 @@ export const runs = sqliteTable("runs", {
   end: text("end"),
   status: text("status").notNull().$type<"running" | "success" | "failure">(),
   config: blob("config", { mode: "json" }).notNull().$type<JobConfig>(),
-  results: blob("results", { mode: "json" }).$type<unknown[]>(),
+  results: blob("results", { mode: "json" }).$type<JSONObject[]>(),
 });
 
 export type SavedRun = Run & { id: number };
@@ -47,7 +48,11 @@ export async function updateRun(id: number, run: Partial<Run>): Promise<any> {
 }
 
 export async function getJobRuns(jobId: string): Promise<Run[]> {
-  return db.select().from(runs).where(eq(runs.jobId, jobId));
+  return db
+    .select()
+    .from(runs)
+    .where(eq(runs.jobId, jobId))
+    .orderBy(desc(runs.start));
 }
 
 export async function getLastRun(jobId: string): Promise<Run | undefined> {

@@ -1,7 +1,7 @@
 // import * as Sentry from "@sentry/node";
 import { CronJob } from "cron";
 import { executeRun } from "./run.js";
-import { JobConfig, Runner } from "@cronny/types/Job.js";
+import { JobConfig, Runner } from "@cronny/types";
 
 export function cron(config: JobConfig, runner: Runner): CronJob {
   if (!config.cron) {

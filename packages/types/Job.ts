@@ -1,9 +1,11 @@
+import type { JSONObject } from "./JSON.js";
+
 type JobConfigBase = {
   jobId: string;
   strategy: string;
   name: string;
   enabled?: boolean;
-  params?: Record<string, unknown>;
+  params?: JSONObject;
   notify?: {
     onSuccess?: NotificationConfig & { onResultChangeOnly: boolean };
     onFailure?: NotificationConfig;
@@ -12,7 +14,7 @@ type JobConfigBase = {
 
 export type NotificationConfig = {
   transport: "file" | "email" | "slack" | "telegram" | "whatsapp" | "webhook";
-  params: Record<string, unknown>;
+  params: JSONObject;
 };
 
 export type JobConfig =
@@ -25,7 +27,7 @@ export type JobConfig =
       cron?: never;
     });
 
-export type Run<T = any> = {
+export type Run<T = JSONObject> = {
   id?: number;
   jobId: string;
   start: string;
@@ -35,6 +37,4 @@ export type Run<T = any> = {
   results: T[] | null;
 };
 
-export type Runner<T = any> = (
-  params?: Record<string, unknown>
-) => Promise<T[] | null>;
+export type Runner<T = any> = (params?: JSONObject) => Promise<T[] | null>;

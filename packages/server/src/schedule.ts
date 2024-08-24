@@ -1,7 +1,7 @@
 import logger from "./utils/logger.js";
 import { cron } from "./cron.js";
 import { executeRun } from "./run.js";
-import { JobConfig, Runner } from "@cronny/types/Job.js";
+import { JobConfig, Runner } from "@cronny/types";
 import { getSchedule } from "./db/schema.js";
 
 function scheduleRun(config: JobConfig, runner: Runner): void {

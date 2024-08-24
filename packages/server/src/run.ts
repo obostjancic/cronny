@@ -1,6 +1,6 @@
 import { SavedRun, saveRun, updateRun } from "./db/schema.js";
 import { notifyRun } from "./notification/notify.js";
-import { JobConfig, Runner } from "@cronny/types/Job.js";
+import { JobConfig, Runner } from "@cronny/types";
 import { iso } from "./utils/date.js";
 import logger from "./utils/logger.js";
 

@@ -5,7 +5,7 @@ import logger from "../utils/logger.js";
 export type Article = {
   id: string;
   title: string;
-  link: string;
+  url: string;
   date: string;
   content: string;
 };
@@ -43,7 +43,7 @@ function processArticles(articles: RawArticle[]): Article[] {
     .map((article) => ({
       id: article.guid,
       title: article.title,
-      link: article.link,
+      url: article.link,
       date: new Date(article.pubDate).toISOString(),
       content: article.content,
     }));
