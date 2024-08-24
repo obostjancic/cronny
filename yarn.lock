@@ -1180,6 +1180,57 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.21.0.tgz#20c09cf44dcb082140cc7f439dd679fe4bba3375"
   integrity sha512-2jsCDZwtQvRhejHLfZ1JY6w6kEuEtfF9nzYsZxzSlNVKDX+DpsDJ+Rbjkm74nvg2rdx0gwBS+IMdvwJuq3S9pQ==
 
+"@sentry-internal/browser-utils@8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-8.26.0.tgz#3c76015e1bddde6775e6a7e115fbb494f247fed1"
+  integrity sha512-O2Tj+WK33/ZVp5STnz6ZL0OO+/Idk2KqsH0ITQkQmyZ2z0kdzWOeqK7s7q3/My6rB1GfPcyqPcBBv4dVv92FYQ==
+  dependencies:
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+
+"@sentry-internal/feedback@8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-8.26.0.tgz#c29a2a4d97d9a9b56344521f3dbb16e2c40d799e"
+  integrity sha512-hQtw1gg8n6ERK1UH47F7ZI1zOsbhu0J2VX+TrnkpaQR2FgxDW1oe9Ja6oCV4CQKuR4w+1ZI/Kj4imSt0K33kEw==
+  dependencies:
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+
+"@sentry-internal/replay-canvas@8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-8.26.0.tgz#005e4ebed631d0e505e117d42ae8bc64748628d1"
+  integrity sha512-2CFQW6f9aJHIo/DqmqYa9PaYoLn1o36ywc0h8oyGrD4oPCbrnE5F++PmTdc71GBODu41HBn/yoCTLmxOD+UjpA==
+  dependencies:
+    "@sentry-internal/replay" "8.26.0"
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+
+"@sentry-internal/replay@8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-8.26.0.tgz#7d01b1915343bf8ca3d9ef7500994d4a45f3785e"
+  integrity sha512-JDY7W2bswlp5c3483lKP4kcb75fHNwGNfwD8x8FsY9xMjv7nxeXjLpR5cCEk1XqPq2+n6w4j7mJOXhEXGiUIKg==
+  dependencies:
+    "@sentry-internal/browser-utils" "8.26.0"
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+
+"@sentry/browser@8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-8.26.0.tgz#749508ca8d1da857930f41430eb3a77102712f46"
+  integrity sha512-e5s6eKlwLZWzTwQcBwqyAGZMMuQROW9Z677VzwkSyREWAIkKjfH2VBxHATnNGc0IVkNHjD7iH3ixo3C0rLKM3w==
+  dependencies:
+    "@sentry-internal/browser-utils" "8.26.0"
+    "@sentry-internal/feedback" "8.26.0"
+    "@sentry-internal/replay" "8.26.0"
+    "@sentry-internal/replay-canvas" "8.26.0"
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+
 "@sentry/core@8.26.0":
   version "8.26.0"
   resolved "https://registry.yarnpkg.com/@sentry/core/-/core-8.26.0.tgz#0673a9e2c5b699cf1bde1ed073a345cc393577da"
@@ -1245,6 +1296,17 @@
     "@sentry/utils" "8.26.0"
     detect-libc "^2.0.2"
     node-abi "^3.61.0"
+
+"@sentry/react@^8.26.0":
+  version "8.26.0"
+  resolved "https://registry.yarnpkg.com/@sentry/react/-/react-8.26.0.tgz#b4e72b9759fbf7d3c5ed37bb5ceb2e94b0d10fd1"
+  integrity sha512-dYoC0xzcqq8zmNMFoTWidhA7mVd3RDz/nAUn6C8yK/hkKA7bUknYCkhpESGLZfHaGwSKzeXRXKd/o/cgUVM9eA==
+  dependencies:
+    "@sentry/browser" "8.26.0"
+    "@sentry/core" "8.26.0"
+    "@sentry/types" "8.26.0"
+    "@sentry/utils" "8.26.0"
+    hoist-non-react-statics "^3.3.2"
 
 "@sentry/types@8.26.0":
   version "8.26.0"
@@ -2794,6 +2856,13 @@ he@1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
+hoist-non-react-statics@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
+  integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
+  dependencies:
+    react-is "^16.7.0"
+
 http-errors@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-2.0.0.tgz#b7774a1486ef73cf7667ac9ae0858c012c57b9d3"
@@ -3564,7 +3633,7 @@ react-dom@^18.3.1:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
-react-is@^16.13.1:
+react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==

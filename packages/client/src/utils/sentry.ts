@@ -8,10 +8,7 @@ export const initSentry = () => {
       Sentry.replayIntegration(),
     ],
     tracesSampleRate: 1.0,
-    tracePropagationTargets: [
-      "localhost",
-      /^https:\/\/check-my-pr-nameless-river-2056\.fly\.dev\/api/,
-    ],
+    tracePropagationTargets: ["localhost"],
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
 

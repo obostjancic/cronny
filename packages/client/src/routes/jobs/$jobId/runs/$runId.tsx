@@ -1,4 +1,4 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useGetRuns } from "../../../../api/useGetRuns";
 import { JsonInput, Table } from "@mantine/core";
 import { formatJSON } from "../../../../utils/json";
