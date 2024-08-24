@@ -14,7 +14,7 @@ function processArticles(articles) {
         .map((article) => ({
         id: article.guid,
         title: article.title,
-        link: article.link,
+        url: article.link,
         date: new Date(article.pubDate).toISOString(),
         content: article.content,
     }));

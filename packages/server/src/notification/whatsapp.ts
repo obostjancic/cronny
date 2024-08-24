@@ -16,7 +16,7 @@ export async function sendWhatsappMessage(
     apikey: getEnv("WHATSAPP_API_KEY"),
   });
 
-  if (!isProd && false) {
+  if (!isProd) {
     logger.debug("Skipping sending message", params.toString());
     return;
   }

@@ -33,7 +33,11 @@ export async function updateRun(id, run) {
     return updatedRuns[0];
 }
 export async function getJobRuns(jobId) {
-    return db.select().from(runs).where(eq(runs.jobId, jobId));
+    return db
+        .select()
+        .from(runs)
+        .where(eq(runs.jobId, jobId))
+        .orderBy(desc(runs.start));
 }
 export async function getLastRun(jobId) {
     const savedRuns = await db

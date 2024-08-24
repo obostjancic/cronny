@@ -2,6 +2,7 @@ import { getPreviousRun } from "../db/schema.js";
 import { notifyLogFile } from "./log-file.js";
 import logger from "../utils/logger.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
+import { getEnv } from "../utils/env.js";
 export async function notifyRun(run) {
     if (run.status === "success" && run.config.notify?.onSuccess) {
         logger.debug(`Notifying on success for ${run.config.name}`);
@@ -21,12 +22,20 @@ async function notifySuccess(run) {
             logger.debug(`${run.config.name}: No new results found!`);
             return;
         }
-        const message = `${run.config.name}: ${resultDiff.length} new results found!`;
-        await notify({ transport, params, message, results: resultDiff });
+        await notify({
+            transport,
+            params,
+            message: constructMessage(run),
+            results: resultDiff,
+        });
     }
     else {
-        const message = `${run.config.name}: ${run.results?.length ?? 0} results found!`;
-        await notify({ transport, params, message, results: run.results });
+        await notify({
+            transport,
+            params,
+            message: constructMessage(run),
+            results: run.results,
+        });
     }
 }
 async function notifyFailure(run) {
@@ -59,4 +68,11 @@ async function notify({ transport, params, results, message, }) {
         default:
             logger.error(`Unsupported transport: ${transport}`);
     }
+}
+function constructMessage(run) {
+    const resultsCount = run.results?.length ?? 0;
+    return `${run.config.name}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+}
+function getRunResultsUrl(run) {
+    return `${getEnv("BASE_URL")}/jobs/${run.jobId}/runs/${run.id}`;
 }
