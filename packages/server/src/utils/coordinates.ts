@@ -30,3 +30,23 @@ export function isWithinRadius(
 ): boolean {
   return distance(center, target) <= radius;
 }
+
+export function isWithinPolygon(
+  polygon: Coordinates[],
+  target: Coordinates
+): boolean {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i][0];
+    const yi = polygon[i][1];
+    const xj = polygon[j][0];
+    const yj = polygon[j][1];
+    const intersect =
+      yi > target[1] !== yj > target[1] &&
+      target[0] < ((xj - xi) * (target[1] - yi)) / (yj - yi) + xi;
+    if (intersect) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
