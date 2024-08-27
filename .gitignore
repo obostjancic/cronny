@@ -12,4 +12,4 @@ packages/server/.data
 packages/server/.data/gist.log
 packages/server/.data/schedule.json
 packages/server/.data/sqlite.db
-# packages/server/dist
+packages/server/dist
