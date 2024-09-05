@@ -16,7 +16,10 @@ function JobDetails() {
 
   return (
     <Container fluid>
-      <h1>Job {jobId}</h1>
+      <Flex gap="md" pb="xs" align="center" justify="space-between">
+        <h3>Job {jobId}</h3>
+        <a href="/">Jobs</a>
+      </Flex>
       <Table stickyHeader striped highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
@@ -32,7 +35,7 @@ function JobDetails() {
             <ExpandableRow
               key={run.id}
               details={
-                <Flex gap="md" direction="column">
+                <Flex gap="md" p="xs" direction="column">
                   <CodeHighlight
                     withCopyButton
                     language="json"

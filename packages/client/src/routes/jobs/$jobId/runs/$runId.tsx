@@ -22,14 +22,14 @@ function RunDetails() {
   return (
     <Container fluid>
       <h3>
-        Run {run.id} of job {jobId}
+        Run {run.id} of job <a href={`/jobs/${jobId}/runs`}>{jobId}</a>
       </h3>
-      <Flex gap="md">
+      <Flex gap="md" pb="xs" align="center" justify="space-between">
         <div>Start: {formatDateTime(run.start)}</div>
         <div>Duration {formatDuration(run.start, run.end)}</div>
         <div>Status: {run.status}</div>
       </Flex>
-      <Flex gap="md">
+      <Flex gap="md" pt="xs">
         <Table stickyHeader striped highlightOnHover withTableBorder>
           <Table.Thead>
             <Table.Tr>
