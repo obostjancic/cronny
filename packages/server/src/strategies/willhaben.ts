@@ -25,7 +25,8 @@ export async function run(params: WillhabenParams): Promise<WillhabenResult[]> {
 async function fetchWillhabenSearch({
   url,
 }: WillhabenParams): Promise<WillhabenResult[]> {
-  const html = await fetchHtml(url);
+  const extendedUrl = `${url}&rows=100`;
+  const html = await fetchHtml(extendedUrl);
   return extractResultList(html);
 }
 
