@@ -52,7 +52,8 @@ export async function getJobRuns(jobId: string): Promise<Run[]> {
     .select()
     .from(runs)
     .where(eq(runs.jobId, jobId))
-    .orderBy(desc(runs.start));
+    .orderBy(desc(runs.start))
+    .limit(100);
 }
 
 export async function getLastRun(jobId: string): Promise<Run | undefined> {

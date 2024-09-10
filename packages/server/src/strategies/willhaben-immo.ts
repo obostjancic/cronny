@@ -4,6 +4,9 @@ import {
   parseCoordinates,
 } from "../utils/coordinates.js";
 import { run as fetchWillhabenResults } from "./willhaben.js";
+import { createLogger } from "../utils/logger.js";
+
+const logger = createLogger("willhaben-immo");
 
 type WillhabenImmoParams =
   | {
@@ -51,8 +54,9 @@ async function fetchWillhabenImmoSearch({
       url: `https://www.willhaben.at/iad/object?adId=${result.id}`,
     };
   });
+  logger.debug(`Found ${flatResults.length} results`);
 
-  return flatResults.filter((result) => {
+  const filtered = flatResults.filter((result) => {
     if (!result.coords || typeof result.coords !== "string") {
       return false;
     }
@@ -68,4 +72,7 @@ async function fetchWillhabenImmoSearch({
       return isWithinPolygon(coordParams.points, parsedCoords);
     }
   });
+
+  logger.debug(`Filtered to ${filtered.length} results`);
+  return filtered;
 }

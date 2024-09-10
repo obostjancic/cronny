@@ -20,6 +20,7 @@ function Index() {
             <Table.Th>Id</Table.Th>
             <Table.Th>Name</Table.Th>
             <Table.Th>Strategy</Table.Th>
+            <Table.Th>Enabled</Table.Th>
             <Table.Th>Schedule</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -38,11 +39,12 @@ function Index() {
             >
               <Table.Td>
                 <Link to={`/jobs/${job.jobId}/runs`} key={job.jobId}>
-                  {job.jobId}
+                {job.jobId}
                 </Link>
               </Table.Td>
               <Table.Td>{job.name}</Table.Td>
               <Table.Td>{job.strategy}</Table.Td>
+              <Table.Td>{job.enabled ? "✔️" : "x"}</Table.Td>
               <Table.Td>
                 {job.cron} {job.interval}
               </Table.Td>

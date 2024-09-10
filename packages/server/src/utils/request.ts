@@ -21,3 +21,32 @@ export const retry = async <T>(
     return retry(fn, { retries: retries - 1, delay: delay * backoff, backoff });
   }
 };
+
+export async function fetchURL(
+  url: string,
+  opts: RequestInit = {}
+): Promise<Response> {
+  return retry(() => fetch(url, opts));
+}
+
+export async function fetchMultiplePages<T>(
+  url: string,
+  fetchPageFunction: (url: string, page: number) => Promise<T[]>,
+  maxRows: number,
+  maxPages = 10
+): Promise<T[]> {
+  const allResults: T[] = [];
+  let page = 1;
+  let results: T[] = await fetchPageFunction(url, page);
+  allResults.push(...results);
+  console.log(`Found ${results.length} results on page ${page}`);
+
+  while (results.length === maxRows && page < maxPages) {
+    page += 1;
+    results = await fetchPageFunction(url, page);
+    allResults.push(...results);
+    console.log(`Found ${results.length} results on page ${page}`);
+  }
+
+  return allResults;
+}

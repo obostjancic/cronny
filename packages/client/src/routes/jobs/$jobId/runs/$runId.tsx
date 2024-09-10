@@ -19,6 +19,10 @@ function RunDetails() {
     return <div>Run not found</div>;
   }
 
+  if (!run.results) {
+    return <div>No results</div>;
+  }
+
   return (
     <Container fluid>
       <h3>
@@ -38,30 +42,32 @@ function RunDetails() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {run.results?.map((result) => (
-              <ExpandableRow
-                key={result.id as string}
-                details={
-                  <CodeHighlight
-                    withCopyButton
-                    language="json"
-                    code={formatJSON(result)}
-                    contentEditable={false}
-                  />
-                }
-              >
-                <Table.Td>{`${result["title"]}`}</Table.Td>
-                <Table.Td>
-                  <a
-                    href={(result.url as string) ?? "#"}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Link
-                  </a>
-                </Table.Td>
-              </ExpandableRow>
-            ))}
+            {run.results
+              .sort((a, b) => (a["title"]! > b["title"]! ? 1 : -1))
+              .map((result) => (
+                <ExpandableRow
+                  key={result.id as string}
+                  details={
+                    <CodeHighlight
+                      withCopyButton
+                      language="json"
+                      code={formatJSON(result)}
+                      contentEditable={false}
+                    />
+                  }
+                >
+                  <Table.Td>{`${result["title"]}`}</Table.Td>
+                  <Table.Td>
+                    <a
+                      href={(result.url as string) ?? "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Link
+                    </a>
+                  </Table.Td>
+                </ExpandableRow>
+              ))}
           </Table.Tbody>
         </Table>
       </Flex>
