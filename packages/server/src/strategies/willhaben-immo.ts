@@ -7,6 +7,7 @@ import { run as fetchWillhabenResults } from "./willhaben.js";
 import { createLogger } from "../utils/logger.js";
 import { JSONValue } from "@cronny/types";
 import { fi } from "date-fns/locale";
+import { is } from "drizzle-orm";
 
 const logger = createLogger("willhaben-immo");
 
@@ -76,17 +77,40 @@ async function fetchWillhabenImmoSearch({
         return true;
       }
       return filters.every((filter) => {
-        if (Array.isArray(filter.value)) {
-          const isMatch = filter.value.includes(result[filter.prop]);
-          return filter.negate ? !isMatch : isMatch;
-        }
-        const isMatch = result[filter.prop] === filter.value;
+        const isMatch = matchFilter(result, filter);
         return filter.negate ? !isMatch : isMatch;
       });
     });
 
   logger.debug(`Filtered to ${filtered.length} results`);
   return filtered;
+}
+
+function matchFilter(result: WillhabenImmoResult, filter: DataFilter): boolean {
+  const lhs = `${result[filter.prop]}`.trim().toLowerCase();
+  let rhs = filter.value;
+
+  if (!rhs) {
+    return true;
+  }
+
+  if (Array.isArray(rhs)) {
+    return rhs.some((r) => matchFilter(result, { ...filter, value: r }));
+  }
+
+  rhs = `${rhs}`.toString().trim().toLowerCase();
+
+  if (rhs.startsWith("%") && rhs.endsWith("%")) {
+    return lhs.includes(rhs.slice(1, -1));
+  }
+  if (rhs.startsWith("%")) {
+    return lhs.endsWith(rhs.slice(1));
+  }
+  if (rhs.endsWith("%")) {
+    return lhs.startsWith(rhs.slice(0, -1));
+  }
+
+  return lhs === rhs;
 }
 
 function isWithinArea(
