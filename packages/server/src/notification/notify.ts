@@ -6,20 +6,25 @@ import { notifyLogFile } from "./log-file.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
 import { getPreviousRun } from "../db/run.js";
 
-export async function notifyRun(run: Run, notify: Notify): Promise<void> {
+export async function notifyRun(
+  run: Run,
+  jobName: string,
+  notify: Notify
+): Promise<void> {
   if (run.status === "success" && notify?.onSuccess) {
-    logger.debug(`Notifying on success for ${run.jobId}`);
-    await notifySuccess(run, notify.onSuccess!);
+    logger.debug(`Notifying on success for ${run.id} of job ${jobName}`);
+    await notifySuccess(run, jobName, notify.onSuccess!);
   }
 
   if (run.status === "failure" && notify?.onFailure) {
-    logger.debug(`Notifying on failure for ${run.jobId}`);
-    await notifyFailure(run, notify.onFailure!);
+    logger.debug(`Notifying on failure for ${run.id} of job ${jobName}`);
+    await notifyFailure(run, jobName, notify.onFailure!);
   }
 }
 
 async function notifySuccess(
   run: Run,
+  jobName: string,
   config: NotificationConfig
 ): Promise<void> {
   const { transport, params, onResultChangeOnly } = config;
@@ -34,21 +39,21 @@ async function notifySuccess(
         )
     );
     if (!resultDiff || resultDiff.length === 0) {
-      logger.debug(`${run.jobId}: No new results found!`);
+      logger.debug(`${jobName}: No new results found!`);
       return;
     }
 
     await notify({
       transport,
       params,
-      message: constructMessage(run),
+      message: constructMessage(run, jobName),
       results: resultDiff,
     });
   } else {
     await notify({
       transport,
       params,
-      message: constructMessage(run),
+      message: constructMessage(run, jobName),
       results: run.results,
     });
   }
@@ -56,11 +61,12 @@ async function notifySuccess(
 
 async function notifyFailure(
   run: Run,
+  jobName: string,
   config: NotificationConfig
 ): Promise<void> {
   const { transport, params } = config;
 
-  const message = `${run.jobId} failed!`;
+  const message = `Run ${run.id} of job ${jobName} failed!`;
 
   await notify({ transport, params, message, results: null });
 }
@@ -103,10 +109,10 @@ async function notify({
   }
 }
 
-function constructMessage(run: Run): string {
+function constructMessage(run: Run, jobName: string): string {
   const resultsCount = run.results?.length ?? 0;
 
-  return `${run.jobId}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+  return `${jobName}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
 }
 
 function getRunResultsUrl(run: Run): string {

@@ -25,7 +25,7 @@ function RunDetails() {
   return (
     <Container fluid>
       <h3>
-        Run {run.id} of job <a href={`/jobs/${jobId}/runs`}>{jobId}</a>
+        Run {run.id} of job <a href={`/jobs/${jobId}`}>{jobId}</a>
       </h3>
       <Flex gap="md" pb="xs" align="center" justify="space-between">
         <div>Start: {formatDateTime(run.start)}</div>

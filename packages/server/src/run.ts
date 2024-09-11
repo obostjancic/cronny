@@ -16,7 +16,7 @@ export async function executeRun(job: Job, runner: Runner): Promise<void> {
     run = await finishRun(run.id, results);
   }
   if (job.notify) {
-    notifyRun(run, job.notify);
+    notifyRun(run, job.name, job.notify);
   }
 }
 
