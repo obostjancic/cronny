@@ -1,30 +1,20 @@
-import logger from "./utils/logger.js";
 import { cron } from "./cron.js";
-import { executeRun } from "./run.js";
-import { JobConfig, Runner } from "@cronny/types";
-import { getSchedule } from "./db/schema.js";
-
-function scheduleRun(config: JobConfig, runner: Runner): void {
-  if (config.cron) {
-    cron(config, runner);
-  } else {
-    setInterval(() => executeRun(config, runner), config.interval);
-  }
-}
+import { getJobs } from "./db/job.js";
+import logger from "./utils/logger.js";
 
 export async function scheduleRuns(): Promise<void> {
-  const schedule = await getSchedule();
+  const jobs = await getJobs();
 
-  for (const config of schedule) {
-    if (!config.enabled) {
-      logger.debug(`Skipping ${config.jobId} - disabled`);
+  for (const job of jobs) {
+    if (!job.enabled) {
+      logger.debug(`Skipping ${job.name} - disabled`);
       continue;
     }
-    logger.debug(`Scheduling ${config.jobId}`);
-    const strategyModule = await import(`./strategies/${config.strategy}.js`);
+    logger.debug(`Scheduling ${job.name}`);
+    const strategyModule = await import(`./strategies/${job.strategy}.js`);
 
     if (strategyModule && strategyModule.run) {
-      scheduleRun(config, strategyModule.run);
+      cron(job, strategyModule.run);
     }
   }
 }

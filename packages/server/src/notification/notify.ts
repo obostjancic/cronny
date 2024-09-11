@@ -1,29 +1,31 @@
-import { getLastRun, getPreviousRun } from "../db/schema.js";
-import { NotificationConfig, Run, JSONObject } from "@cronny/types";
+import { JSONObject, NotificationConfig, Notify, Run } from "@cronny/types";
 
-import { notifyLogFile } from "./log-file.js";
-import logger from "../utils/logger.js";
-import { sendWhatsappMessage } from "./whatsapp.js";
 import { getEnv } from "../utils/env.js";
+import logger from "../utils/logger.js";
+import { notifyLogFile } from "./log-file.js";
+import { sendWhatsappMessage } from "./whatsapp.js";
+import { getPreviousRun } from "../db/run.js";
 
-export async function notifyRun(run: Run): Promise<void> {
-  if (run.status === "success" && run.config.notify?.onSuccess) {
-    logger.debug(`Notifying on success for ${run.config.name}`);
-    await notifySuccess(run);
+export async function notifyRun(run: Run, notify: Notify): Promise<void> {
+  if (run.status === "success" && notify?.onSuccess) {
+    logger.debug(`Notifying on success for ${run.jobId}`);
+    await notifySuccess(run, notify.onSuccess!);
   }
 
-  if (run.status === "failure" && run.config.notify?.onFailure) {
-    logger.debug(`Notifying on failure for ${run.config.name}`);
-    await notifyFailure(run);
+  if (run.status === "failure" && notify?.onFailure) {
+    logger.debug(`Notifying on failure for ${run.jobId}`);
+    await notifyFailure(run, notify.onFailure!);
   }
 }
 
-async function notifySuccess(run: Run): Promise<void> {
-  const { transport, params, onResultChangeOnly } =
-    run.config.notify!.onSuccess!;
+async function notifySuccess(
+  run: Run,
+  config: NotificationConfig
+): Promise<void> {
+  const { transport, params, onResultChangeOnly } = config;
 
   if (onResultChangeOnly) {
-    const prevRun = await getPreviousRun(run.config.jobId);
+    const prevRun = await getPreviousRun(run.jobId);
 
     const resultDiff = run.results?.filter(
       (result) =>
@@ -32,7 +34,7 @@ async function notifySuccess(run: Run): Promise<void> {
         )
     );
     if (!resultDiff || resultDiff.length === 0) {
-      logger.debug(`${run.config.name}: No new results found!`);
+      logger.debug(`${run.jobId}: No new results found!`);
       return;
     }
 
@@ -52,10 +54,13 @@ async function notifySuccess(run: Run): Promise<void> {
   }
 }
 
-async function notifyFailure(run: Run): Promise<void> {
-  const { transport, params } = run.config.notify!.onFailure!;
+async function notifyFailure(
+  run: Run,
+  config: NotificationConfig
+): Promise<void> {
+  const { transport, params } = config;
 
-  const message = `${run.config.name} failed!`;
+  const message = `${run.jobId} failed!`;
 
   await notify({ transport, params, message, results: null });
 }
@@ -101,7 +106,7 @@ async function notify({
 function constructMessage(run: Run): string {
   const resultsCount = run.results?.length ?? 0;
 
-  return `${run.config.name}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+  return `${run.jobId}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
 }
 
 function getRunResultsUrl(run: Run): string {

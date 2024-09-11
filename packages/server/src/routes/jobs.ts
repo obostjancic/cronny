@@ -1,38 +1,29 @@
 import { Request, Response } from "express";
-import {
-  getJob,
-  getJobRuns,
-  getLastRun,
-  getRun,
-  getSchedule,
-} from "../db/schema.js";
+
 import AsyncRouter from "./router.js";
+import { getJob, getJobs } from "../db/job.js";
+import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 
 const router = AsyncRouter();
 
 router.get("/", async (_: Request, res: Response) => {
-  const jobs = await getSchedule();
+  const jobs = await getJobs();
   res.json(jobs);
 });
 
-router.get("/:jobId", async (req: Request, res: Response) => {
-  const job = await getJob(req.params.jobId);
-  res.json(job);
+router.get("/:id", async (req: Request, res: Response) => {
+  const job = await getJob(+req.params.id);
+  const runs = await getJobRuns(+req.params.id);
+  res.json({ ...job, runs });
 });
 
-router.get("/:jobId/runs", async (req: Request, res: Response) => {
-  const runs = await getJobRuns(req.params.jobId);
-  res.json(runs);
-});
-
-router.get("/:jobId/runs/:runId", async (req: Request, res: Response) => {
+router.get("/:id/runs/:runId", async (req: Request, res: Response) => {
   if (req.params.runId === "latest") {
-    const run = await getLastRun(req.params.jobId);
+    const run = await getLastRun(+req.params.id);
     res.json(run);
     return;
   }
-  const run = await getRun(+req.params.jobId);
-
+  const run = await getRun(+req.params.runId);
   res.json(run);
 });
 

@@ -1,10 +1,10 @@
 import { CodeHighlight } from "@mantine/code-highlight";
 import { Container, Flex, Table } from "@mantine/core";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useGetRuns } from "../../../../api/useGetRuns";
+import { useGetRun } from "../../../../api/useGetRun";
+import { ExpandableRow } from "../../../../components/ExpandableRow";
 import { formatDateTime, formatDuration } from "../../../../utils/date/date";
 import { formatJSON } from "../../../../utils/json";
-import { ExpandableRow } from "../../../../components/ExpandableRow";
 
 export const Route = createFileRoute("/jobs/$jobId/runs/$runId")({
   component: () => <RunDetails />,
@@ -12,8 +12,7 @@ export const Route = createFileRoute("/jobs/$jobId/runs/$runId")({
 
 function RunDetails() {
   const { jobId, runId } = useParams({ from: "/jobs/$jobId/runs/$runId" });
-  const runs = useGetRuns(jobId);
-  const run = runs.data?.find((run) => run.id === Number(runId));
+  const { data: run } = useGetRun(jobId, runId);
 
   if (!run) {
     return <div>Run not found</div>;

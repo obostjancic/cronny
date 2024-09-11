@@ -1,21 +1,20 @@
+import { Job } from "@cronny/types/Job";
 import { useSuspenseQuery, type QueryOptions } from "@tanstack/react-query";
-import { fetchJson } from "./utils";
 import { queryClient } from "../utils/queryClient";
-import { JobConfig } from "@cronny/types/Job";
+import { fetchJson } from "./utils";
 
-// eslint-disable-next-line react-refresh/only-export-components
-const ENDPOINT = "/api/jobs";
+const getQueryKey = () => [`/api/jobs`];
 
-export function useGetJobs(options?: QueryOptions<JobConfig[], Error>) {
-  return useSuspenseQuery<JobConfig[], Error>({
-    queryKey: [ENDPOINT],
+export function useGetJobs(options?: QueryOptions<Job[], Error>) {
+  return useSuspenseQuery<Job[], Error>({
+    queryKey: getQueryKey(),
     queryFn: async () => {
-      return await fetchJson(ENDPOINT);
+      return await fetchJson(getQueryKey()[0]);
     },
     ...options,
   });
 }
 
 export async function invalidateGetJobs() {
-  await queryClient.invalidateQueries({ queryKey: [ENDPOINT] });
+  await queryClient.invalidateQueries({ queryKey: getQueryKey() });
 }

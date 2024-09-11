@@ -1,18 +1,20 @@
 import { Container, Flex, Table } from "@mantine/core";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useGetRuns } from "../../../../api/useGetRuns";
-import { formatDateTime, formatDuration } from "../../../../utils/date/date";
-import { ExpandableRow } from "../../../../components/ExpandableRow";
+import { useGetJob } from "../../../api/useGetJob";
+import { formatDateTime, formatDuration } from "../../../utils/date/date";
+import { ExpandableRow } from "../../../components/ExpandableRow";
 import { CodeHighlight } from "@mantine/code-highlight";
-import { formatJSON } from "../../../../utils/json";
+import { formatJSON } from "../../../utils/json";
 
-export const Route = createFileRoute("/jobs/$jobId/runs/")({
+export const Route = createFileRoute("/jobs/$jobId/")({
   component: () => <JobDetails />,
 });
 
 function JobDetails() {
-  const { jobId } = useParams({ from: "/jobs/$jobId/runs/" });
-  const runs = useGetRuns(jobId);
+  const { jobId } = useParams({ from: "/jobs/$jobId/" });
+  const {
+    data: { runs, ...job },
+  } = useGetJob(jobId);
 
   return (
     <Container fluid>
@@ -31,7 +33,7 @@ function JobDetails() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {runs.data?.map((run) => (
+          {runs.map((run) => (
             <ExpandableRow
               key={run.id}
               details={
@@ -39,7 +41,7 @@ function JobDetails() {
                   <CodeHighlight
                     withCopyButton
                     language="json"
-                    code={formatJSON(run.config)}
+                    code={formatJSON(job)}
                     contentEditable={false}
                   />
                   <CodeHighlight

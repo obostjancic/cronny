@@ -20,7 +20,7 @@ export function parseURLParams(url: string) {
 
 export function replaceURLParams(
   url: string,
-  params: Record<string, string | number | string[] | number[]>
+  params: Record<string, number | string | string[] | number[]>
 ): string {
   const existingParams = parseURLParams(url);
 

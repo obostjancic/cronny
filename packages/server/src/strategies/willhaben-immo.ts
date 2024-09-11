@@ -5,19 +5,30 @@ import {
 } from "../utils/coordinates.js";
 import { run as fetchWillhabenResults } from "./willhaben.js";
 import { createLogger } from "../utils/logger.js";
+import { JSONValue } from "@cronny/types";
+import { fi } from "date-fns/locale";
 
 const logger = createLogger("willhaben-immo");
 
-type WillhabenImmoParams =
+type LocationParams =
   | {
-      url: string;
       center: [number, number];
       radius: number;
     }
   | {
-      url: string;
       points: [number, number][];
     };
+
+// allows filtering by a prop of the result, and negation
+type DataFilter = {
+  prop: keyof WillhabenImmoResult;
+  value: JSONValue;
+  negate?: boolean;
+};
+
+type WillhabenImmoParams = {
+  url: string;
+} & LocationParams & { filters?: DataFilter[] };
 
 type WillhabenImmoResult = {
   id: string;
@@ -36,7 +47,8 @@ export async function run(params: WillhabenImmoParams) {
 
 async function fetchWillhabenImmoSearch({
   url,
-  ...coordParams
+  filters,
+  ...locationParams
 }: WillhabenImmoParams) {
   const genericResults = await fetchWillhabenResults({ url });
 
@@ -56,23 +68,47 @@ async function fetchWillhabenImmoSearch({
   });
   logger.debug(`Found ${flatResults.length} results`);
 
-  const filtered = flatResults.filter((result) => {
-    if (!result.coords || typeof result.coords !== "string") {
-      return false;
-    }
+  const filtered = flatResults
+    .filter((result) => isWithinArea(result, locationParams))
 
-    const parsedCoords = parseCoordinates(result.coords);
-    if (!parsedCoords) {
-      return false;
-    }
-    if ("radius" in coordParams) {
-      const { center, radius } = coordParams;
-      return isWithinRadius(center, radius, parsedCoords);
-    } else {
-      return isWithinPolygon(coordParams.points, parsedCoords);
-    }
-  });
+    .filter((result) => {
+      if (!filters) {
+        return true;
+      }
+      return filters.every((filter) => {
+        if (Array.isArray(filter.value)) {
+          const isMatch = filter.value.includes(result[filter.prop]);
+          return filter.negate ? !isMatch : isMatch;
+        }
+        const isMatch = result[filter.prop] === filter.value;
+        return filter.negate ? !isMatch : isMatch;
+      });
+    });
 
   logger.debug(`Filtered to ${filtered.length} results`);
   return filtered;
+}
+
+function isWithinArea(
+  result: WillhabenImmoResult,
+  locationParams: LocationParams
+) {
+  if (!locationParams) {
+    return true;
+  }
+
+  if (!result.coords || typeof result.coords !== "string") {
+    return false;
+  }
+
+  const parsedCoords = parseCoordinates(result.coords);
+  if (!parsedCoords) {
+    return false;
+  }
+  if ("radius" in locationParams) {
+    const { center, radius } = locationParams;
+    return isWithinRadius(center, radius, parsedCoords);
+  } else {
+    return isWithinPolygon(locationParams.points, parsedCoords);
+  }
 }

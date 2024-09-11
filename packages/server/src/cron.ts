@@ -1,20 +1,16 @@
 // import * as Sentry from "@sentry/node";
 import { CronJob } from "cron";
 import { executeRun } from "./run.js";
-import { JobConfig, Runner } from "@cronny/types";
+import { Job, Runner } from "@cronny/types";
 
-export function cron(config: JobConfig, runner: Runner): CronJob {
-  if (!config.cron) {
-    throw new Error("Cron job must have a cron property");
-  }
-
+export function cron(job: Job, runner: Runner): CronJob {
   // const CronJobWithCheckIn = Sentry.cron.instrumentCron(CronJob, config.id);
   const CronJobWithCheckIn = CronJob;
 
   return CronJobWithCheckIn.from({
-    cronTime: config.cron,
+    cronTime: job.cron,
     onTick: function () {
-      executeRun(config, runner);
+      executeRun(job, runner);
     },
     start: true,
   });

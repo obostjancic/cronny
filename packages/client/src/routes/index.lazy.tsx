@@ -27,7 +27,7 @@ function Index() {
         <Table.Tbody>
           {job.data?.map((job) => (
             <ExpandableRow
-              key={job.jobId}
+              key={job.id}
               details={
                 <CodeHighlight
                   withCopyButton
@@ -38,16 +38,14 @@ function Index() {
               }
             >
               <Table.Td>
-                <Link to={`/jobs/${job.jobId}/runs`} key={job.jobId}>
-                {job.jobId}
+                <Link to={`/jobs/${job.id}`} key={job.id}>
+                  {job.id}
                 </Link>
               </Table.Td>
               <Table.Td>{job.name}</Table.Td>
               <Table.Td>{job.strategy}</Table.Td>
               <Table.Td>{job.enabled ? "✔️" : "x"}</Table.Td>
-              <Table.Td>
-                {job.cron} {job.interval}
-              </Table.Td>
+              <Table.Td>{job.cron}</Table.Td>
             </ExpandableRow>
           ))}
         </Table.Tbody>

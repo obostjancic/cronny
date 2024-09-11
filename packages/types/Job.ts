@@ -1,40 +1,41 @@
 import type { JSONObject } from "./JSON.js";
 
-type JobConfigBase = {
-  jobId: string;
+export type UnsavedJob = {
+  id?: number;
   strategy: string;
   name: string;
-  enabled?: boolean;
-  params?: JSONObject;
-  notify?: {
-    onSuccess?: NotificationConfig & { onResultChangeOnly: boolean };
-    onFailure?: NotificationConfig;
-  };
+  enabled: boolean;
+  cron: string;
+  params: JSONObject | null;
+  notify: Notify | null;
 };
+
+export type Notify = {
+  onSuccess?: NotificationConfig;
+  onFailure?: NotificationConfig;
+};
+
+export type Job = UnsavedJob & { id: number };
 
 export type NotificationConfig = {
   transport: "file" | "email" | "slack" | "telegram" | "whatsapp" | "webhook";
   params: JSONObject;
+  onResultChangeOnly?: boolean;
 };
 
-export type JobConfig =
-  | (JobConfigBase & {
-      cron: string;
-      interval?: never;
-    })
-  | (JobConfigBase & {
-      interval: number;
-      cron?: never;
-    });
-
-export type Run<T = JSONObject> = {
+export type UnsavedRun<T = JSONObject> = {
   id?: number;
-  jobId: string;
+  jobId: number;
   start: string;
   end: string | null;
   status: "running" | "success" | "failure";
-  config: JobConfig;
   results: T[] | null;
 };
 
-export type Runner<T = any> = (params?: JSONObject) => Promise<T[] | null>;
+export type Run = UnsavedRun & { id: number };
+
+export type JobWithRuns = Job & { runs: Run[] };
+
+export type Runner<T = any> = (
+  params: JSONObject | null
+) => Promise<T[] | null>;

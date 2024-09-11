@@ -1,44 +1,38 @@
-import { SavedRun, saveRun, updateRun } from "./db/schema.js";
+import { Job, Run, Runner } from "@cronny/types";
+import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
-import { JobConfig, Runner } from "@cronny/types";
 import { iso } from "./utils/date.js";
 import logger from "./utils/logger.js";
 
-export async function executeRun(
-  config: JobConfig,
-  runner: Runner
-): Promise<void> {
-  let run = await startRun(config);
+export async function executeRun(job: Job, runner: Runner): Promise<void> {
+  let run = await startRun(job);
   let results = null;
   try {
-    results = await runner(run.config.params);
+    results = await runner(job.params);
   } catch (e) {
-    logger.error(`Error running job ${run.config.name}`, e);
+    logger.error(`Error running job ${job.name}`, e);
     run.results = null;
   } finally {
     run = await finishRun(run.id, results);
   }
-
-  notifyRun(run);
+  if (job.notify) {
+    notifyRun(run, job.notify);
+  }
 }
 
-async function startRun(config: JobConfig) {
-  logger.debug(`Starting run for ${config.name}`);
+async function startRun(job: Job) {
+  logger.debug(`Starting run for ${job.name}`);
 
   return saveRun({
-    jobId: config.jobId,
+    jobId: job.id,
     start: iso(),
     end: null,
     status: "running",
     results: null,
-    config: config,
   });
 }
 
-async function finishRun(
-  runId: number,
-  results: any[] | null
-): Promise<SavedRun> {
+async function finishRun(runId: number, results: any[] | null): Promise<Run> {
   const isSuccess = !!results;
 
   const savedRun = await updateRun(runId, {
