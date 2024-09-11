@@ -1,10 +1,3 @@
-import {
-  getJob,
-  getJobRuns,
-  getLastRun,
-  getRun,
-  getSchedule,
-} from "./db/schema.js";
 import "./instrument.js";
 import express, { Request, Response } from "express";
 import { scheduleRuns } from "./schedule.js";
