@@ -1,6 +1,9 @@
+import { CronJob } from "cron";
 import { cron } from "./cron.js";
 import { getJobs } from "./db/job.js";
 import logger from "./utils/logger.js";
+
+let schedule: CronJob[] = [];
 
 export async function scheduleRuns(): Promise<void> {
   const jobs = await getJobs();
@@ -14,7 +17,20 @@ export async function scheduleRuns(): Promise<void> {
     const strategyModule = await import(`./strategies/${job.strategy}.js`);
 
     if (strategyModule && strategyModule.run) {
-      cron(job, strategyModule.run);
+      schedule.push(cron(job, strategyModule.run));
     }
   }
+}
+
+function stopRuns(): void {
+  logger.debug("Stopping all scheduled jobs");
+  schedule.forEach((job) => {
+    job.stop();
+  });
+  schedule = [];
+}
+
+export function invalidateSchedule(): void {
+  stopRuns();
+  scheduleRuns();
 }

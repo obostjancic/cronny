@@ -4,6 +4,7 @@ import AsyncRouter from "./router.js";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { UnsavedJob } from "@cronny/types";
+import { invalidateSchedule } from "../schedule.js";
 
 const router = AsyncRouter();
 
@@ -21,11 +22,17 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post("/:id", async (req: Request, res: Response) => {
   const body = req.body as UnsavedJob;
   const job = await saveJob(body);
+
+  await invalidateSchedule();
+
   return res.json(job);
 });
 
 router.patch("/:id", async (req: Request, res: Response) => {
   const job = await updateJob(+req.params.id, req.body);
+
+  await invalidateSchedule();
+
   return res.json(job);
 });
 
