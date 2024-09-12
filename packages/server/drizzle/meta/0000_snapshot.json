@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "99b7a0d4-5e70-48b5-983a-00d608fdd279",
+  "id": "20319e23-5f61-48d3-9b82-82bc20744e17",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "jobs": {
@@ -101,12 +101,21 @@
           "notNull": true,
           "autoincrement": false
         },
-        "results": {
-          "name": "results",
+        "data": {
+          "name": "data",
           "type": "blob",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "blob",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
         }
       },
       "indexes": {},

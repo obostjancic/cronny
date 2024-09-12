@@ -3,6 +3,7 @@ import { createLogger } from "../utils/logger.js";
 import { fetchURL } from "../utils/request.js";
 import { fetchMultiplePages } from "../utils/request.js";
 import { replaceURLParams } from "../utils/url.js";
+import { Runner } from "@cronny/types";
 
 const MAX_ROWS = 90;
 const MAX_PAGES = 5;
@@ -26,9 +27,10 @@ type AdvertSummary = {
   attributes: { attribute: { name: string; values: string[] }[] };
 }[];
 
-export async function run(params: WillhabenParams): Promise<WillhabenResult[]> {
-  return await fetchWillhabenSearch(params);
-}
+export const run: Runner<WillhabenParams, WillhabenResult> = async (params) => {
+  const data = await fetchWillhabenSearch(params!);
+  return { data };
+};
 
 async function fetchWillhabenSearch({
   url,

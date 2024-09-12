@@ -18,7 +18,7 @@ function RunDetails() {
     return <div>Run not found</div>;
   }
 
-  if (!run.results) {
+  if (!run.data) {
     return <div>No results</div>;
   }
 
@@ -41,7 +41,7 @@ function RunDetails() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {run.results
+            {run.data
               .sort((a, b) => (a["title"]! > b["title"]! ? 1 : -1))
               .map((result) => (
                 <ExpandableRow

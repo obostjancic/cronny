@@ -1,10 +1,17 @@
-import { JSONObject, NotificationConfig, Notify, Run } from "@cronny/types";
+import {
+  JSONObject,
+  NotificationConfig,
+  Notify,
+  Run,
+  RunResult,
+} from "@cronny/types";
 
 import { getEnv } from "../utils/env.js";
 import logger from "../utils/logger.js";
 import { notifyLogFile } from "./log-file.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
 import { getPreviousRun } from "../db/run.js";
+import { diff } from "../utils/diff.js";
 
 export async function notifyRun(
   run: Run,
@@ -32,13 +39,9 @@ async function notifySuccess(
   if (onResultChangeOnly) {
     const prevRun = await getPreviousRun(run.jobId);
 
-    const resultDiff = run.results?.filter(
-      (result) =>
-        !(prevRun?.results || []).some(
-          (prevResult) => JSON.stringify(prevResult) === JSON.stringify(result)
-        )
-    );
-    if (!resultDiff || resultDiff.length === 0) {
+    const { added } = diff(prevRun?.data || [], run.data);
+
+    if (added.length === 0) {
       logger.debug(`${jobName}: No new results found!`);
       return;
     }
@@ -47,14 +50,14 @@ async function notifySuccess(
       transport,
       params,
       message: constructMessage(run, jobName),
-      results: resultDiff,
+      results: { data: added },
     });
   } else {
     await notify({
       transport,
       params,
       message: constructMessage(run, jobName),
-      results: run.results,
+      results: { data: run.data },
     });
   }
 }
@@ -68,7 +71,14 @@ async function notifyFailure(
 
   const message = `Run ${run.id} of job ${jobName} failed!`;
 
-  await notify({ transport, params, message, results: null });
+  await notify({
+    transport,
+    params,
+    message,
+    results: {
+      data: [],
+    },
+  });
 }
 
 async function notify({
@@ -79,14 +89,14 @@ async function notify({
 }: {
   transport: NotificationConfig["transport"];
   params: JSONObject;
-  results: unknown[] | null;
+  results: RunResult;
   message: string;
 }): Promise<void> {
   logger.debug(`Notifying via ${transport}`, message);
 
   switch (transport) {
     case "file":
-      notifyLogFile(params.path as string, results!);
+      notifyLogFile(params.path as string, results.data!);
       break;
     case "email":
       // sendEmail(params, message);
@@ -110,7 +120,7 @@ async function notify({
 }
 
 function constructMessage(run: Run, jobName: string): string {
-  const resultsCount = run.results?.length ?? 0;
+  const resultsCount = run.data?.length ?? 0;
 
   return `${jobName}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
 }

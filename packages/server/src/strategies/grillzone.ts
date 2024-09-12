@@ -4,6 +4,7 @@ import { de } from "date-fns/locale";
 import logger from "../utils/logger.js";
 import { sleep } from "../utils/request.js";
 import { isProd } from "../utils/env.js";
+import { Runner } from "@cronny/types";
 
 type GrillAreaParams = {
   from: Date;
@@ -11,9 +12,10 @@ type GrillAreaParams = {
   areas: number[];
 };
 
-export async function run(params: GrillAreaParams) {
-  return await fetchCurrentGrillareaState(params);
-}
+export const run: Runner<GrillAreaParams, any> = async (params) => {
+  const data = await fetchCurrentGrillareaState(params!);
+  return { data };
+};
 
 export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
   const browser = await chromium.launch({

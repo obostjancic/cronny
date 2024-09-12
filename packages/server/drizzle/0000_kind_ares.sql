@@ -14,6 +14,7 @@ CREATE TABLE `runs` (
 	`start` text NOT NULL,
 	`end` text,
 	`status` text NOT NULL,
-	`results` blob,
+	`data` blob DEFAULT '[]' NOT NULL,
+	`meta` blob DEFAULT '{}' NOT NULL,
 	FOREIGN KEY (`jobId`) REFERENCES `jobs`(`id`) ON UPDATE no action ON DELETE no action
 );

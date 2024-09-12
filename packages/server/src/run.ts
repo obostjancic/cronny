@@ -1,4 +1,11 @@
-import { Job, Run, Runner } from "@cronny/types";
+import {
+  Job,
+  JSONArray,
+  JSONObject,
+  Run,
+  Runner,
+  RunResult,
+} from "@cronny/types";
 import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
 import { iso } from "./utils/date.js";
@@ -6,14 +13,14 @@ import logger from "./utils/logger.js";
 
 export async function executeRun(job: Job, runner: Runner): Promise<void> {
   let run = await startRun(job);
-  let results = null;
+  let data = null;
   try {
-    results = await runner(job.params);
+    data = await runner(job.params);
   } catch (e) {
     logger.error(`Error running job ${job.name}`, e);
-    run.results = null;
+    run.data = [];
   } finally {
-    run = await finishRun(run.id, results);
+    run = await finishRun(run.id, data);
   }
   if (job.notify) {
     notifyRun(run, job.name, job.notify);
@@ -28,17 +35,18 @@ async function startRun(job: Job) {
     start: iso(),
     end: null,
     status: "running",
-    results: null,
+    data: [],
+    meta: undefined,
   });
 }
 
-async function finishRun(runId: number, results: any[] | null): Promise<Run> {
-  const isSuccess = !!results;
+async function finishRun(runId: number, data: RunResult | null): Promise<Run> {
+  const isSuccess = !!data;
 
   const savedRun = await updateRun(runId, {
     end: iso(),
-    results: results,
     status: isSuccess ? "success" : "failure",
+    ...data,
   });
 
   return savedRun;

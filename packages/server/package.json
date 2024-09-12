@@ -11,7 +11,7 @@
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
     "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
     "start": "node --env-file=.env dist/index.js",
-    "test": "jest"
+    "test": "vitest"
   },
   "engines": {
     "node": ">=20.6.0"
@@ -26,7 +26,8 @@
     "@types/node": "^20.14.12",
     "drizzle-kit": "^0.24.1",
     "tsx": "^4.17.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   },
   "dependencies": {
     "@sentry/node": "^8.20.0",

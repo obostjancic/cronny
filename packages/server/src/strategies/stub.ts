@@ -1,6 +1,8 @@
+import { Runner } from "@cronny/types";
 import logger from "../utils/logger.js";
 
-export async function run(params?: any) {
-  logger.log("Running stub job", params);
-  return [];
-}
+export const run: Runner = async () => {
+  logger.log("Running stub job");
+
+  return { data: [] };
+};

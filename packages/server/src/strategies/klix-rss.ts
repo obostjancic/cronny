@@ -1,6 +1,7 @@
 // @ts-ignore
 import Parser from "rss-parser";
 import logger from "../utils/logger.js";
+import { Runner } from "@cronny/types";
 
 export type Article = {
   id: string;
@@ -28,6 +29,12 @@ type RawArticle = {
   categories: { _: string; $: string }[];
 };
 
+export const run: Runner<undefined, Article> = async () => {
+  const articles = await fetchFeed();
+  const data = processArticles(articles);
+  return { data };
+};
+
 async function fetchFeed(): Promise<RawArticle[]> {
   logger.log("Fetching feed");
   // const parser = { parseURL: (url: string) => Promise.resolve({ items: [] }) };
@@ -47,9 +54,4 @@ function processArticles(articles: RawArticle[]): Article[] {
       date: new Date(article.pubDate).toISOString(),
       content: article.content,
     }));
-}
-
-export async function run() {
-  const articles = await fetchFeed();
-  return processArticles(articles);
 }

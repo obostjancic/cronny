@@ -1,4 +1,10 @@
-import { JSONObject, NotificationConfig, Notify } from "@cronny/types";
+import {
+  JSONArray,
+  JSONObject,
+  JSONValue,
+  NotificationConfig,
+  Notify,
+} from "@cronny/types";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
@@ -27,5 +33,12 @@ export const runs = sqliteTable("runs", {
   start: text("start").notNull(),
   end: text("end"),
   status: text("status").notNull().$type<"running" | "success" | "failure">(),
-  results: blob("results", { mode: "json" }).$type<JSONObject[]>(),
+  data: blob("data", { mode: "json" })
+    .notNull()
+    .$type<JSONObject[]>()
+    .default([]),
+  meta: blob("meta", { mode: "json" })
+    .notNull()
+    .$type<JSONObject>()
+    .default({}),
 });

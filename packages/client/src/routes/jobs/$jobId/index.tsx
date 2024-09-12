@@ -47,7 +47,7 @@ function JobDetails() {
                   <CodeHighlight
                     withCopyButton
                     language="json"
-                    code={formatJSON(run.results)}
+                    code={formatJSON(run.data)}
                     contentEditable={false}
                   />
                 </Flex>
@@ -61,7 +61,7 @@ function JobDetails() {
               <Table.Td>{formatDateTime(run.start)}</Table.Td>
               <Table.Td>{formatDuration(run.start, run.end)}</Table.Td>
               <Table.Td>{run.status}</Table.Td>
-              <Table.Td>{run.results?.length}</Table.Td>
+              <Table.Td>{run.data?.length}</Table.Td>
             </ExpandableRow>
           ))}
         </Table.Tbody>
