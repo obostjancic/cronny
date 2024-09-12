@@ -4,7 +4,8 @@ import AsyncRouter from "./router.js";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { UnsavedJob } from "@cronny/types";
-import { invalidateSchedule } from "../schedule.js";
+import { getRunner, invalidateSchedule } from "../schedule.js";
+import { executeRun } from "../run.js";
 
 const router = AsyncRouter();
 
@@ -44,6 +45,18 @@ router.get("/:id/runs/:runId", async (req: Request, res: Response) => {
   }
   const run = await getRun(+req.params.runId);
   return res.json(run);
+});
+
+router.post("/:id/runs/", async (req: Request, res: Response) => {
+  const job = await getJob(+req.params.id);
+  if (!job) {
+    return res.status(404).json({ error: "Job not found" });
+  }
+
+  const runner = await getRunner(job);
+  executeRun(job, runner);
+
+  return res.json({ message: "Job started" });
 });
 
 export default router;

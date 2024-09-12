@@ -2,6 +2,7 @@ import { CronJob } from "cron";
 import { cron } from "./cron.js";
 import { getJobs } from "./db/job.js";
 import logger from "./utils/logger.js";
+import { Job, Runner } from "@cronny/types";
 
 let schedule: CronJob[] = [];
 
@@ -14,12 +15,20 @@ export async function scheduleRuns(): Promise<void> {
       continue;
     }
     logger.debug(`Scheduling ${job.name}`);
-    const strategyModule = await import(`./strategies/${job.strategy}.js`);
+    const runner = await getRunner(job);
 
-    if (strategyModule && strategyModule.run) {
-      schedule.push(cron(job, strategyModule.run));
-    }
+    schedule.push(cron(job, runner));
   }
+}
+
+export async function getRunner(job: Job): Promise<Runner> {
+  const strategyModule = await import(`./strategies/${job.strategy}.js`);
+
+  if (strategyModule && strategyModule.run) {
+    return strategyModule.run;
+  }
+
+  throw new Error(`Strategy ${job.strategy} not found`);
 }
 
 function stopRuns(): void {
