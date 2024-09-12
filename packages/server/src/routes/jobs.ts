@@ -37,17 +37,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
   return res.json(job);
 });
 
-router.get("/:id/runs/:runId", async (req: Request, res: Response) => {
-  if (req.params.runId === "latest") {
-    const run = await getLastRun(+req.params.id);
-    return res.json(run);
-    return;
-  }
-  const run = await getRun(+req.params.runId);
-  return res.json(run);
-});
-
-router.post("/:id/runs/", async (req: Request, res: Response) => {
+router.post("/:id/runs", async (req: Request, res: Response) => {
   const job = await getJob(+req.params.id);
   if (!job) {
     return res.status(404).json({ error: "Job not found" });
@@ -57,6 +47,16 @@ router.post("/:id/runs/", async (req: Request, res: Response) => {
   executeRun(job, runner);
 
   return res.json({ message: "Job started" });
+});
+
+router.get("/:id/runs/:runId", async (req: Request, res: Response) => {
+  if (req.params.runId === "latest") {
+    const run = await getLastRun(+req.params.id);
+    return res.json(run);
+    return;
+  }
+  const run = await getRun(+req.params.runId);
+  return res.json(run);
 });
 
 export default router;
