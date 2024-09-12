@@ -12,7 +12,8 @@
     "debug": "concurrently \"yarn workspace @cronny/client dev\" \"yarn workspace @cronny/server debug\"",
     "build": "yarn workspace @cronny/server build && yarn workspace @cronny/client build",
     "start:prod": "yarn workspace @cronny/server migrate && yarn workspace @cronny/server start",
-    "start": "yarn start:prod"
+    "start": "yarn start:prod",
+    "test": "yarn workspace @cronny/server test"
   },
   "volta": {
     "yarn": "1.22.19",

@@ -19,7 +19,7 @@ function JobDetails() {
   return (
     <Container fluid>
       <Flex gap="md" pb="xs" align="center" justify="space-between">
-        <h3>Job {jobId}</h3>
+        <h3>Job {job.name}</h3>
         <a href="/">Jobs</a>
       </Flex>
       <Table stickyHeader striped highlightOnHover withTableBorder>

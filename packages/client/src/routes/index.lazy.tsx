@@ -37,12 +37,12 @@ function Index() {
                 />
               }
             >
+              <Table.Td>{job.id}</Table.Td>
               <Table.Td>
                 <Link to={`/jobs/${job.id}`} key={job.id}>
-                  {job.id}
+                  {job.name}
                 </Link>
               </Table.Td>
-              <Table.Td>{job.name}</Table.Td>
               <Table.Td>{job.strategy}</Table.Td>
               <Table.Td>{job.enabled ? "✔️" : "x"}</Table.Td>
               <Table.Td>{job.cron}</Table.Td>

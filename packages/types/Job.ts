@@ -1,4 +1,5 @@
-import type { JSONArray, JSONObject, JSONValue } from "./JSON.js";
+import type { JSONObject } from "./JSON.js";
+import type { Run } from "./Run.js";
 
 export type UnsavedJob = {
   id?: number;
@@ -23,23 +24,4 @@ export type NotificationConfig = {
   onResultChangeOnly?: boolean;
 };
 
-export type UnsavedRun<TResult = JSONObject> = {
-  id?: number;
-  jobId: number;
-  start: string;
-  end: string | null;
-  status: "running" | "success" | "failure";
-} & RunResult<TResult>;
-
-export type RunResult<TResult = JSONObject> = {
-  data: TResult[];
-  meta?: JSONObject;
-};
-
-export type Run = UnsavedRun & { id: number };
-
 export type JobWithRuns = Job & { runs: Run[] };
-
-export type Runner<Params = JSONObject, Result = JSONObject> = (
-  params: Params | null
-) => Promise<RunResult<Result> | null>;

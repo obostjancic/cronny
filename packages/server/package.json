@@ -8,6 +8,7 @@
     "build": "tsc",
     "migrate": "drizzle-kit migrate",
     "predev": "drizzle-kit generate && drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
     "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
     "start": "node --env-file=.env dist/index.js",
