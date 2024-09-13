@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
-import AsyncRouter from "./router.js";
+import type { UnsavedJob } from "@cronny/types";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
-import type { UnsavedJob, MarkedResultStatus } from "@cronny/types";
-import { getRunner, invalidateSchedule } from "../schedule.js";
 import { executeRun } from "../run.js";
+import { getRunner, invalidateSchedule } from "../schedule.js";
+import AsyncRouter from "./router.js";
 
 const router = AsyncRouter();
 
@@ -20,7 +20,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json({ ...job, runs });
 });
 
-router.post("/:id", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const body = req.body as UnsavedJob;
   const job = await saveJob(body);
 

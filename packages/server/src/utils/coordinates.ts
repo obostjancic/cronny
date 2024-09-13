@@ -1,4 +1,4 @@
-type Coordinates = [number, number];
+import { Coordinates } from "@cronny/types";
 
 export function parseCoordinates(coordinates: string): Coordinates | null {
   try {

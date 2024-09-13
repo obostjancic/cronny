@@ -11,7 +11,7 @@ import logger from "../utils/logger.js";
 import { notifyLogFile } from "./log-file.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
 import { getPreviousRun } from "../db/run.js";
-import { diff } from "../utils/diff.js";
+import { arrayDiff } from "../utils/diff.js";
 
 export async function notifyRun(
   run: Run,
@@ -39,7 +39,7 @@ async function notifySuccess(
   if (onResultChangeOnly) {
     const prevRun = await getPreviousRun(run.jobId);
 
-    const { added } = diff(prevRun?.data || [], run.data);
+    const { added } = arrayDiff(prevRun?.data || [], run.data);
 
     if (added.length === 0) {
       logger.debug(`${jobName}: No new results found!`);

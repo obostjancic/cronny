@@ -1,3 +1,5 @@
+import axios, { AxiosRequestConfig } from "axios";
+
 export const sleep = (ms = 250) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -21,13 +23,6 @@ export const retry = async <T>(
     return retry(fn, { retries: retries - 1, delay: delay * backoff, backoff });
   }
 };
-
-export async function fetchURL(
-  url: string,
-  opts: RequestInit = {}
-): Promise<Response> {
-  return retry(() => fetch(url, opts));
-}
 
 export async function fetchMultiplePages<T>(
   url: string,

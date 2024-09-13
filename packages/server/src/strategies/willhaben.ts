@@ -1,9 +1,9 @@
+import type { Runner } from "@cronny/types";
+import axios from "axios";
 import { parse } from "node-html-parser";
 import { createLogger } from "../utils/logger.js";
-import { fetchURL } from "../utils/request.js";
 import { fetchMultiplePages } from "../utils/request.js";
 import { replaceURLParams } from "../utils/url.js";
-import type { Runner } from "@cronny/types";
 
 const MAX_ROWS = 90;
 const MAX_PAGES = 5;
@@ -14,7 +14,7 @@ type WillhabenParams = {
   url: string;
 };
 
-type WillhabenResult = {
+export type WillhabenResult = {
   id: string;
   title: string;
   price: number;
@@ -54,8 +54,8 @@ async function fetchWillhabenSearchPage(
 }
 
 async function fetchHtml(url: string): Promise<string> {
-  const response = await fetchURL(url);
-  return response.text();
+  const response = await axios.get(url);
+  return response.data;
 }
 
 function extractResultList(html: string): WillhabenResult[] {

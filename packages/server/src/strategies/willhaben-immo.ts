@@ -1,130 +1,83 @@
-import {
-  isWithinPolygon,
-  isWithinRadius,
-  parseCoordinates,
-} from "../utils/coordinates.js";
-import { run as fetchWillhabenResults } from "./willhaben.js";
+import type { Runner } from "@cronny/types";
+import { parseCoordinates } from "../utils/coordinates.js";
 import { createLogger } from "../utils/logger.js";
-import type { JSONValue, Runner } from "@cronny/types";
-import { matchDataFilter } from "../utils/filter.js";
+import { filterResults, ImmoParams, ImmoResult } from "./immo.js";
+import { run as fetchWillhabenResults, WillhabenResult } from "./willhaben.js";
 
 const logger = createLogger("willhaben-immo");
 
-type CoordsFilter = {
-  prop: "coords";
-  value:
-    | {
-        center: [number, number];
-        radius: number;
-      }
-    | {
-        points: [number, number][];
-      };
-  negate?: boolean;
+type WillhabenImmoResult = WillhabenResult & {
+  ADDRESS: string;
+  LOCATION: string;
+  POSTCODE: string;
+  STATE: string;
+  ORGNAME: string;
+  "ESTATE_SIZE/LIVING_AREA": string;
+  DISTRICT: string;
+  HEADING: string;
+  FLOOR: string;
+  PUBLISHED: string;
+  LOCATION_ID: string;
+  PROPERTY_TYPE: string;
+  NUMBER_OF_ROOMS: string;
+  ADID: string;
+  ORGID: string;
+  "RENT/PER_MONTH_LETTINGS": string;
+  PRODUCT_ID: string;
+  ROOMS: string;
+  COORDINATES: string;
+  PRICE: string;
+  PRICE_FOR_DISPLAY: string;
+  ESTATE_SIZE: string;
+  ISPRIVATE: string;
+  PROPERTY_TYPE_FLAT: string;
+  UNIT_TITLE: string;
 };
 
-type DataFilter = {
-  prop: keyof WillhabenImmoResult;
-  value: JSONValue;
-  negate?: boolean;
-};
+export const run: Runner<ImmoParams, ImmoResult> = (params) => {
+  if (!params) {
+    throw new Error("Missing params");
+  }
 
-type Filter = DataFilter | CoordsFilter;
-
-type WillhabenImmoParams = {
-  url: string;
-} & { filters?: Filter[] };
-
-type WillhabenImmoResult = {
-  id: string;
-  title: string;
-  price: number;
-  address: string;
-  floor: number;
-  rooms: number;
-  coords: string;
-  url: string;
-};
-
-export const run: Runner<WillhabenImmoParams, WillhabenImmoParams> = (
-  params
-) => {
   return fetchWillhabenImmoSearch(params!);
 };
 
-async function fetchWillhabenImmoSearch({ url, filters }: WillhabenImmoParams) {
-  const genericResults = await fetchWillhabenResults({ url });
+async function fetchWillhabenImmoSearch({ url, filters }: ImmoParams) {
+  const rawResults = await fetchWillhabenResults({ url });
 
-  if (!genericResults) {
+  if (!rawResults) {
     return { data: [], meta: { filteredResults: [] } };
   }
 
-  const allResults: WillhabenImmoResult[] = genericResults.data.map(
-    (result) => {
-      const size = result["ESTATE_SIZE/LIVING_AREA"] || result["ESTATE_SIZE"];
-      return {
-        id: result.id,
-        title: `${result.HEADING}`,
-        price: Number(result.PRICE),
-        address: `${result.ADDRESS}`,
-        floor: Number(result.FLOOR),
-        rooms: Number(result.NUMBER_OF_ROOMS),
-        coords: `${result.COORDINATES}`,
-        size: Number(size),
-        url: `https://www.willhaben.at/iad/object?adId=${result.id}`,
-      };
-    }
-  );
-  logger.debug(`Found ${allResults.length} results`);
+  const rawImmoResults = rawResults.data as WillhabenImmoResult[];
+  const transformedResults: ImmoResult[] = rawImmoResults.map(toImmoResult);
+  logger.debug(`Found ${transformedResults.length} results`);
 
-  const results = allResults.filter((result) => {
-    if (!filters) {
-      return true;
-    }
-    return filters.every((filter) => {
-      const isMatch = matchFilter(result, filter);
-      return filter.negate ? !isMatch : isMatch;
-    });
-  });
+  const results = filterResults(transformedResults, filters);
 
   logger.debug(`Filtered to ${results.length} results`);
 
   return {
     data: results,
     meta: {
-      filteredResults: allResults.filter((result) => !results.includes(result)),
+      filteredResults: transformedResults.filter(
+        (result) => !results.includes(result)
+      ),
     },
   };
 }
 
-function matchFilter(result: WillhabenImmoResult, filter: Filter): boolean {
-  if (filter.prop === "coords") {
-    return matchCoordsFilter(result, filter as CoordsFilter);
-  }
-
-  return matchDataFilter(result, filter as DataFilter);
-}
-
-function matchCoordsFilter(
-  result: WillhabenImmoResult,
-  coordsFilter: CoordsFilter
-) {
-  if (!coordsFilter) {
-    return true;
-  }
-
-  if (!result.coords || typeof result.coords !== "string") {
-    return false;
-  }
-
-  const parsedCoords = parseCoordinates(result.coords);
-  if (!parsedCoords) {
-    return false;
-  }
-  if ("radius" in coordsFilter.value) {
-    const { center, radius } = coordsFilter.value;
-    return isWithinRadius(center, radius, parsedCoords);
-  } else {
-    return isWithinPolygon(coordsFilter.value.points, parsedCoords);
-  }
+function toImmoResult(result: WillhabenImmoResult): ImmoResult {
+  const size = result["ESTATE_SIZE/LIVING_AREA"] || result["ESTATE_SIZE"];
+  return {
+    id: result.id,
+    title: `${result.HEADING}`,
+    price: Number(result.PRICE),
+    address: `${result.ADDRESS}`,
+    floor: Number(result.FLOOR),
+    rooms: Number(result.NUMBER_OF_ROOMS),
+    coordinates: parseCoordinates(result.COORDINATES),
+    size: Number(size),
+    url: `https://www.willhaben.at/iad/object?adId=${result.id}`,
+  };
 }

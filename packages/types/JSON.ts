@@ -1,4 +1,10 @@
-export type JSONValue = number | string | boolean | JSONObject | JSONArray;
+export type JSONValue =
+  | number
+  | string
+  | boolean
+  | null
+  | JSONObject
+  | JSONArray;
 
 export type JSONArray = JSONValue[];
 

@@ -1,7 +1,6 @@
 import type { JSONValue } from "@cronny/types";
 
-// allows filtering by a prop of the result, and negation
-type Filter<T> = {
+export type Filter<T> = {
   prop: keyof T;
   value: JSONValue;
   negate?: boolean;
