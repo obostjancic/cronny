@@ -4,7 +4,7 @@ import { de } from "date-fns/locale";
 import logger from "../utils/logger.js";
 import { sleep } from "../utils/request.js";
 import { isProd } from "../utils/env.js";
-import { Runner } from "@cronny/types";
+import type { Runner } from "@cronny/types";
 
 type GrillAreaParams = {
   from: Date;

@@ -1,4 +1,4 @@
-import { Run } from "@cronny/types";
+import type { Run } from "@cronny/types";
 import { useSuspenseQuery, type QueryOptions } from "@tanstack/react-query";
 import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";

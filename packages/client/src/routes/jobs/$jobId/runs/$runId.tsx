@@ -1,4 +1,4 @@
-import { JSONObject, Run } from "@cronny/types";
+import type { JSONObject, Run } from "@cronny/types";
 import { CodeHighlight } from "@mantine/code-highlight";
 import { Button, Collapse, Container, Flex, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

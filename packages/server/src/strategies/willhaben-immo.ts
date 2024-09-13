@@ -5,7 +5,7 @@ import {
 } from "../utils/coordinates.js";
 import { run as fetchWillhabenResults } from "./willhaben.js";
 import { createLogger } from "../utils/logger.js";
-import { JSONValue, Runner } from "@cronny/types";
+import type { JSONValue, Runner } from "@cronny/types";
 import { matchDataFilter } from "../utils/filter.js";
 
 const logger = createLogger("willhaben-immo");

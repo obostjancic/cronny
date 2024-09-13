@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import AsyncRouter from "./router.js";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
-import { UnsavedJob } from "@cronny/types";
+import type { UnsavedJob, MarkedResultStatus } from "@cronny/types";
 import { getRunner, invalidateSchedule } from "../schedule.js";
 import { executeRun } from "../run.js";
 

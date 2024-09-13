@@ -1,4 +1,4 @@
-import { JSONValue } from "@cronny/types";
+import type { JSONValue } from "@cronny/types";
 
 // allows filtering by a prop of the result, and negation
 type Filter<T> = {

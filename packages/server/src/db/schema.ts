@@ -1,10 +1,4 @@
-import {
-  JSONArray,
-  JSONObject,
-  JSONValue,
-  NotificationConfig,
-  Notify,
-} from "@cronny/types";
+import type { JSONObject, Notify } from "@cronny/types";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";

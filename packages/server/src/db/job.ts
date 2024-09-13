@@ -1,4 +1,4 @@
-import { Job, UnsavedJob } from "@cronny/types";
+import type { Job, UnsavedJob } from "@cronny/types";
 import { eq } from "drizzle-orm";
 import { db, jobs } from "./schema.js";
 
@@ -30,4 +30,3 @@ export async function updateJob(
 
   return updatedJobs[0];
 }
-

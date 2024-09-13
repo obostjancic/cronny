@@ -3,7 +3,7 @@ import { createLogger } from "../utils/logger.js";
 import { fetchURL } from "../utils/request.js";
 import { fetchMultiplePages } from "../utils/request.js";
 import { replaceURLParams } from "../utils/url.js";
-import { Runner } from "@cronny/types";
+import type { Runner } from "@cronny/types";
 
 const MAX_ROWS = 90;
 const MAX_PAGES = 5;

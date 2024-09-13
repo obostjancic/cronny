@@ -1,4 +1,4 @@
-import { Run } from "@cronny/types";
+import type { Run } from "@cronny/types";
 import { useMutation, type QueryOptions } from "@tanstack/react-query";
 import { fetchJson } from "./utils";
 

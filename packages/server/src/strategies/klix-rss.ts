@@ -1,7 +1,7 @@
 // @ts-ignore
 import Parser from "rss-parser";
 import logger from "../utils/logger.js";
-import { Runner } from "@cronny/types";
+import type { Runner } from "@cronny/types";
 
 export type Article = {
   id: string;

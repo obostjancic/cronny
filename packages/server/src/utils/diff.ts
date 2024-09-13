@@ -1,4 +1,4 @@
-import { JSONObject } from "@cronny/types";
+import type { JSONObject } from "@cronny/types";
 
 export function diff(a: JSONObject[], b: JSONObject[]) {
   const aIds = a.map((x) => x.id);

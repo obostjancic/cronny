@@ -2,7 +2,7 @@ import { CronJob } from "cron";
 import { cron } from "./cron.js";
 import { getJobs } from "./db/job.js";
 import logger from "./utils/logger.js";
-import { Job, Runner } from "@cronny/types";
+import type { Job, Runner } from "@cronny/types";
 
 let schedule: CronJob[] = [];
 
