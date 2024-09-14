@@ -11,20 +11,16 @@ export async function notifyRun(
 ): Promise<void> {
   if (run.status === "success" && job.notify?.onSuccess) {
     logger.debug(`Notifying on success for ${run.id} of job ${job.name}`);
-    await notifySuccess(job, run, resultDiff);
+    await notifySuccess(job, resultDiff);
   }
 
   if (run.status === "failure" && job.notify?.onFailure) {
     logger.debug(`Notifying on failure for ${run.id} of job ${job.name}`);
-    await notifyFailure(job, run);
+    await notifyFailure(job);
   }
 }
 
-async function notifySuccess(
-  job: Job,
-  run: Run,
-  resultDiff: number
-): Promise<void> {
+async function notifySuccess(job: Job, resultDiff: number): Promise<void> {
   const { transport, params, onResultChangeOnly } = job.notify!.onSuccess!;
 
   if (onResultChangeOnly) {
@@ -36,21 +32,21 @@ async function notifySuccess(
     await notify({
       transport,
       params,
-      message: constructMessage(job, run, resultDiff),
+      message: constructMessage(job, resultDiff),
     });
   } else {
     await notify({
       transport,
       params,
-      message: constructMessage(job, run, resultDiff),
+      message: constructMessage(job, resultDiff),
     });
   }
 }
 
-async function notifyFailure(job: Job, run: Run): Promise<void> {
+async function notifyFailure(job: Job): Promise<void> {
   const { transport, params } = job.notify!.onFailure!;
 
-  const message = `Run ${run.id} of job ${job.name} failed!`;
+  const message = `Run  of job ${job.name} failed!`;
 
   await notify({
     transport,
@@ -92,10 +88,10 @@ async function notify({
   }
 }
 
-function constructMessage(job: Job, run: Run, resultDiff: number): string {
-  return `${job.name}: ${resultDiff} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+function constructMessage(job: Job, resultDiff: number): string {
+  return `${job.name}: ${resultDiff} results found! \n Check the results at ${getRunResultsUrl(job)}`;
 }
 
-function getRunResultsUrl(run: Run): string {
-  return `${getEnv("BASE_URL")}/jobs/${run.jobId}/runs/${run.id}`;
+function getRunResultsUrl(job: Job): string {
+  return `${getEnv("BASE_URL")}/jobs/${job.id}`;
 }
