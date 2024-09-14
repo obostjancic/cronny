@@ -12,7 +12,7 @@ import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
 import { iso } from "./utils/date.js";
 import logger from "./utils/logger.js";
-import { equal } from "./utils/diff";
+import { equal } from "./utils/diff.js";
 
 export async function executeRun(job: Job, runner: Runner): Promise<void> {
   let run = await startRun(job);
