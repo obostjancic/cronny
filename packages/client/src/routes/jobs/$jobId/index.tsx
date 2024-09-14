@@ -23,27 +23,27 @@ function JobDetails() {
       <ResultsTable
         rows={results
           .filter((r) => r.status === "active")
-          .map((r) => ({ ...r, ...r.data }))}
+          .map((r) => ({ ...r.data, ...r }))}
       />
       <Collapsible title="Filtered results">
         <ResultsTable
           rows={results
             .filter((r) => r.status === "filtered")
-            .map((r) => ({ ...r, ...r.data }))}
+            .map((r) => ({ ...r.data, ...r }))}
         />
       </Collapsible>
       <Collapsible title="Hidden results">
         <ResultsTable
           rows={results
             .filter((r) => r.status === "hidden")
-            .map((r) => ({ ...r, ...r.data }))}
+            .map((r) => ({ ...r.data, ...r }))}
         />
       </Collapsible>
       <Collapsible title="Expired results">
         <ResultsTable
           rows={results
             .filter((r) => r.status === "expired")
-            .map((r) => ({ ...r, ...r.data }))}
+            .map((r) => ({ ...r.data, ...r }))}
         />
       </Collapsible>
     </Container>

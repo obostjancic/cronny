@@ -22,6 +22,13 @@
       "when": 1726307784802,
       "tag": "0002_free_silver_samurai",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1726330540970,
+      "tag": "0003_talented_blonde_phantom",
+      "breakpoints": true
     }
   ]
 }

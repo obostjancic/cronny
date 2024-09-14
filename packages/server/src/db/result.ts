@@ -1,6 +1,7 @@
 import { Result, UnsavedResult } from "@cronny/types";
 import { and, eq, ne } from "drizzle-orm";
 import { db, results } from "./schema.js";
+import { iso } from "../utils/date.js";
 
 export async function getJobResults(jobId: number): Promise<Result[]> {
   return db.select().from(results).where(eq(results.jobId, jobId));
@@ -14,15 +15,12 @@ export async function getNonExpiredResults(jobId: number): Promise<Result[]> {
 }
 
 export async function saveResult(result: UnsavedResult): Promise<Result> {
-  const savedResults = await db.insert(results).values(result).returning();
+  const savedResults = await db
+    .insert(results)
+    .values({ ...result, updatedAt: iso() })
+    .returning();
 
   return savedResults[0];
-}
-
-export async function saveResults(
-  newResults: UnsavedResult[]
-): Promise<Result[]> {
-  return db.insert(results).values(newResults).returning();
 }
 
 export async function updateResult(
@@ -31,7 +29,7 @@ export async function updateResult(
 ): Promise<Result> {
   const updateResults = await db
     .update(results)
-    .set(result)
+    .set({ ...result, updatedAt: iso() })
     .where(eq(results.id, id))
     .returning();
 

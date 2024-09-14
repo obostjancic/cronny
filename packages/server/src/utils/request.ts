@@ -34,13 +34,11 @@ export async function fetchMultiplePages<T>(
   let page = 1;
   let results: T[] = await fetchPageFunction(url, page);
   allResults.push(...results);
-  console.log(`Found ${results.length} results on page ${page}`);
 
   while (results.length === maxRows && page < maxPages) {
     page += 1;
     results = await fetchPageFunction(url, page);
     allResults.push(...results);
-    console.log(`Found ${results.length} results on page ${page}`);
   }
 
   return allResults;

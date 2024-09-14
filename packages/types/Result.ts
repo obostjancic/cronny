@@ -10,4 +10,7 @@ export type UnsavedResult<T = JSONObject> = {
   status: ResultStatus;
 };
 
-export type Result<T = JSONObject> = UnsavedResult<T> & { id: number };
+export type Result<T = JSONObject> = UnsavedResult<T> & {
+  id: number;
+  updatedAt: string;
+};

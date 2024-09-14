@@ -1,7 +1,7 @@
 import type { Runner } from "@cronny/types";
 import { parseCoordinates } from "../utils/coordinates.js";
 import { createLogger } from "../utils/logger.js";
-import { filterResults, ImmoParams, ImmoResult } from "./immo.js";
+import { filterResults, BaseImmoParams, BaseImmoResult } from "./immo.base.js";
 import { run as fetchWillhabenResults, WillhabenResult } from "./willhaben.js";
 
 const logger = createLogger("willhaben-immo");
@@ -34,7 +34,7 @@ type WillhabenImmoResult = WillhabenResult & {
   UNIT_TITLE: string;
 };
 
-export const run: Runner<ImmoParams, ImmoResult> = (params) => {
+export const run: Runner<BaseImmoParams, BaseImmoResult> = (params) => {
   if (!params) {
     throw new Error("Missing params");
   }
@@ -42,14 +42,14 @@ export const run: Runner<ImmoParams, ImmoResult> = (params) => {
   return fetchWillhabenImmoSearch(params!);
 };
 
-async function fetchWillhabenImmoSearch({ url, filters }: ImmoParams) {
+async function fetchWillhabenImmoSearch({ url, filters }: BaseImmoParams) {
   const rawResults = await fetchWillhabenResults({ url });
 
   if (!rawResults) {
     return [];
   }
 
-  const transformedResults: ImmoResult[] = rawResults.map(toImmoResult);
+  const transformedResults: BaseImmoResult[] = rawResults.map(toImmoResult);
   logger.debug(`Found ${transformedResults.length} results`);
 
   const results = filterResults(transformedResults, filters);
@@ -64,14 +64,13 @@ async function fetchWillhabenImmoSearch({ url, filters }: ImmoParams) {
 
 function toImmoResult(
   result: WillhabenResult | WillhabenImmoResult
-): ImmoResult {
+): BaseImmoResult {
   const size = result["ESTATE_SIZE/LIVING_AREA"] || result["ESTATE_SIZE"];
   return {
     id: result.id,
     title: `${result.HEADING}`,
     price: Number(result.PRICE),
     address: `${result.ADDRESS}`,
-    floor: Number(result.FLOOR),
     rooms: Number(result.NUMBER_OF_ROOMS),
     coordinates: parseCoordinates(result.COORDINATES),
     size: Number(size),

@@ -1,8 +1,10 @@
 import type { Job, JSONObject, NotificationConfig, Run } from "@cronny/types";
 
 import { getEnv } from "../utils/env.js";
-import logger from "../utils/logger.js";
+import { createLogger } from "../utils/logger.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
+
+const logger = createLogger("notify");
 
 export async function notifyRun(
   job: Job,
@@ -10,12 +12,12 @@ export async function notifyRun(
   resultDiff: number
 ): Promise<void> {
   if (run.status === "success" && job.notify?.onSuccess) {
-    logger.debug(`Notifying on success for ${run.id} of job ${job.name}`);
+    logger.debug(`Notifying on success for run ${run.id} of job ${job.name}`);
     await notifySuccess(job, resultDiff);
   }
 
   if (run.status === "failure" && job.notify?.onFailure) {
-    logger.debug(`Notifying on failure for ${run.id} of job ${job.name}`);
+    logger.debug(`Notifying on failure for run ${run.id} of job ${job.name}`);
     await notifyFailure(job);
   }
 }
@@ -24,7 +26,7 @@ async function notifySuccess(job: Job, resultDiff: number): Promise<void> {
   const { transport, params, onResultChangeOnly } = job.notify!.onSuccess!;
 
   if (onResultChangeOnly) {
-    if (resultDiff === 0) {
+    if (resultDiff <= 0) {
       logger.debug(`${job.name}: No new results found!`);
       return;
     }
@@ -46,7 +48,7 @@ async function notifySuccess(job: Job, resultDiff: number): Promise<void> {
 async function notifyFailure(job: Job): Promise<void> {
   const { transport, params } = job.notify!.onFailure!;
 
-  const message = `Run  of job ${job.name} failed!`;
+  const message = `Run for job ${job.name} failed!`;
 
   await notify({
     transport,
@@ -77,8 +79,7 @@ async function notify({
       // sendTelegram(params, message);
       break;
     case "whatsapp":
-      const phone = params.phone as string;
-      sendWhatsappMessage(phone, message);
+      sendWhatsappMessage(params.phone as string, message);
       break;
     case "webhook":
       // sendWebhook(params, message);

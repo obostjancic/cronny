@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createLogger } from "../utils/logger.js";
 import { Coordinates, Runner } from "@cronny/types";
-import { filterResults, ImmoResult } from "./immo.js";
+import { filterResults, BaseImmoResult } from "./immo.base.js";
 // fetch list with
 // https://www.immobilienscout24.at/portal/graphql?operationName=findPropertiesByParams&variables=%7B%22aspectRatio%22%3A1.77%2C%22params%22%3A%7B%22countryCode%22%3A%22AT%22%2C%22estateType%22%3A%22APARTMENT%22%2C%22from%22%3A%2215%22%2C%22size%22%3A%2210%22%2C%22transferType%22%3A%22RENT%22%2C%22useType%22%3A%22RESIDENTIAL%22%2C%22zipCode%22%3A%221200%22%7D%7D&extensions=%7B%22persistedQuery%22%3A%7B%22sha256Hash%22%3A%221a73f5536e8aad220c24f1b4ce4f7654e3d7a1d932e85134f9efc1777f34f4ce%22%2C%22version%22%3A1%7D%7D
 
@@ -51,7 +51,8 @@ export interface Links {
   targetURL: string;
   absoluteURL: string;
 }
-export const run: Runner<ImmoscoutParams, ImmoResult> = async (params) => {
+
+export const run: Runner<ImmoscoutParams, BaseImmoResult> = async (params) => {
   if (!params) {
     throw new Error("Missing params");
   }
@@ -106,13 +107,12 @@ async function fetchImmoscoutCoordinates(
   return [data.data.location.map.center.lat, data.data.location.map.center.lng];
 }
 
-function toImmoResult(result: ImmoscoutResult): ImmoResult {
+function toImmoResult(result: ImmoscoutResult): BaseImmoResult {
   return {
     id: result.exposeId,
     title: result.headline,
     price: result.primaryPrice,
     address: result.addressString,
-    floor: 0,
     rooms: result.numberOfRooms,
     coordinates: result.coordinates,
     size: result.primaryArea,

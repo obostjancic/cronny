@@ -33,8 +33,6 @@ export async function executeRun(job: Job, runner: Runner): Promise<void> {
 }
 
 async function startRun(job: Job) {
-  logger.debug(`Starting run for ${job.name}`);
-
   return saveRun({
     jobId: job.id,
     start: iso(),

@@ -1,5 +1,6 @@
 import type { JSONObject, Notify } from "@cronny/types";
 import Database from "better-sqlite3";
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import path from "path";
@@ -31,6 +32,7 @@ export const runs = sqliteTable("runs", {
 
 export const results = sqliteTable("results", {
   id: integer("id").primaryKey().notNull(),
+  updatedAt: text("updatedAt").notNull().default("1970-01-01T00:00:00.000Z"),
   internalId: text("internalId").notNull(),
   runId: integer("runId")
     .references(() => runs.id)

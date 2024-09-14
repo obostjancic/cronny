@@ -1,72 +1,51 @@
-import { Coordinates, JSONValue } from "@cronny/types";
-import { isWithinPolygon, isWithinRadius } from "../utils/coordinates.js";
-import { Filter, matchDataFilter } from "../utils/filter.js";
+import { Runner } from "@cronny/types";
+import { Filter } from "../utils/filter.js";
+import { createLogger } from "../utils/logger.js";
+import { BaseImmoResult } from "./immo.base.js";
+import { run as runImmoscoutImmo } from "./immoscout.js";
+import { run as runWillhabenImmo } from "./willhaben-immo.js";
 
-export type CoordinatesFilter = {
-  prop: "coordinates";
-  value:
-    | {
-        center: [number, number];
-        radius: number;
-      }
-    | {
-        points: [number, number][];
-      };
-  negate?: boolean;
-};
+const logger = createLogger("immo");
 
 export type ImmoParams = {
-  url: string;
-} & { filters?: Filter<ImmoResult>[] };
+  sources: {
+    willhaben?: {
+      url: string;
+    };
+    immoscout?: {
+      url: string;
+    };
+  };
+} & { filters?: Filter<BaseImmoResult>[] };
 
-export type ImmoResult = {
-  id: string;
-  title: string;
-  price: number;
-  address: string;
-  floor: number;
-  rooms: number;
-  coordinates: Coordinates | null;
-  size: number;
-  url: string;
+export const run: Runner<ImmoParams, BaseImmoResult> = async (params) => {
+  if (!params) {
+    throw new Error("Missing params");
+  }
+
+  const willhabenImmoResults = params.sources.willhaben
+    ? await runWillhabenImmo({
+        url: params.sources.willhaben.url,
+        filters: params.filters,
+      })
+    : [];
+
+  const immoscoutResults = params.sources.immoscout
+    ? await runImmoscoutImmo({
+        url: params.sources.immoscout.url,
+        filters: params.filters,
+      })
+    : [];
+
+  const dedupedResults = [
+    ...(willhabenImmoResults ?? []),
+    ...(immoscoutResults ?? []),
+  ].filter(
+    (result, index, self) =>
+      index === self.findIndex((t) => t.title === result.title)
+  );
+
+  logger.debug(`Found ${dedupedResults.length} results`);
+
+  return dedupedResults;
 };
-
-export function filterResults(
-  results: ImmoResult[],
-  filters?: Filter<ImmoResult>[]
-) {
-  if (!filters) {
-    return results;
-  }
-
-  return results.filter((result) => {
-    return filters.every((filter) => {
-      const isMatch = matchFilter(result, filter);
-      return filter.negate ? !isMatch : isMatch;
-    });
-  });
-}
-
-function matchFilter(result: ImmoResult, filter: Filter<ImmoResult>): boolean {
-  if (filter.prop === "coordinates") {
-    return matchCoordsFilter(result, filter as CoordinatesFilter);
-  }
-
-  return matchDataFilter(result, filter);
-}
-
-function matchCoordsFilter(
-  result: ImmoResult,
-  coordinatesFilter: CoordinatesFilter
-) {
-  if (!result.coordinates) {
-    return false;
-  }
-
-  if ("radius" in coordinatesFilter.value) {
-    const { center, radius } = coordinatesFilter.value;
-    return isWithinRadius(center, radius, result.coordinates);
-  } else {
-    return isWithinPolygon(coordinatesFilter.value.points, result.coordinates);
-  }
-}
