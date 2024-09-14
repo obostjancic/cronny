@@ -32,6 +32,7 @@ export const runs = sqliteTable("runs", {
 
 export const results = sqliteTable("results", {
   id: integer("id").primaryKey().notNull(),
+  createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
   updatedAt: text("updatedAt").notNull().default("1970-01-01T00:00:00.000Z"),
   internalId: text("internalId").notNull(),
   runId: integer("runId")

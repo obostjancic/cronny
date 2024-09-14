@@ -19,7 +19,8 @@
     "@tanstack/react-router": "^1.50.0",
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-timeago": "^7.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -27,6 +28,7 @@
     "@tanstack/router-plugin": "^1.49.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/react-timeago": "^4.1.7",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

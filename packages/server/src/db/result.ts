@@ -17,7 +17,7 @@ export async function getNonExpiredResults(jobId: number): Promise<Result[]> {
 export async function saveResult(result: UnsavedResult): Promise<Result> {
   const savedResults = await db
     .insert(results)
-    .values({ ...result, updatedAt: iso() })
+    .values({ ...result, updatedAt: iso(), createdAt: iso() })
     .returning();
 
   return savedResults[0];

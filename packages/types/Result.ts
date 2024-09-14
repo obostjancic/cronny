@@ -12,5 +12,6 @@ export type UnsavedResult<T = JSONObject> = {
 
 export type Result<T = JSONObject> = UnsavedResult<T> & {
   id: number;
+  createdAt: string;
   updatedAt: string;
 };
