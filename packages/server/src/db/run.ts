@@ -17,7 +17,7 @@ export async function saveRun(run: UnsavedRun): Promise<Run> {
 export async function updateRun(
   id: number,
   run: Partial<UnsavedRun>
-): Promise<any> {
+): Promise<Run> {
   const updatedRuns = await db
     .update(runs)
     .set(run)

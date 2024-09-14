@@ -5,7 +5,7 @@ import { rawResults, expectedResults } from "../fixtures/willhaben-immo";
 
 describe("Willhaben Immo", () => {
   it("should return a list of properties", async () => {
-    vi.spyOn(willhaben, "run").mockResolvedValue({ data: rawResults });
+    vi.spyOn(willhaben, "run").mockResolvedValue(rawResults);
 
     const properties = await run({
       url: "https://www.willhaben.at/iad/immobilien/mietwohnungen/mietwohnung-angebote?sfId=20ee62a7-8490-46d8-869d-de3fcf26bc5a&isNavigation=true&rows=90&areaId=117224&areaId=117242&page=1&PRICE_TO=1200&ESTATE_SIZE/LIVING_AREA_FROM=50",
@@ -39,6 +39,7 @@ describe("Willhaben Immo", () => {
         },
       ],
     });
+
     expect(properties).toEqual(expectedResults);
   });
 });

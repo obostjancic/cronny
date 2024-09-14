@@ -1,103 +1,76 @@
-import type {
-  JSONObject,
-  NotificationConfig,
-  Notify,
-  Run,
-  RunResult,
-} from "@cronny/types";
+import type { Job, JSONObject, NotificationConfig, Run } from "@cronny/types";
 
 import { getEnv } from "../utils/env.js";
 import logger from "../utils/logger.js";
-import { notifyLogFile } from "./log-file.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
-import { getPreviousRun } from "../db/run.js";
-import { arrayDiff } from "../utils/diff.js";
 
 export async function notifyRun(
+  job: Job,
   run: Run,
-  jobName: string,
-  notify: Notify
+  resultDiff: number
 ): Promise<void> {
-  if (run.status === "success" && notify?.onSuccess) {
-    logger.debug(`Notifying on success for ${run.id} of job ${jobName}`);
-    await notifySuccess(run, jobName, notify.onSuccess!);
+  if (run.status === "success" && job.notify?.onSuccess) {
+    logger.debug(`Notifying on success for ${run.id} of job ${job.name}`);
+    await notifySuccess(job, run, resultDiff);
   }
 
-  if (run.status === "failure" && notify?.onFailure) {
-    logger.debug(`Notifying on failure for ${run.id} of job ${jobName}`);
-    await notifyFailure(run, jobName, notify.onFailure!);
+  if (run.status === "failure" && job.notify?.onFailure) {
+    logger.debug(`Notifying on failure for ${run.id} of job ${job.name}`);
+    await notifyFailure(job, run);
   }
 }
 
 async function notifySuccess(
+  job: Job,
   run: Run,
-  jobName: string,
-  config: NotificationConfig
+  resultDiff: number
 ): Promise<void> {
-  const { transport, params, onResultChangeOnly } = config;
+  const { transport, params, onResultChangeOnly } = job.notify!.onSuccess!;
 
   if (onResultChangeOnly) {
-    const prevRun = await getPreviousRun(run.jobId);
-
-    const { added } = arrayDiff(prevRun?.data || [], run.data);
-
-    if (added.length === 0) {
-      logger.debug(`${jobName}: No new results found!`);
+    if (resultDiff === 0) {
+      logger.debug(`${job.name}: No new results found!`);
       return;
     }
 
     await notify({
       transport,
       params,
-      message: constructMessage(run, jobName),
-      results: { data: added },
+      message: constructMessage(job, run, resultDiff),
     });
   } else {
     await notify({
       transport,
       params,
-      message: constructMessage(run, jobName),
-      results: { data: run.data },
+      message: constructMessage(job, run, resultDiff),
     });
   }
 }
 
-async function notifyFailure(
-  run: Run,
-  jobName: string,
-  config: NotificationConfig
-): Promise<void> {
-  const { transport, params } = config;
+async function notifyFailure(job: Job, run: Run): Promise<void> {
+  const { transport, params } = job.notify!.onFailure!;
 
-  const message = `Run ${run.id} of job ${jobName} failed!`;
+  const message = `Run ${run.id} of job ${job.name} failed!`;
 
   await notify({
     transport,
     params,
     message,
-    results: {
-      data: [],
-    },
   });
 }
 
 async function notify({
   transport,
   params,
-  results,
   message,
 }: {
   transport: NotificationConfig["transport"];
   params: JSONObject;
-  results: RunResult;
   message: string;
 }): Promise<void> {
   logger.debug(`Notifying via ${transport}`, message);
 
   switch (transport) {
-    case "file":
-      notifyLogFile(params.path as string, results.data!);
-      break;
     case "email":
       // sendEmail(params, message);
       break;
@@ -119,10 +92,8 @@ async function notify({
   }
 }
 
-function constructMessage(run: Run, jobName: string): string {
-  const resultsCount = run.data?.length ?? 0;
-
-  return `${jobName}: ${resultsCount} results found! \n Check the results at ${getRunResultsUrl(run)}`;
+function constructMessage(job: Job, run: Run, resultDiff: number): string {
+  return `${job.name}: ${resultDiff} results found! \n Check the results at ${getRunResultsUrl(run)}`;
 }
 
 function getRunResultsUrl(run: Run): string {

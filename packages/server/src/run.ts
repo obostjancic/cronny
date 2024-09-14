@@ -1,29 +1,34 @@
 import {
   Job,
-  JSONArray,
   JSONObject,
+  Result,
+  ResultStatus,
   Run,
   Runner,
-  RunResult,
+  UnsavedResult,
 } from "@cronny/types";
+import { getJobResults, upsertResults } from "./db/result.js";
 import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
 import { iso } from "./utils/date.js";
 import logger from "./utils/logger.js";
+import { equal } from "./utils/diff";
 
 export async function executeRun(job: Job, runner: Runner): Promise<void> {
   let run = await startRun(job);
-  let data = null;
+  let results = null;
+  let resultDiff = 0;
   try {
-    data = await runner(job.params);
+    results = await runner(job.params);
   } catch (e) {
     logger.error(`Error running job ${job.name}`, e);
-    run.data = [];
   } finally {
-    run = await finishRun(run.id, data);
+    const res = await finishRun(run.id, results);
+    run = res.run;
+    resultDiff = res.resultDiff;
   }
   if (job.notify) {
-    notifyRun(run, job.name, job.notify);
+    notifyRun(job, run, resultDiff);
   }
 }
 
@@ -35,19 +40,76 @@ async function startRun(job: Job) {
     start: iso(),
     end: null,
     status: "running",
-    data: [],
-    meta: undefined,
   });
 }
 
-async function finishRun(runId: number, data: RunResult | null): Promise<Run> {
-  const isSuccess = !!data;
+async function finishRun(
+  runId: number,
+  results: JSONObject[] | null
+): Promise<{ run: Run; resultDiff: number }> {
+  const isSuccess = !!results;
 
   const savedRun = await updateRun(runId, {
     end: iso(),
     status: isSuccess ? "success" : "failure",
-    ...data,
   });
 
-  return savedRun;
+  const newResults: UnsavedResult[] = (results ?? []).map((r) =>
+    toResult(r, savedRun.jobId, savedRun.id)
+  );
+
+  const exisitingResults = await getJobResults(savedRun.jobId);
+  const allResults = mergeResults(newResults, exisitingResults);
+
+  await upsertResults(allResults);
+
+  const resultDiff =
+    newResults.filter((r) => r.status === "active").length -
+    exisitingResults.filter((r) => r.status === "active").length;
+
+  return { run: savedRun, resultDiff };
+}
+
+export function mergeResults(
+  newResults: UnsavedResult[],
+  existingResults: Result[]
+): (Result | UnsavedResult)[] {
+  const updatedExistingResults: Result[] = existingResults.map(
+    (existingResult) => {
+      const newResult = newResults.find(
+        (newResult) => newResult.internalId === existingResult.internalId
+      );
+
+      if (newResult) {
+        if (equal(newResult.data, existingResult.data)) {
+          return existingResult;
+        }
+        return { ...existingResult, ...newResult };
+      }
+      return { ...existingResult, status: "expired" as ResultStatus };
+    }
+  );
+
+  const newResultsToInsert = newResults.filter(
+    (newResult) =>
+      !existingResults.some(
+        (existingResult) => existingResult.internalId === newResult.internalId
+      )
+  );
+
+  return newResultsToInsert.concat(updatedExistingResults);
+}
+
+export function toResult(
+  data: JSONObject,
+  jobId: number,
+  runId: number
+): UnsavedResult {
+  return {
+    jobId,
+    runId,
+    internalId: `${data.id}`,
+    data,
+    status: (data.status ?? "active") as ResultStatus,
+  };
 }

@@ -14,7 +14,6 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as JobsJobIdIndexImport } from './routes/jobs/$jobId/index'
-import { Route as JobsJobIdRunsRunIdImport } from './routes/jobs/$jobId/runs/$runId'
 
 // Create Virtual Routes
 
@@ -29,11 +28,6 @@ const IndexLazyRoute = IndexLazyImport.update({
 
 const JobsJobIdIndexRoute = JobsJobIdIndexImport.update({
   path: '/jobs/$jobId/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const JobsJobIdRunsRunIdRoute = JobsJobIdRunsRunIdImport.update({
-  path: '/jobs/$jobId/runs/$runId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -55,13 +49,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdIndexImport
       parentRoute: typeof rootRoute
     }
-    '/jobs/$jobId/runs/$runId': {
-      id: '/jobs/$jobId/runs/$runId'
-      path: '/jobs/$jobId/runs/$runId'
-      fullPath: '/jobs/$jobId/runs/$runId'
-      preLoaderRoute: typeof JobsJobIdRunsRunIdImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -70,7 +57,6 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   JobsJobIdIndexRoute,
-  JobsJobIdRunsRunIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -82,8 +68,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/jobs/$jobId/",
-        "/jobs/$jobId/runs/$runId"
+        "/jobs/$jobId/"
       ]
     },
     "/": {
@@ -91,9 +76,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/jobs/$jobId/": {
       "filePath": "jobs/$jobId/index.tsx"
-    },
-    "/jobs/$jobId/runs/$runId": {
-      "filePath": "jobs/$jobId/runs/$runId.tsx"
     }
   }
 }

@@ -14,7 +14,7 @@ type GrillAreaParams = {
 
 export const run: Runner<GrillAreaParams, any> = async (params) => {
   const data = await fetchCurrentGrillareaState(params!);
-  return { data };
+  return data;
 };
 
 export async function fetchCurrentGrillareaState(params: GrillAreaParams) {

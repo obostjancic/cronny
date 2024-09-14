@@ -27,12 +27,19 @@ export const runs = sqliteTable("runs", {
   start: text("start").notNull(),
   end: text("end"),
   status: text("status").notNull().$type<"running" | "success" | "failure">(),
-  data: blob("data", { mode: "json" })
+});
+
+export const results = sqliteTable("results", {
+  id: integer("id").primaryKey().notNull(),
+  internalId: text("internalId").notNull(),
+  runId: integer("runId")
+    .references(() => runs.id)
+    .notNull(),
+  jobId: integer("jobId")
+    .references(() => jobs.id)
+    .notNull(),
+  data: blob("data", { mode: "json" }).notNull().$type<JSONObject>(),
+  status: text("status")
     .notNull()
-    .$type<JSONObject[]>()
-    .default([]),
-  meta: blob("meta", { mode: "json" })
-    .notNull()
-    .$type<JSONObject>()
-    .default({}),
+    .$type<"active" | "expired" | "filtered" | "hidden">(),
 });

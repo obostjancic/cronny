@@ -59,7 +59,7 @@ export const run: Runner<ImmoscoutParams, ImmoResult> = async (params) => {
   const rawResults = await fetchImmoscoutSearch(params);
 
   if (!rawResults) {
-    return { data: [], meta: { filteredResults: [] } };
+    return [];
   }
 
   const transformedResults = rawResults.map(toImmoResult);
@@ -68,14 +68,10 @@ export const run: Runner<ImmoscoutParams, ImmoResult> = async (params) => {
   const results = filterResults(transformedResults, params.filters);
   logger.debug(`Filtered to ${results.length} results`);
 
-  return {
-    data: results,
-    meta: {
-      filteredResults: transformedResults.filter(
-        (result) => !results.includes(result)
-      ),
-    },
-  };
+  return transformedResults.map((result) => ({
+    ...result,
+    status: !results.includes(result) ? "filtered" : "active",
+  }));
 };
 
 export async function fetchImmoscoutSearch({ url }: ImmoscoutParams) {

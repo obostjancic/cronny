@@ -4,5 +4,5 @@ import logger from "../utils/logger.js";
 export const run: Runner = async () => {
   logger.log("Running stub job");
 
-  return { data: [] };
+  return [];
 };

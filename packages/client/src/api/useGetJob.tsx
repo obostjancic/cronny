@@ -1,4 +1,4 @@
-import { JobWithRuns } from "@cronny/types/Job";
+import { JobWithResults } from "@cronny/types/Job";
 import { useSuspenseQuery, type QueryOptions } from "@tanstack/react-query";
 import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";
@@ -7,10 +7,10 @@ const getQueryKey = (jobId: number | string) => [`/api/jobs/${jobId}`];
 
 export function useGetJob(
   jobId: number | string,
-  options?: QueryOptions<JobWithRuns, Error>
+  options?: QueryOptions<JobWithResults, Error>
 ) {
   const queryKey = getQueryKey(jobId);
-  return useSuspenseQuery<JobWithRuns, Error>({
+  return useSuspenseQuery<JobWithResults, Error>({
     queryKey,
     queryFn: async () => {
       return await fetchJson(queryKey[0]);

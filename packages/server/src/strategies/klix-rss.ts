@@ -32,7 +32,7 @@ type RawArticle = {
 export const run: Runner<undefined, Article> = async () => {
   const articles = await fetchFeed();
   const data = processArticles(articles);
-  return { data };
+  return data;
 };
 
 async function fetchFeed(): Promise<RawArticle[]> {

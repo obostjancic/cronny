@@ -6,6 +6,7 @@ import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { executeRun } from "../run.js";
 import { getRunner, invalidateSchedule } from "../schedule.js";
 import AsyncRouter from "./router.js";
+import { getJobResults } from "../db/result.js";
 
 const router = AsyncRouter();
 
@@ -16,8 +17,8 @@ router.get("/", async (_: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   const job = await getJob(+req.params.id);
-  const runs = await getJobRuns(+req.params.id);
-  return res.json({ ...job, runs });
+  const results = await getJobResults(+req.params.id);
+  return res.json({ ...job, results });
 });
 
 router.post("/", async (req: Request, res: Response) => {

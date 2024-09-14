@@ -1,20 +1,15 @@
-import { JSONObject } from "./JSON.js";
+import type { JSONObject } from "./JSON.js";
 
-export type UnsavedRun<TResult = JSONObject> = {
+export type UnsavedRun = {
   id?: number;
   jobId: number;
   start: string;
   end: string | null;
   status: "running" | "success" | "failure";
-} & RunResult<TResult>;
-
-export type RunResult<TResult = JSONObject> = {
-  data: TResult[];
-  meta?: JSONObject;
 };
 
 export type Run = UnsavedRun & { id: number };
 
-export type Runner<Params = JSONObject, Result = JSONObject> = (
-  params: Params | null
-) => Promise<RunResult<Result> | null>;
+export type Runner<TParams = JSONObject, TResult = JSONObject> = (
+  params: TParams | null
+) => Promise<TResult[] | null>;

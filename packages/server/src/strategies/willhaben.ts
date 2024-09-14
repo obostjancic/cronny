@@ -19,7 +19,7 @@ export type WillhabenResult = {
   title: string;
   price: number;
   url: string;
-} & Record<string, unknown>;
+} & Record<string, any>;
 
 type AdvertSummary = {
   id: string;
@@ -29,7 +29,7 @@ type AdvertSummary = {
 
 export const run: Runner<WillhabenParams, WillhabenResult> = async (params) => {
   const data = await fetchWillhabenSearch(params!);
-  return { data };
+  return data;
 };
 
 async function fetchWillhabenSearch({

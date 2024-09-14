@@ -46,28 +46,25 @@ async function fetchWillhabenImmoSearch({ url, filters }: ImmoParams) {
   const rawResults = await fetchWillhabenResults({ url });
 
   if (!rawResults) {
-    return { data: [], meta: { filteredResults: [] } };
+    return [];
   }
 
-  const rawImmoResults = rawResults.data as WillhabenImmoResult[];
-  const transformedResults: ImmoResult[] = rawImmoResults.map(toImmoResult);
+  const transformedResults: ImmoResult[] = rawResults.map(toImmoResult);
   logger.debug(`Found ${transformedResults.length} results`);
 
   const results = filterResults(transformedResults, filters);
 
   logger.debug(`Filtered to ${results.length} results`);
 
-  return {
-    data: results,
-    meta: {
-      filteredResults: transformedResults.filter(
-        (result) => !results.includes(result)
-      ),
-    },
-  };
+  return transformedResults.map((result) => ({
+    ...result,
+    status: !results.includes(result) ? "filtered" : "active",
+  }));
 }
 
-function toImmoResult(result: WillhabenImmoResult): ImmoResult {
+function toImmoResult(
+  result: WillhabenResult | WillhabenImmoResult
+): ImmoResult {
   const size = result["ESTATE_SIZE/LIVING_AREA"] || result["ESTATE_SIZE"];
   return {
     id: result.id,

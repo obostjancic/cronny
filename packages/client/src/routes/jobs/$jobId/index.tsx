@@ -1,10 +1,8 @@
-import { Container, Flex, Table } from "@mantine/core";
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { Button, Collapse, Container, Flex } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useGetJob } from "../../../api/useGetJob";
-import { formatDateTime, formatDuration } from "../../../utils/date/date";
-import { ExpandableRow } from "../../../components/ExpandableRow";
-import { CodeHighlight } from "@mantine/code-highlight";
-import { formatJSON } from "../../../utils/json";
+import { ResultsTable } from "../../../components/ResultsTable";
 
 export const Route = createFileRoute("/jobs/$jobId/")({
   component: () => <JobDetails />,
@@ -13,7 +11,7 @@ export const Route = createFileRoute("/jobs/$jobId/")({
 function JobDetails() {
   const { jobId } = useParams({ from: "/jobs/$jobId/" });
   const {
-    data: { runs, ...job },
+    data: { results, ...job },
   } = useGetJob(jobId);
 
   return (
@@ -22,50 +20,55 @@ function JobDetails() {
         <h3>Job {job.name}</h3>
         <a href="/">Jobs</a>
       </Flex>
-      <Table stickyHeader striped highlightOnHover withTableBorder>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Id</Table.Th>
-            <Table.Th>Start</Table.Th>
-            <Table.Th>Duration</Table.Th>
-            <Table.Th>Status</Table.Th>
-            <Table.Th>No. of results</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {runs.map((run) => (
-            <ExpandableRow
-              key={run.id}
-              details={
-                <Flex gap="md" p="xs" direction="column">
-                  <CodeHighlight
-                    withCopyButton
-                    language="json"
-                    code={formatJSON(job)}
-                    contentEditable={false}
-                  />
-                  <CodeHighlight
-                    withCopyButton
-                    language="json"
-                    code={formatJSON(run.data)}
-                    contentEditable={false}
-                  />
-                </Flex>
-              }
-            >
-              <Table.Td>
-                <Link to={`/jobs/${jobId}/runs/${run.id}`} key={run.id}>
-                  {run.id}
-                </Link>
-              </Table.Td>
-              <Table.Td>{formatDateTime(run.start)}</Table.Td>
-              <Table.Td>{formatDuration(run.start, run.end)}</Table.Td>
-              <Table.Td>{run.status}</Table.Td>
-              <Table.Td>{run.data?.length}</Table.Td>
-            </ExpandableRow>
-          ))}
-        </Table.Tbody>
-      </Table>
+      <ResultsTable
+        rows={results
+          .filter((r) => r.status === "active")
+          .map((r) => ({ ...r, ...r.data }))}
+      />
+      <Collapsible title="Filtered results">
+        <ResultsTable
+          rows={results
+            .filter((r) => r.status === "filtered")
+            .map((r) => ({ ...r, ...r.data }))}
+        />
+      </Collapsible>
+      <Collapsible title="Hidden results">
+        <ResultsTable
+          rows={results
+            .filter((r) => r.status === "hidden")
+            .map((r) => ({ ...r, ...r.data }))}
+        />
+      </Collapsible>
+      <Collapsible title="Expired results">
+        <ResultsTable
+          rows={results
+            .filter((r) => r.status === "expired")
+            .map((r) => ({ ...r, ...r.data }))}
+        />
+      </Collapsible>
+    </Container>
+  );
+}
+
+function Collapsible({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  const [opened, { toggle }] = useDisclosure(false);
+
+  if (!children) {
+    return null;
+  }
+  return (
+    <Container fluid p={0} mt="sm">
+      <Button variant="transparent" size="sm" onClick={toggle}>
+        {opened ? "Hide" : "Show"} {title}
+      </Button>
+
+      <Collapse in={opened}>{children}</Collapse>
     </Container>
   );
 }

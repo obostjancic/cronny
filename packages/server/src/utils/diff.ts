@@ -19,3 +19,7 @@ export function objectDiff(a: JSONObject, b: JSONObject) {
 
   return { added, removed, changed };
 }
+
+export function equal(a: JSONObject, b: JSONObject) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
