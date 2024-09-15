@@ -1,3 +1,4 @@
+import { JobDetails } from "@cronny/types";
 import {
   Button,
   Checkbox,
@@ -8,30 +9,27 @@ import {
   JsonInput,
   JsonInputProps,
   rem,
-  Select,
   Tabs,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import {
+  IconCancel,
+  IconCheck,
   IconClockCancel,
   IconEyeOff,
   IconFilterOff,
-  IconCancel,
-  IconCheck,
 } from "@tabler/icons-react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useGetJob } from "../../../api/useGetJob";
-import { ResultsTable } from "../../../components/ResultsTable";
-import { JobDetails } from "@cronny/types";
-import { usePatchJob } from "../../../api/usePatchJob";
-import { notifications } from "@mantine/notifications";
-import ReactTimeago from "react-timeago";
-import { usePostRun } from "../../../api/usePostRun";
-import { formatJSON } from "../../../utils/json";
 import { useState } from "react";
+import ReactTimeago from "react-timeago";
+import { useGetJob } from "../../../api/useGetJob";
+import { usePatchJob } from "../../../api/usePatchJob";
+import { usePostRun } from "../../../api/usePostRun";
+import { ResultsTable } from "../../../components/ResultsTable";
+import { formatJSON } from "../../../utils/json";
 
 export const Route = createFileRoute("/jobs/$jobId/")({
   component: () => <JobDetailsPage />,
