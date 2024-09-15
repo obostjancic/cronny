@@ -17,8 +17,10 @@ router.get("/", async (_: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   const job = await getJob(+req.params.id);
+  const runs = await getJobRuns(+req.params.id);
   const results = await getJobResults(+req.params.id);
-  return res.json({ ...job, results });
+
+  return res.json({ ...job, results, runs });
 });
 
 router.post("/", async (req: Request, res: Response) => {
@@ -31,7 +33,8 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.patch("/:id", async (req: Request, res: Response) => {
-  const job = await updateJob(+req.params.id, req.body);
+  const { id, ...patch } = req.body;
+  const job = await updateJob(+req.params.id ?? id, patch);
 
   await invalidateSchedule();
 
@@ -45,9 +48,9 @@ router.post("/:id/runs", async (req: Request, res: Response) => {
   }
 
   const runner = await getRunner(job);
-  executeRun(job, runner);
+  const run = await executeRun(job, runner);
 
-  return res.json({ message: "Job started" });
+  return res.json(run);
 });
 
 router.get("/:id/runs/:runId", async (req: Request, res: Response) => {

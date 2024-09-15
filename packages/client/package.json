@@ -12,9 +12,11 @@
   "dependencies": {
     "@mantine/code-highlight": "^7.12.1",
     "@mantine/core": "^7.12.1",
+    "@mantine/form": "^7.12.2",
     "@mantine/hooks": "^7.12.1",
     "@mantine/notifications": "^7.12.2",
     "@sentry/react": "^8.26.0",
+    "@tabler/icons-react": "^3.16.0",
     "@tanstack/react-query": "^5.52.1",
     "@tanstack/react-router": "^1.50.0",
     "date-fns": "^3.6.0",

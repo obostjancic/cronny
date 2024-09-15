@@ -14,7 +14,7 @@ import { iso } from "./utils/date.js";
 import logger from "./utils/logger.js";
 import { equal } from "./utils/diff.js";
 
-export async function executeRun(job: Job, runner: Runner): Promise<void> {
+export async function executeRun(job: Job, runner: Runner): Promise<Run> {
   let run = await startRun(job);
   let results = null;
   let resultDiff = 0;
@@ -30,6 +30,8 @@ export async function executeRun(job: Job, runner: Runner): Promise<void> {
   if (job.notify) {
     notifyRun(job, run, resultDiff);
   }
+
+  return run;
 }
 
 async function startRun(job: Job) {

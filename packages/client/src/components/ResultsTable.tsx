@@ -1,6 +1,7 @@
 import { JSONObject } from "@cronny/types";
 import { CodeHighlight } from "@mantine/code-highlight";
 import { Flex, Table } from "@mantine/core";
+import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
 import useSortableData from "../hooks/useSortableData";
 import { formatJSON } from "../utils/json";
@@ -61,13 +62,13 @@ export function ResultsTable({ rows }: { rows: JSONObject[] }) {
               {columns.map((column) => {
                 if (column === "url") {
                   return (
-                    <Table.Td key={column}>
+                    <Table.Td key={column} pt="sm">
                       <a
                         href={(row[column] as string) ?? "#"}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noreferrer"      
                       >
-                        Link
+                        <IconExternalLink />
                       </a>
                     </Table.Td>
                   );

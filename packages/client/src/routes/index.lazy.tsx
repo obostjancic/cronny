@@ -1,11 +1,10 @@
 import { CodeHighlight } from "@mantine/code-highlight";
-import { Button, Table } from "@mantine/core";
+import { Flex, Table } from "@mantine/core";
+import { IconCancel, IconCheck } from "@tabler/icons-react";
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useGetJobs } from "../api/useGetJobs";
 import { ExpandableRow } from "../components/ExpandableRow";
 import { formatJSON } from "../utils/json";
-import { usePostRun } from "../api/usePostRun";
-import { notifications } from "@mantine/notifications";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -13,7 +12,6 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   const job = useGetJobs();
-  const postRun = usePostRun();
 
   return (
     <div className="p-2">
@@ -25,7 +23,6 @@ function Index() {
             <Table.Th>Strategy</Table.Th>
             <Table.Th>Enabled</Table.Th>
             <Table.Th>Schedule</Table.Th>
-            <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -48,24 +45,12 @@ function Index() {
                 </Link>
               </Table.Td>
               <Table.Td>{job.strategy}</Table.Td>
-              <Table.Td>{job.enabled ? "✔️" : "x"}</Table.Td>
-              <Table.Td>{job.cron}</Table.Td>
               <Table.Td>
-                <Button
-                  variant="transparent"
-                  size="sm"
-                  onClick={async () => {
-                    await postRun.mutate(job.id);
-                    notifications.show({
-                      title: "Success",
-                      message: "Run has been started",
-                      autoClose: 2000,
-                    });
-                  }}
-                >
-                  Run
-                </Button>
+                <Flex align="center">
+                  {job.enabled ? <IconCheck /> : <IconCancel />}
+                </Flex>
               </Table.Td>
+              <Table.Td>{job.cron}</Table.Td>
             </ExpandableRow>
           ))}
         </Table.Tbody>

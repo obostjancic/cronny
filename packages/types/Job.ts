@@ -1,5 +1,6 @@
 import type { JSONObject } from "./JSON.js";
 import type { Result } from "./Result.js";
+import { Run } from "./Run.js";
 
 export type UnsavedJob = {
   id?: number;
@@ -24,4 +25,4 @@ export type NotificationConfig = {
   onResultChangeOnly?: boolean;
 };
 
-export type JobWithResults = Job & { results: Result[] };
+export type JobDetails = Job & { results: Result[]; runs: Run[] };
