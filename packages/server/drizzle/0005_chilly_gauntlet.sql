@@ -1,0 +1,1 @@
+ALTER TABLE `results` ADD `isHidden` integer DEFAULT false NOT NULL;

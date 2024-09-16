@@ -1,19 +1,19 @@
 import type { Job, UnsavedJob } from "@cronny/types";
 import { eq } from "drizzle-orm";
-import { db, jobs } from "./schema.js";
+import { db, Jobs } from "./schema.js";
 
 export async function getJobs(): Promise<Job[]> {
-  return db.select().from(jobs);
+  return db.select().from(Jobs);
 }
 
 export async function getJob(id: number): Promise<Job | undefined> {
-  const savedJobs = await db.select().from(jobs).where(eq(jobs.id, id));
+  const savedJobs = await db.select().from(Jobs).where(eq(Jobs.id, id));
 
   return savedJobs[0];
 }
 
 export async function saveJob(job: UnsavedJob): Promise<Job> {
-  const savedJobs = await db.insert(jobs).values(job).returning();
+  const savedJobs = await db.insert(Jobs).values(job).returning();
 
   return savedJobs[0];
 }
@@ -23,9 +23,9 @@ export async function updateJob(
   job: Partial<UnsavedJob>
 ): Promise<any> {
   const updatedJobs = await db
-    .update(jobs)
+    .update(Jobs)
     .set(job)
-    .where(eq(jobs.id, id))
+    .where(eq(Jobs.id, id))
     .returning();
 
   return updatedJobs[0];

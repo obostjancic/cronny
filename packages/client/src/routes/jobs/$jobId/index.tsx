@@ -100,7 +100,7 @@ function JobDetailsPage() {
 
       <ResultsTable
         rows={results
-          .filter((r) => r.status === "active")
+          .filter((r) => !r.isHidden && r.status === "active")
           .map((r) => ({ ...r.data, ...r }))}
       />
       <Container fluid p={0} pt="xl">
@@ -129,21 +129,21 @@ function JobDetailsPage() {
           <Tabs.Panel value="hidden">
             <ResultsTable
               rows={results
-                .filter((r) => r.status === "hidden")
+                .filter((r) => r.isHidden)
                 .map((r) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>
           <Tabs.Panel value="filtered">
             <ResultsTable
               rows={results
-                .filter((r) => r.status === "filtered")
+                .filter((r) => !r.isHidden && r.status === "filtered")
                 .map((r) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>
           <Tabs.Panel value="expired">
             <ResultsTable
               rows={results
-                .filter((r) => r.status === "expired")
+                .filter((r) => !r.isHidden && r.status === "expired")
                 .map((r) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>

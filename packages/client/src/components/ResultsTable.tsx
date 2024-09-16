@@ -114,7 +114,7 @@ function ChangeResultStateButton(props: {
   row: Result;
 }) {
   const { jobId } = useParams({ from: "/jobs/$jobId/" });
-  const label = props.row.status === "active" ? "Hide" : "Show";
+  const label = props.row.isHidden ? "Show" : "Hide";
 
   return (
     <Button
@@ -122,10 +122,9 @@ function ChangeResultStateButton(props: {
       variant="transparent"
       size="xs"
       onClick={async () => {
-        const status = props.row.status === "active" ? "hidden" : "active";
         await props.onClick({
           id: props.row.id,
-          status,
+          isHidden: !props.row.isHidden,
         });
         invalidateGetJob(jobId);
       }}

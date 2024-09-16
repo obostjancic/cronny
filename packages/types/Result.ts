@@ -1,6 +1,6 @@
 import type { JSONObject } from "./JSON.ts";
 
-export type ResultStatus = "active" | "expired" | "filtered" | "hidden";
+export type ResultStatus = "active" | "expired" | "filtered";
 
 export type UnsavedResult<T = JSONObject> = {
   jobId: number;
@@ -8,6 +8,7 @@ export type UnsavedResult<T = JSONObject> = {
   internalId: string;
   data: T;
   status: ResultStatus;
+  isHidden: boolean;
 };
 
 export type Result<T = JSONObject> = UnsavedResult<T> & {

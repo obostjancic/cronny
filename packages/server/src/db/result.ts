@@ -1,22 +1,22 @@
 import { Result, UnsavedResult } from "@cronny/types";
 import { and, eq, ne } from "drizzle-orm";
-import { db, results } from "./schema.js";
+import { db, Results } from "./schema.js";
 import { iso } from "../utils/date.js";
 
 export async function getJobResults(jobId: number): Promise<Result[]> {
-  return db.select().from(results).where(eq(results.jobId, jobId));
+  return db.select().from(Results).where(eq(Results.jobId, jobId));
 }
 
 export async function getNonExpiredResults(jobId: number): Promise<Result[]> {
   return db
     .select()
-    .from(results)
-    .where(and(eq(results.jobId, jobId), ne(results.status, "expired")));
+    .from(Results)
+    .where(and(eq(Results.jobId, jobId), ne(Results.status, "expired")));
 }
 
 export async function saveResult(result: UnsavedResult): Promise<Result> {
   const savedResults = await db
-    .insert(results)
+    .insert(Results)
     .values({ ...result, updatedAt: iso(), createdAt: iso() })
     .returning();
 
@@ -28,9 +28,9 @@ export async function updateResult(
   result: Partial<UnsavedResult>
 ): Promise<Result> {
   const updateResults = await db
-    .update(results)
+    .update(Results)
     .set({ ...result, updatedAt: iso() })
-    .where(eq(results.id, id))
+    .where(eq(Results.id, id))
     .returning();
 
   return updateResults[0];

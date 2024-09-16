@@ -111,5 +111,6 @@ export function toResult(
     internalId: `${data.id}`,
     data,
     status: (data.status ?? "active") as ResultStatus,
+    isHidden: false,
   };
 }

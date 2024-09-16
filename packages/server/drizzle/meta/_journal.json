@@ -36,6 +36,13 @@
       "when": 1726334309478,
       "tag": "0004_warm_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1726513433611,
+      "tag": "0005_chilly_gauntlet",
+      "breakpoints": true
     }
   ]
 }
