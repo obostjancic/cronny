@@ -90,7 +90,7 @@ async function notify({
 }
 
 function constructMessage(job: Job, resultDiff: number): string {
-  return `${job.name}: ${resultDiff} results found! \n Check the results at ${getRunResultsUrl(job)}`;
+  return `${job.name}: ${resultDiff} new results found! \n Check the results at ${getRunResultsUrl(job)}`;
 }
 
 function getRunResultsUrl(job: Job): string {
