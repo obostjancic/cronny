@@ -82,6 +82,10 @@ export async function fetchImmoscoutSearch({ url }: ImmoscoutParams) {
 
   const resultsWithCoords = [];
   for (const result of results) {
+    if (result.coordinates) {
+      resultsWithCoords.push(result);
+      continue;
+    }
     const coordinates = await fetchImmoscoutCoordinates(result.exposeId);
     resultsWithCoords.push({ ...result, coordinates });
   }

@@ -1,11 +1,15 @@
-import * as immoscout from "../../src/strategies/immoscout";
+import axios from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { rawResults, expectedResults } from "../fixtures/immoscout";
 import { run } from "../../src/strategies/immoscout";
 
 describe("Immoscout", () => {
   beforeEach(() => {
-    vi.spyOn(immoscout, "fetchImmoscoutSearch").mockResolvedValue(rawResults);
+    vi.spyOn(axios, "get").mockResolvedValue({
+      data: {
+        data: { findPropertiesByParams: { hits: rawResults } },
+      },
+    });
   });
 
   it("should return a list of properties", async () => {
