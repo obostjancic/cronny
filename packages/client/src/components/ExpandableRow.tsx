@@ -18,8 +18,8 @@ export const ExpandableRow = ({
     <>
       <Table.Tr>
         {children}
-        <Table.Td align="right">
-          <Button variant="transparent" size="sm" onClick={toggleExpand}>
+        <Table.Td>
+          <Button variant="transparent" size="xs" onClick={toggleExpand}>
             {isExpanded ? "Collapse" : "Expand"}
           </Button>
         </Table.Td>

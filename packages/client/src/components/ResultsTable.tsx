@@ -1,11 +1,14 @@
-import { JSONObject } from "@cronny/types";
+import { JSONObject, Result } from "@cronny/types";
 import { CodeHighlight } from "@mantine/code-highlight";
-import { Flex, Table } from "@mantine/core";
+import { Container, Flex, Table, Text, Button } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
 import useSortableData from "../hooks/useSortableData";
 import { formatJSON } from "../utils/json";
 import { ExpandableRow } from "./ExpandableRow";
+import { usePatchResult } from "../api/usePatchResult";
+import { useParams } from "@tanstack/react-router";
+import { invalidateGetJob } from "../api/useGetJob";
 
 const indicator = (direction?: string) => {
   if (!direction) {
@@ -15,24 +18,26 @@ const indicator = (direction?: string) => {
   return direction === "ascending" ? "▲" : "▼";
 };
 
-export function ResultsTable({ rows }: { rows: JSONObject[] }) {
+export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
   const { items, requestSort, sortConfig } = useSortableData(rows, {
-    key: "title",
-    direction: "ascending",
+    key: "createdAt",
+    direction: "descending",
   });
 
+  const patchResult = usePatchResult();
+
   if (!rows || rows.length === 0) {
-    return <div>No results</div>;
+    return <Flex p="md">No results</Flex>;
   }
 
   const firstRow = rows[0];
 
-  const allColumns = ["title", "createdAt", "size", "price", "url"];
+  const allColumns = ["url", "title", "createdAt", "size", "price"];
 
   const columns = allColumns.filter((column) => firstRow[column] !== undefined);
   return (
-    <Flex gap="md" pt="xs">
-      <Table stickyHeader striped highlightOnHover withTableBorder>
+    <Container p={0} pt="xs" fluid>
+      <Table striped stickyHeader highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
             {columns.map((column) => (
@@ -44,12 +49,14 @@ export function ResultsTable({ rows }: { rows: JSONObject[] }) {
                 )}
               </Table.Th>
             ))}
+            <Table.Th>actions</Table.Th>
+            <Table.Th>details</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {items.map((row) => (
             <ExpandableRow
-              key={row.id as string}
+              key={row.id}
               details={
                 <CodeHighlight
                   withCopyButton
@@ -66,7 +73,7 @@ export function ResultsTable({ rows }: { rows: JSONObject[] }) {
                       <a
                         href={(row[column] as string) ?? "#"}
                         target="_blank"
-                        rel="noreferrer"      
+                        rel="noreferrer"
                       >
                         <IconExternalLink />
                       </a>
@@ -82,13 +89,48 @@ export function ResultsTable({ rows }: { rows: JSONObject[] }) {
                 }
 
                 return (
-                  <Table.Td key={column}>{row[column]?.toString()}</Table.Td>
+                  <Table.Td key={column} maw="300px">
+                    <Text truncate="end" size="sm">
+                      {row[column]?.toString()}
+                    </Text>
+                  </Table.Td>
                 );
               })}
+              <Table.Td>
+                <ChangeResultStateButton
+                  onClick={patchResult.mutate}
+                  row={row}
+                />
+              </Table.Td>
             </ExpandableRow>
           ))}
         </Table.Tbody>
       </Table>
-    </Flex>
+    </Container>
+  );
+}
+function ChangeResultStateButton(props: {
+  onClick: (data: Partial<Result>) => void;
+  row: Result;
+}) {
+  const { jobId } = useParams({ from: "/jobs/$jobId/" });
+  const label = props.row.status === "active" ? "Hide" : "Show";
+
+  return (
+    <Button
+      disabled={props.row.status === "expired"}
+      variant="transparent"
+      size="xs"
+      onClick={async () => {
+        const status = props.row.status === "active" ? "hidden" : "active";
+        await props.onClick({
+          id: props.row.id,
+          status,
+        });
+        invalidateGetJob(jobId);
+      }}
+    >
+      {label}
+    </Button>
   );
 }

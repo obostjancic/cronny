@@ -48,16 +48,16 @@ function JobDetailsPage() {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <Container fluid>
+    <Container fluid p={0}>
       <a href="/">Jobs</a>
-      <Flex gap="md" pb="xs" align="center" justify="space-between">
+      <Flex gap="md" pb="xs" align="center" justify="space-between" wrap="wrap">
         <h3>Job {job.name}</h3>
-        <Button variant="transparent" size="sm" onClick={open}>
+        <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>
           Edit
         </Button>
       </Flex>
 
-      <Flex gap="md" pb="xs" align="center" justify="space-between">
+      <Flex gap="md" pb="xs" align="center" wrap="wrap" justify="space-between">
         <Flex align="center" gap="xs">
           Enabled:
           {job.enabled ? (
@@ -74,6 +74,7 @@ function JobDetailsPage() {
           <Button
             variant="transparent"
             size="sm"
+            pr={0}
             onClick={async () => {
               await postRun.mutate(job.id);
               notifications.show({

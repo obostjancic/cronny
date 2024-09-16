@@ -14,7 +14,6 @@ export function usePatchJob(
       });
     },
     onSettled: (...args) => {
-      console.log(args);
       const data = args[0];
       if (data) {
         invalidateGetJob(data.id);
