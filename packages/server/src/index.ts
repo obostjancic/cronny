@@ -5,6 +5,7 @@ import { jobsRoutes } from "./routes/jobs.js";
 import { resultRoutes } from "./routes/results.js";
 import { scheduleRuns } from "./schedule.js";
 import { isProd } from "./utils/env.js";
+import fs from "fs";
 
 const app = new Hono();
 
@@ -15,7 +16,16 @@ const port = 3000;
 console.log(`Server is running on port ${port}`);
 
 if (isProd) {
-  app.use("*", serveStatic({ root: "../client/dist" }));
+  const indexHtml = fs.readFileSync("../client/dist/index.html", "utf-8");
+  app.use(
+    serveStatic({
+      root: "../client/dist",
+      index: "index.html",
+    })
+  );
+  app.get("*", (c) => {
+    return c.html(indexHtml);
+  });
 } else {
   app.use("*", (c) => {
     return fetch(`http://localhost:5173${c.req.path}`);
