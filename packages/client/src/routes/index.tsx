@@ -1,12 +1,12 @@
 import { CodeHighlight } from "@mantine/code-highlight";
 import { Flex, Table } from "@mantine/core";
 import { IconCancel, IconCheck } from "@tabler/icons-react";
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useGetJobs } from "../api/useGetJobs";
 import { ExpandableRow } from "../components/ExpandableRow";
 import { formatJSON } from "../utils/json";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
   component: Index,
 });
 
