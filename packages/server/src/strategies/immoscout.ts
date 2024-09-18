@@ -64,10 +64,11 @@ export const run: Runner<ImmoscoutParams, BaseImmoResult> = async (params) => {
   }
 
   const transformedResults = rawResults.map(toImmoResult);
-  logger.debug(`Found ${transformedResults.length} results`);
 
   const results = filterResults(transformedResults, params.filters);
-  logger.debug(`Filtered to ${results.length} results`);
+  logger.debug(
+    `Found ${transformedResults.length} results, filtered to ${results.length}`
+  );
 
   return transformedResults.map((result) => ({
     ...result,

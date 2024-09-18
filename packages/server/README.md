@@ -1,4 +1,6 @@
 ### Todos
 
 // price comparison
-// mgmt ui
+
+redo notify
+make a proper state diff

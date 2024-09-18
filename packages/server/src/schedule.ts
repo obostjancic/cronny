@@ -13,10 +13,10 @@ export async function scheduleRuns(): Promise<void> {
 
   for (const job of jobs) {
     if (!job.enabled) {
-      logger.debug(`Skipping ${job.name} - disabled`);
+      logger.info(`Skipping ${job.name} - disabled`);
       continue;
     }
-    logger.debug(`Scheduling ${job.name}`);
+    logger.info(`Scheduling ${job.name}`);
     const runner = await getRunner(job);
 
     schedule.push(cron(job, runner));
@@ -34,7 +34,7 @@ export async function getRunner(job: Job): Promise<Runner> {
 }
 
 function stopRuns(): void {
-  logger.debug("Stopping all scheduled jobs");
+  logger.info("Stopping all scheduled jobs");
   schedule.forEach((job) => {
     job.stop();
   });

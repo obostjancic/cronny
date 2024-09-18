@@ -50,12 +50,12 @@ async function fetchWillhabenImmoSearch({ url, filters }: BaseImmoParams) {
   }
 
   const transformedResults: BaseImmoResult[] = rawResults.map(toImmoResult);
-  logger.debug(`Found ${transformedResults.length} results`);
 
   const results = filterResults(transformedResults, filters);
 
-  logger.debug(`Filtered to ${results.length} results`);
-
+  logger.debug(
+    `Found ${transformedResults.length} results, filtered to ${results.length}`
+  );
   return transformedResults.map((result) => ({
     ...result,
     status: !results.includes(result) ? "filtered" : "active",

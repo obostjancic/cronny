@@ -1,6 +1,9 @@
 import axios from "axios";
-import logger from "../utils/logger.js";
+
 import { getEnv, isProd } from "../utils/env.js";
+import { createLogger } from "../utils/logger.js";
+
+const logger = createLogger("whatsapp");
 
 const PRESUMED_WHATSAPP_MESSAGE_LENGTH = 738;
 

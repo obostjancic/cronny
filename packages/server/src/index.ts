@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/jobs", jobRoutes);
 app.use("/api/results", resultRoutes);
+
 if (isProd) {
   app.use(express.static("../client/dist"));
   const file = fs.readFileSync("../client/dist/index.html", "utf-8");

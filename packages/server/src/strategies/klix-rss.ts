@@ -36,8 +36,6 @@ export const run: Runner<undefined, Article> = async () => {
 };
 
 async function fetchFeed(): Promise<RawArticle[]> {
-  logger.log("Fetching feed");
-  // const parser = { parseURL: (url: string) => Promise.resolve({ items: [] }) };
   const parser = new Parser<KlixFeed, RawArticle>();
   const feed = await parser.parseURL("https://www.klix.ba/rss");
 

@@ -25,7 +25,7 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
 
   const page = await browser.newPage();
   try {
-    logger.log("Fetching https://mein.wien.gv.at/grillplatz");
+    logger.debug("Fetching https://mein.wien.gv.at/grillplatz");
     const results = [];
 
     for (const month of getMonthNamesInInterval(params.from, params.to)) {
@@ -34,7 +34,7 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
     }
     return results.flat();
   } catch (e) {
-    logger.log("Error fetching grill areas", e);
+    logger.error("Error fetching grill areas", e);
     throw e;
   } finally {
     page.close();
@@ -112,7 +112,7 @@ async function checkAreas(areas: number[], page: Page, month: string) {
 
   const areaResults = await collectAreaResults(page);
 
-  logger.log(
+  logger.info(
     `Found ${areaResults?.length ?? 0} results for interval: ${toString(
       from
     )} - ${toString(to)}`

@@ -118,7 +118,7 @@ function ChangeResultStateButton(props: {
 
   return (
     <Button
-      disabled={props.row.status === "expired"}
+      disabled={props.row.status === "expired" && !props.row.isHidden}
       variant="transparent"
       size="xs"
       onClick={async () => {

@@ -43,6 +43,9 @@
     "http-proxy-middleware": "^3.0.0",
     "lowdb": "^7.0.1",
     "node-html-parser": "^6.1.13",
+    "pino": "^9.4.0",
+    "pino-http": "^10.3.0",
+    "pino-pretty": "^11.2.2",
     "playwright": "^1.45.3",
     "rss-parser": "^3.13.0"
   },
