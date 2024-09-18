@@ -1,16 +1,13 @@
-import { Request, Response } from "express";
-import { updateJob } from "../db/job.js";
-import { invalidateSchedule } from "../schedule.js";
-import AsyncRouter from "./router.js";
+import { Result } from "@cronny/types";
+import { Hono } from "hono";
 import { updateResult } from "../db/result.js";
 
-const router = AsyncRouter();
+export const resultRoutes = new Hono();
 
-router.patch("/:id", async (req: Request, res: Response) => {
-  const { id, ...patch } = req.body;
-  const result = await updateResult(+req.params.id ?? id, patch);
+resultRoutes.patch("/:id", async (c) => {
+  const { id, ...patch } = await c.req.json<Partial<Result>>();
+  const resultId = Number(c.req.param("id") ?? id);
+  const result = await updateResult(resultId, patch);
 
-  return res.json(result);
+  return c.json(result);
 });
-
-export default router;

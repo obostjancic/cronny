@@ -1,30 +1,29 @@
-import "./instrument.js";
-import express, { Request, Response } from "express";
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
+import { jobsRoutes } from "./routes/jobs.js";
+import { resultRoutes } from "./routes/results.js";
 import { scheduleRuns } from "./schedule.js";
-import proxy from "./middlewares/proxy.js";
-import fs from "fs";
 import { isProd } from "./utils/env.js";
-import jobRoutes from "./routes/jobs.js";
-import resultRoutes from "./routes/results.js";
 
-const app = express();
+const app = new Hono();
+
+app.route("/api/jobs", jobsRoutes);
+app.route("/api/results", resultRoutes);
+
 const port = 3000;
-
-app.use(express.json());
-
-app.use("/api/jobs", jobRoutes);
-app.use("/api/results", resultRoutes);
+console.log(`Server is running on port ${port}`);
 
 if (isProd) {
-  app.use(express.static("../client/dist"));
-  const file = fs.readFileSync("../client/dist/index.html", "utf-8");
-  app.get("*", (req, res) => {
-    res.send(file);
-  });
+  app.use("*", serveStatic({ root: "../client/dist" }));
 } else {
-  app.use("/", proxy);
+  app.use("*", (c) => {
+    return fetch(`http://localhost:5173${c.req.path}`);
+  });
 }
 
-app.listen(port, () => {
-  scheduleRuns();
+serve({
+  fetch: app.fetch,
+  port,
 });
+scheduleRuns();

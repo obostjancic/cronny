@@ -1,66 +1,63 @@
-import { Request, Response } from "express";
-
-import type { UnsavedJob } from "@cronny/types";
+import type { Job, UnsavedJob } from "@cronny/types";
+import { Hono } from "hono";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
+import { getJobResults } from "../db/result.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { executeRun } from "../run.js";
 import { getRunner, invalidateSchedule } from "../schedule.js";
-import AsyncRouter from "./router.js";
-import { getJobResults } from "../db/result.js";
 
-const router = AsyncRouter();
+export const jobsRoutes = new Hono();
 
-router.get("/", async (_: Request, res: Response) => {
+jobsRoutes.get("/", async (c) => {
   const jobs = await getJobs();
-  return res.json(jobs);
+  return c.json(jobs);
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-  const job = await getJob(+req.params.id);
-  const runs = await getJobRuns(+req.params.id);
-  const results = await getJobResults(+req.params.id);
+jobsRoutes.get("/:id", async (c) => {
+  const job = await getJob(+c.req.param("id"));
+  const runs = await getJobRuns(+c.req.param("id"));
+  const results = await getJobResults(+c.req.param("id"));
 
-  return res.json({ ...job, results, runs });
+  return c.json({ ...job, results, runs });
 });
 
-router.post("/", async (req: Request, res: Response) => {
-  const body = req.body as UnsavedJob;
+jobsRoutes.post("/", async (c) => {
+  const body = await c.req.json<UnsavedJob>();
   const job = await saveJob(body);
 
   await invalidateSchedule();
 
-  return res.json(job);
+  return c.json(job);
 });
 
-router.patch("/:id", async (req: Request, res: Response) => {
-  const { id, ...patch } = req.body;
-  const job = await updateJob(+req.params.id ?? id, patch);
+jobsRoutes.patch("/:id", async (c) => {
+  const { id, ...patch } = await c.req.json<Partial<Job>>();
+  const jobId = Number(c.req.param("id") ?? id);
+  const job = await updateJob(jobId, patch);
 
   await invalidateSchedule();
 
-  return res.json(job);
+  return c.json(job);
 });
 
-router.post("/:id/runs", async (req: Request, res: Response) => {
-  const job = await getJob(+req.params.id);
+jobsRoutes.post("/:id/runs", async (c) => {
+  const job = await getJob(+c.req.param("id"));
   if (!job) {
-    return res.status(404).json({ error: "Job not found" });
+    return c.status(404);
   }
 
   const runner = await getRunner(job);
   const run = await executeRun(job, runner);
 
-  return res.json(run);
+  return c.json(run);
 });
 
-router.get("/:id/runs/:runId", async (req: Request, res: Response) => {
-  if (req.params.runId === "latest") {
-    const run = await getLastRun(+req.params.id);
-    return res.json(run);
-    return;
+jobsRoutes.get("/:id/runs/:runId", async (c) => {
+  const runId = c.req.param("runId");
+  if (runId === "latest") {
+    const run = await getLastRun(+c.req.param("id"));
+    return c.json(run);
   }
-  const run = await getRun(+req.params.runId);
-  return res.json(run);
+  const run = await getRun(+runId);
+  return c.json(run);
 });
-
-export default router;

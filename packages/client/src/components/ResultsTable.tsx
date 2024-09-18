@@ -1,14 +1,13 @@
 import { JSONObject, Result } from "@cronny/types";
 import { CodeHighlight } from "@mantine/code-highlight";
-import { Container, Flex, Table, Text, Button } from "@mantine/core";
+import { Button, Container, Flex, Table, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
+import { invalidateGetJob } from "../api/useGetJob";
+import { usePatchResult } from "../api/usePatchResult";
 import useSortableData from "../hooks/useSortableData";
 import { formatJSON } from "../utils/json";
 import { ExpandableRow } from "./ExpandableRow";
-import { usePatchResult } from "../api/usePatchResult";
-import { useParams } from "@tanstack/react-router";
-import { invalidateGetJob } from "../api/useGetJob";
 
 const indicator = (direction?: string) => {
   if (!direction) {
@@ -24,7 +23,13 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
     direction: "descending",
   });
 
-  const patchResult = usePatchResult();
+  const patchResult = usePatchResult({
+    onSettled: (data) => {
+      if (data) {
+        invalidateGetJob(data.jobId);
+      }
+    },
+  });
 
   if (!rows || rows.length === 0) {
     return <Flex p="md">No results</Flex>;
@@ -113,7 +118,6 @@ function ChangeResultStateButton(props: {
   onClick: (data: Partial<Result>) => void;
   row: Result;
 }) {
-  const { jobId } = useParams({ from: "/jobs/$jobId/" });
   const label = props.row.isHidden ? "Show" : "Hide";
 
   return (
@@ -122,11 +126,10 @@ function ChangeResultStateButton(props: {
       variant="transparent"
       size="xs"
       onClick={async () => {
-        await props.onClick({
+        props.onClick({
           id: props.row.id,
           isHidden: !props.row.isHidden,
         });
-        invalidateGetJob(jobId);
       }}
     >
       {label}

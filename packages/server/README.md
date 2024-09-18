@@ -1,6 +1,8 @@
-### Todos
+```
+npm install
+npm run dev
+```
 
-// price comparison
-
-redo notify
-make a proper state diff
+```
+open http://localhost:3000
+```
