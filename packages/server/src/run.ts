@@ -64,7 +64,7 @@ async function finishRun(
 
   await upsertResults(allResults);
 
-  const newActiveResults = allResults.filter((r) => r.status === "active");
+  const newActiveResults = newResults.filter((r) => r.status === "active");
   logger.debug(
     `Found ${newActiveResults.length} new results for run ${savedRun.id}`
   );
