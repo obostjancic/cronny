@@ -33,7 +33,7 @@ if (isProd) {
 }
 
 serve({
-  fetch: app.fetch,
   port,
+  fetch: app.fetch,
 });
 scheduleRuns();

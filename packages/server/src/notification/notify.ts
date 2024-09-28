@@ -3,6 +3,7 @@ import type { Job, JSONObject, NotificationConfig, Run } from "@cronny/types";
 import { getEnv } from "../utils/env.js";
 import { createLogger } from "../utils/logger.js";
 import { sendWhatsappMessage } from "./whatsapp.js";
+import { sendSlack } from "./slack.js";
 
 const logger = createLogger("notify");
 
@@ -73,7 +74,7 @@ async function notify({
       // sendEmail(params, message);
       break;
     case "slack":
-      // sendSlack(params, message);
+      sendSlack(params.webhook as string, message);
       break;
     case "telegram":
       // sendTelegram(params, message);

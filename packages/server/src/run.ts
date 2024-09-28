@@ -76,8 +76,8 @@ export function mergeResults(
 ): (Result | UnsavedResult)[] {
   const updatedExistingResults: Result[] = existingResults.map(
     (existingResult) => {
-      const newResult = newResults.find(
-        (newResult) => newResult.internalId === existingResult.internalId
+      const newResult = newResults.find((newResult) =>
+        equalResults(newResult, existingResult)
       );
 
       if (newResult) {
@@ -92,12 +92,22 @@ export function mergeResults(
 
   const newResultsToInsert = newResults.filter(
     (newResult) =>
-      !existingResults.some(
-        (existingResult) => existingResult.internalId === newResult.internalId
+      !existingResults.some((existingResult) =>
+        equalResults(newResult, existingResult)
       )
   );
 
   return newResultsToInsert.concat(updatedExistingResults);
+}
+
+function equalResults(a: UnsavedResult, b: UnsavedResult) {
+  if (a.internalId === b.internalId) {
+    return true;
+  }
+  const { id, ...restA } = a.data;
+  const { id: _, ...restB } = b.data;
+
+  return equal(restA, restB);
 }
 
 export function toResult(
