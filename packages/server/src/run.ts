@@ -64,32 +64,31 @@ async function finishRun(
 
   await upsertResults(allResults);
 
-  const newActiveResults = newResults.filter((r) => r.status === "active");
-  logger.debug(
-    `Found ${newActiveResults.length} new results for run ${savedRun.id}`
-  );
-  const existingActiveResults = exisitingResults.filter(
-    (r) => r.status === "active"
+  const newActiveResults = new Set(
+    newResults.filter((r) => r.status === "active").map((r) => r.internalId)
   );
   logger.debug(
-    `Found ${existingActiveResults.length} existing results for run ${savedRun.id}`
+    `Found ${newActiveResults.size} new results for run ${savedRun.id}`
+  );
+  const existingActiveResults = new Set(
+    exisitingResults
+      .filter((r) => r.status === "active")
+      .map((r) => r.internalId)
+  );
+  logger.debug(
+    `Found ${existingActiveResults.size} existing results for run ${savedRun.id}`
   );
 
-  const resultDiff = newActiveResults.length - existingActiveResults.length;
+  const resultDiff = newActiveResults.size - existingActiveResults.size;
 
   if (resultDiff > 0) {
     logger.info(`Found ${resultDiff} new results for run ${savedRun.id}`);
 
-    const resultsThatAreNew = newActiveResults.filter(
-      (r) =>
-        !existingActiveResults.some((existingResult) =>
-          equalResults(r, existingResult)
-        )
+    const resultsThatAreNew = [...newActiveResults].filter(
+      (r) => !existingActiveResults.has(r)
     );
     logger.debug(
-      `New results for run ${savedRun.id}: ${resultsThatAreNew
-        .map((r) => r.internalId)
-        .join(", ")}`
+      `New results for run ${savedRun.id}: ${resultsThatAreNew.join(", ")}`
     );
   }
 
