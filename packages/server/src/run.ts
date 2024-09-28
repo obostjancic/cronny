@@ -15,6 +15,7 @@ import logger from "./utils/logger.js";
 import { equal } from "./utils/diff.js";
 
 export async function executeRun(job: Job, runner: Runner): Promise<Run> {
+  logger.info(`Running job ${job.name}`);
   let run = await startRun(job);
   let results = null;
   let resultDiff = 0;
@@ -104,6 +105,7 @@ function equalResults(a: UnsavedResult, b: UnsavedResult) {
   if (a.internalId === b.internalId) {
     return true;
   }
+
   const { id, ...restA } = a.data;
   const { id: _, ...restB } = b.data;
 
