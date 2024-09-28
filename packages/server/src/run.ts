@@ -64,9 +64,34 @@ async function finishRun(
 
   await upsertResults(allResults);
 
-  const resultDiff =
-    newResults.filter((r) => r.status === "active").length -
-    exisitingResults.filter((r) => r.status === "active").length;
+  const newActiveResults = allResults.filter((r) => r.status === "active");
+  logger.debug(
+    `Found ${newActiveResults.length} new results for run ${savedRun.id}`
+  );
+  const existingActiveResults = exisitingResults.filter(
+    (r) => r.status === "active"
+  );
+  logger.debug(
+    `Found ${existingActiveResults.length} existing results for run ${savedRun.id}`
+  );
+
+  const resultDiff = newActiveResults.length - existingActiveResults.length;
+
+  if (resultDiff > 0) {
+    logger.info(`Found ${resultDiff} new results for run ${savedRun.id}`);
+
+    const resultsThatAreNew = newActiveResults.filter(
+      (r) =>
+        !existingActiveResults.some((existingResult) =>
+          equalResults(r, existingResult)
+        )
+    );
+    logger.debug(
+      `New results for run ${savedRun.id}: ${resultsThatAreNew
+        .map((r) => r.internalId)
+        .join(", ")}`
+    );
+  }
 
   return { run: savedRun, resultDiff };
 }
