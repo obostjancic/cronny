@@ -73,9 +73,15 @@ async function finishRun(
       .map((r) => r.internalId)
   );
 
-  const resultDiff = newActiveResults.size - existingActiveResults.size;
+  const resultDiff = new Set(
+    [...newActiveResults].filter((x) => !existingActiveResults.has(x))
+  );
 
-  return { run: savedRun, resultDiff };
+  if (resultDiff.size > 0) {
+    logger.debug("Diff", resultDiff);
+  }
+
+  return { run: savedRun, resultDiff: resultDiff.size };
 }
 
 export function mergeResults(
