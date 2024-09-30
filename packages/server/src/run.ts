@@ -78,8 +78,8 @@ async function finishRun(
   );
 
   if (resultDiff.length > 0) {
-    logger.debug("Diff", resultDiff.map((r) => `${r}`).join(", "));
-    logger.debug("Diff length", resultDiff.length);
+    logger.debug(`Diff ${resultDiff.map((r) => `${r}`).join(", ")}`);
+    logger.debug(`Diff length ${resultDiff.length}`);
   }
 
   return { run: savedRun, resultDiff: resultDiff.length };
