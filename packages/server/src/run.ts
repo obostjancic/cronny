@@ -73,15 +73,19 @@ async function finishRun(
       .map((r) => r.internalId)
   );
 
-  const resultDiff = new Set(
-    [...newActiveResults].filter((x) => !existingActiveResults.has(x))
+  const resultDiff = [...newActiveResults].filter(
+    (x) => !existingActiveResults.has(x)
   );
 
-  if (resultDiff.size > 0) {
-    logger.debug("Diff", resultDiff);
+  if (resultDiff.length > 0) {
+    logger.debug(
+      "Diff",
+      resultDiff.length,
+      resultDiff.map((r) => `${r}`).join(", ")
+    );
   }
 
-  return { run: savedRun, resultDiff: resultDiff.size };
+  return { run: savedRun, resultDiff: resultDiff.length };
 }
 
 export function mergeResults(
