@@ -1,4 +1,4 @@
-### TODOS
-
-- zod
-- results state merge/diff
+```
+yarn
+yarn dev
+```

@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobResults } from "../db/result.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
-import { executeRun } from "../run.js";
 
 export const jobsRoutes = new Hono();
 
@@ -44,7 +43,7 @@ jobsRoutes.post("/:id/runs", async (c) => {
   // const runner = await getRunner(job);
   // const run = await executeRun(job, runner);
 
-  return c.json(run);
+  return c.json({ message: "Run started" });
 });
 
 jobsRoutes.get("/:id/runs/:runId", async (c) => {
