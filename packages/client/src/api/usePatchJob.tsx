@@ -1,7 +1,7 @@
 import type { Job } from "@cronny/types";
 import { MutationOptions, useMutation } from "@tanstack/react-query";
-import { invalidateGetJob } from "./useGetJob";
 import { fetchJson } from "./utils";
+import { invalidateGetJobs } from "./useGetJobs";
 
 export function usePatchJob(
   options?: MutationOptions<Job, Error, Partial<Job>>
@@ -16,7 +16,7 @@ export function usePatchJob(
     onSettled: (...args) => {
       const data = args[0];
       if (data) {
-        invalidateGetJob(data.id);
+        invalidateGetJobs();
       }
       options?.onSettled?.(...args);
     },

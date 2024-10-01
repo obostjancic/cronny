@@ -1,7 +1,7 @@
 import type { Run } from "@cronny/types";
 import { MutationOptions, useMutation } from "@tanstack/react-query";
+import { invalidateGetJobs } from "./useGetJobs";
 import { fetchJson } from "./utils";
-import { invalidateGetJob } from "./useGetJob";
 
 export function usePostRun(options?: MutationOptions<Run, Error, number>) {
   return useMutation({
@@ -14,7 +14,7 @@ export function usePostRun(options?: MutationOptions<Run, Error, number>) {
       console.log(args);
       const data = args[0];
       if (data) {
-        invalidateGetJob(data.jobId);
+        invalidateGetJobs();
       }
       options?.onSettled?.(...args);
     },

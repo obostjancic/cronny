@@ -12,17 +12,11 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as JobsJobIdIndexImport } from './routes/jobs/$jobId/index'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const JobsJobIdIndexRoute = JobsJobIdIndexImport.update({
-  path: '/jobs/$jobId/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,22 +31,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/jobs/$jobId/': {
-      id: '/jobs/$jobId/'
-      path: '/jobs/$jobId'
-      fullPath: '/jobs/$jobId'
-      preLoaderRoute: typeof JobsJobIdIndexImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexRoute,
-  JobsJobIdIndexRoute,
-})
+export const routeTree = rootRoute.addChildren({ IndexRoute })
 
 /* prettier-ignore-end */
 
@@ -62,15 +46,11 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/jobs/$jobId/"
+        "/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/jobs/$jobId/": {
-      "filePath": "jobs/$jobId/index.tsx"
     }
   }
 }

@@ -4,7 +4,6 @@ import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
 import { getJobResults } from "../db/result.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { executeRun } from "../run.js";
-import { getRunner, invalidateSchedule } from "../schedule.js";
 
 export const jobsRoutes = new Hono();
 
@@ -25,8 +24,6 @@ jobsRoutes.post("/", async (c) => {
   const body = await c.req.json<UnsavedJob>();
   const job = await saveJob(body);
 
-  await invalidateSchedule();
-
   return c.json(job);
 });
 
@@ -34,8 +31,6 @@ jobsRoutes.patch("/:id", async (c) => {
   const { id, ...patch } = await c.req.json<Partial<Job>>();
   const jobId = Number(c.req.param("id") ?? id);
   const job = await updateJob(jobId, patch);
-
-  await invalidateSchedule();
 
   return c.json(job);
 });
@@ -46,8 +41,8 @@ jobsRoutes.post("/:id/runs", async (c) => {
     return c.status(404);
   }
 
-  const runner = await getRunner(job);
-  const run = await executeRun(job, runner);
+  // const runner = await getRunner(job);
+  // const run = await executeRun(job, runner);
 
   return c.json(run);
 });

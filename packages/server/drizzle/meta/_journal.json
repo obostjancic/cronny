@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1726155785936,
-      "tag": "0000_kind_ares",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1726303658450,
-      "tag": "0001_hesitant_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1726307784802,
-      "tag": "0002_free_silver_samurai",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1726330540970,
-      "tag": "0003_talented_blonde_phantom",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1726334309478,
-      "tag": "0004_warm_puppet_master",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1726513433611,
-      "tag": "0005_chilly_gauntlet",
+      "when": 1727801344104,
+      "tag": "0000_cute_vapor",
       "breakpoints": true
     }
   ]
