@@ -28,7 +28,8 @@ export async function executeRun(job: Job, runner: Runner): Promise<Run> {
   try {
     results = await runner(job.params);
   } catch (e) {
-    logger.error(`Error running job ${job.name}`, e);
+    logger.error(`Error running job ${job.name}`);
+    logger.error(e);
   } finally {
     const res = await finishRun(run.id, results);
     run = res.run;

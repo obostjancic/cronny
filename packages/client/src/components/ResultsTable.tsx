@@ -1,13 +1,11 @@
 import { JSONObject, Result } from "@cronny/types";
-import { CodeHighlight } from "@mantine/code-highlight";
 import { Button, Container, Flex, Table, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
 import { invalidateGetJob } from "../api/useGetJob";
 import { usePatchResult } from "../api/usePatchResult";
+import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 import useSortableData from "../hooks/useSortableData";
-import { formatJSON } from "../utils/json";
-import { ExpandableRow } from "./ExpandableRow";
 
 const indicator = (direction?: string) => {
   if (!direction) {
@@ -22,6 +20,8 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
     key: "createdAt",
     direction: "descending",
   });
+
+  const openJSONInNewTab = useOpenJSONInNewTab();
 
   const patchResult = usePatchResult({
     onSettled: (data) => {
@@ -55,22 +55,12 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
               </Table.Th>
             ))}
             <Table.Th>actions</Table.Th>
-            <Table.Th>details</Table.Th>
+            <Table.Th>raw</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {items.map((row) => (
-            <ExpandableRow
-              key={row.id}
-              details={
-                <CodeHighlight
-                  withCopyButton
-                  language="json"
-                  code={formatJSON(row)}
-                  contentEditable={false}
-                />
-              }
-            >
+            <Table.Tr>
               {columns.map((column) => {
                 if (column === "url") {
                   return (
@@ -107,7 +97,18 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                   row={row}
                 />
               </Table.Td>
-            </ExpandableRow>
+              <Table.Td>
+                <Button
+                  variant="transparent"
+                  size="xs"
+                  onClick={() => {
+                    openJSONInNewTab(row);
+                  }}
+                >
+                  JSON
+                </Button>
+              </Table.Td>
+            </Table.Tr>
           ))}
         </Table.Tbody>
       </Table>

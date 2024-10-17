@@ -61,7 +61,6 @@ async function fetchResultPage(url: string, page = 1) {
   const response = await axios.get(urlWithPage);
   const html = response.data as string;
 
-  // parse results
   const items = parse(html).querySelectorAll(".sc-listing-card-content");
 
   return Promise.all(

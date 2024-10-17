@@ -63,30 +63,35 @@ export async function geocode(address: string): Promise<Coordinates | null> {
     return cache.get<Coordinates | null>(sanitized);
   }
 
-  const apiKey = getEnv("GEOCODE_API_KEY");
-  const response = await retry(
-    () =>
-      axios.get("https://geocode.maps.co/search", {
-        params: {
-          api_key: apiKey,
-          q: sanitized,
-        },
-      }),
-    {
-      retries: 5,
+  try {
+    const apiKey = getEnv("GEOCODE_API_KEY");
+    const response = await retry(
+      () =>
+        axios.get("https://geocode.maps.co/search", {
+          params: {
+            api_key: apiKey,
+            q: sanitized,
+          },
+        }),
+      {
+        retries: 5,
+      }
+    );
+
+    const match = response.data[0];
+
+    if (!match) {
+      cache.set(sanitized, null);
+      return null;
     }
-  );
 
-  const match = response.data[0];
+    const coordinates = parseCoordinates(`${match.lat},${match.lon}`);
 
-  if (!match) {
-    cache.set(address, null);
+    cache.set(sanitized, coordinates);
+
+    return coordinates;
+  } catch (e) {
+    cache.set(sanitized, null);
     return null;
   }
-
-  const coordinates = parseCoordinates(`${match.lat},${match.lon}`);
-
-  cache.set(address, coordinates);
-
-  return coordinates;
 }

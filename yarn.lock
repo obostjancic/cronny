@@ -209,11 +209,6 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@donedeal0/superdiff@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@donedeal0/superdiff/-/superdiff-2.1.0.tgz#42812fc40f0139448d5315ee32cb5fe90b57816f"
-  integrity sha512-nMivD8NFFrp+qemga1dOpe764cpEmSJp9ZLwmv7/2MWPA/w5FZMZU0L26xXWle5zHPgFzcH/1tXibm7029pFtA==
-
 "@drizzle-team/brocli@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@drizzle-team/brocli/-/brocli-0.10.1.tgz#8b73d65eaf2f6d04f45718ea6f4d789d69526cd3"

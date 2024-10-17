@@ -1,10 +1,9 @@
-import { CodeHighlight } from "@mantine/code-highlight";
-import { Flex, Table } from "@mantine/core";
+import { Button, Flex, Table } from "@mantine/core";
 import { IconCancel, IconCheck } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useGetJobs } from "../api/useGetJobs";
-import { ExpandableRow } from "../components/ExpandableRow";
-import { formatJSON } from "../utils/json";
+import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
+import { usePostJob } from "../api/usePostJob";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -12,6 +11,10 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const job = useGetJobs();
+
+  const postJob = usePostJob();
+
+  const openJSONInNewTab = useOpenJSONInNewTab();
 
   return (
     <div className="p-2">
@@ -23,21 +26,13 @@ function Index() {
             <Table.Th>Strategy</Table.Th>
             <Table.Th>Enabled</Table.Th>
             <Table.Th>Schedule</Table.Th>
+            <Table.Th>Raw</Table.Th>
+            <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {job.data?.map((job) => (
-            <ExpandableRow
-              key={job.id}
-              details={
-                <CodeHighlight
-                  withCopyButton
-                  language="json"
-                  code={formatJSON(job)}
-                  contentEditable={false}
-                />
-              }
-            >
+            <Table.Tr>
               <Table.Td>{job.id}</Table.Td>
               <Table.Td>
                 <Link to={`/jobs/${job.id}`} key={job.id}>
@@ -51,7 +46,33 @@ function Index() {
                 </Flex>
               </Table.Td>
               <Table.Td>{job.cron}</Table.Td>
-            </ExpandableRow>
+              <Table.Td>
+                <Button
+                  variant="transparent"
+                  size="xs"
+                  onClick={() => {
+                    openJSONInNewTab(job);
+                  }}
+                >
+                  JSON
+                </Button>
+              </Table.Td>
+              <Table.Td>
+                <Button
+                  variant="transparent"
+                  size="xs"
+                  onClick={() => {
+                    postJob.mutate({
+                      ...job,
+                      id: undefined,
+                      enabled: false,
+                    });
+                  }}
+                >
+                  Duplicate
+                </Button>
+              </Table.Td>
+            </Table.Tr>
           ))}
         </Table.Tbody>
       </Table>

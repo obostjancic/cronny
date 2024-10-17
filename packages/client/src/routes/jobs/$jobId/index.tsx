@@ -72,7 +72,7 @@ function JobDetailsPage() {
         <div>Strategy: {job.strategy}</div>
         <div>Schedule: {job.cron}</div>
         <div>
-          Last run: <ReactTimeago date={runs[0].start} />
+          Last run: <ReactTimeago date={runs[0]?.start} />
           <Button
             variant="transparent"
             size="sm"

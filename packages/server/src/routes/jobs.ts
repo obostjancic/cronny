@@ -13,14 +13,6 @@ jobsRoutes.get("/", async (c) => {
   return c.json(jobs);
 });
 
-jobsRoutes.get("/:id", async (c) => {
-  const job = await getJob(+c.req.param("id"));
-  const runs = await getJobRuns(+c.req.param("id"));
-  const results = await getJobResults(+c.req.param("id"));
-
-  return c.json({ ...job, results, runs });
-});
-
 jobsRoutes.post("/", async (c) => {
   const body = await c.req.json<UnsavedJob>();
   const job = await saveJob(body);
@@ -28,6 +20,14 @@ jobsRoutes.post("/", async (c) => {
   await invalidateSchedule();
 
   return c.json(job);
+});
+
+jobsRoutes.get("/:id", async (c) => {
+  const job = await getJob(+c.req.param("id"));
+  const runs = await getJobRuns(+c.req.param("id"));
+  const results = await getJobResults(+c.req.param("id"));
+
+  return c.json({ ...job, results, runs });
 });
 
 jobsRoutes.patch("/:id", async (c) => {
