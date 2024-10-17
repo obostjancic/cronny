@@ -1,6 +1,6 @@
 import { createLogger } from "../utils/logger.js";
 import { Coordinates, Runner } from "@cronny/types";
-import { BaseImmoParams, BaseImmoResult } from "./immo.base.js";
+import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 import axios from "axios";
 import { parse } from "node-html-parser";
 import { geocode } from "../utils/coordinates.js";
@@ -33,7 +33,6 @@ export const run: Runner<BaseImmoParams, BaseImmoResult> = (params) => {
 
 async function fetchStandardImmoSearch({ url, filters }: BaseImmoParams) {
   const rawResults = await fetchResults({ url });
-  console.log(rawResults.length);
   if (!rawResults) {
     return [];
   }
@@ -47,6 +46,7 @@ async function fetchStandardImmoSearch({ url, filters }: BaseImmoParams) {
   );
   return transformedResults.map((result) => ({
     ...result,
+    status: !results.includes(result) ? "filtered" : "active",
   }));
 }
 
@@ -94,10 +94,6 @@ async function fetchResultPage(url: string, page = 1) {
       };
     })
   );
-}
-
-function filterResults(results: BaseImmoResult[], filters: any) {
-  return results;
 }
 
 function toImmoResult(result: RawStandardResult): BaseImmoResult {
