@@ -11,6 +11,7 @@ import {
   rem,
   Tabs,
   TextInput,
+  useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -21,6 +22,7 @@ import {
   IconClockCancel,
   IconEyeOff,
   IconFilterOff,
+  IconPencil,
 } from "@tabler/icons-react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
@@ -50,10 +52,10 @@ function JobDetailsPage() {
   return (
     <Container fluid p={0}>
       <a href="/">Jobs</a>
-      <Flex gap="md" pb="xs" align="center" justify="space-between" wrap="wrap">
+      <Flex gap="md" pb="xs" align="center" wrap="wrap">
         <h3>Job {job.name}</h3>
         <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>
-          Edit
+          <IconPencil style={iconStyle} /> Edit
         </Button>
       </Flex>
 
@@ -92,7 +94,7 @@ function JobDetailsPage() {
       <Drawer
         opened={opened}
         onClose={close}
-        position="right"
+        position="left"
         title={`Job ${job.name}`}
       >
         <EditJobForm initialValues={job} onSubmit={close} />
@@ -171,6 +173,8 @@ const EditJobForm = ({ initialValues, onSubmit }: EditJobFormProps) => {
     },
   });
 
+  const theme = useMantineTheme();
+
   const patchJob = usePatchJob({
     onSuccess: () => {
       console.log("Job updated");
@@ -188,7 +192,14 @@ const EditJobForm = ({ initialValues, onSubmit }: EditJobFormProps) => {
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleFormSubmit)}>
+    <form
+      onSubmit={form.onSubmit(handleFormSubmit)}
+      style={{
+        display: "flex",
+        gap: theme.spacing.xs,
+        flexDirection: "column",
+      }}
+    >
       <TextInput
         label="Strategy"
         placeholder="Strategy"

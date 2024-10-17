@@ -1,4 +1,9 @@
 import { Coordinates } from "@cronny/types";
+import axios from "axios";
+import { getEnv } from "./env.js";
+import cache from "./cache.js";
+import { retry } from "./request.js";
+import { sanitizeAddress } from "./address.js";
 
 export function parseCoordinates(coordinates: string): Coordinates | null {
   try {
@@ -49,4 +54,39 @@ export function isWithinPolygon(
     }
   }
   return inside;
+}
+
+export async function geocode(address: string): Promise<Coordinates | null> {
+  const sanitized = sanitizeAddress(address);
+
+  if (cache.get(sanitized)) {
+    return cache.get<Coordinates | null>(sanitized);
+  }
+
+  const apiKey = getEnv("GEOCODE_API_KEY");
+  const response = await retry(
+    () =>
+      axios.get("https://geocode.maps.co/search", {
+        params: {
+          api_key: apiKey,
+          q: sanitized,
+        },
+      }),
+    {
+      retries: 5,
+    }
+  );
+
+  const match = response.data[0];
+
+  if (!match) {
+    cache.set(address, null);
+    return null;
+  }
+
+  const coordinates = parseCoordinates(`${match.lat},${match.lon}`);
+
+  cache.set(address, coordinates);
+
+  return coordinates;
 }

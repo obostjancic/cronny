@@ -7,12 +7,18 @@ import {
   Runner,
   UnsavedResult,
 } from "@cronny/types";
-import { getJobResults, upsertResults } from "./db/result.js";
+import {
+  getJobResults,
+  getNonExpiredResults,
+  upsertResults,
+} from "./db/result.js";
 import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
 import { iso } from "./utils/date.js";
-import logger from "./utils/logger.js";
 import { equal } from "./utils/diff.js";
+import { createLogger } from "./utils/logger.js";
+
+const logger = createLogger("run");
 
 export async function executeRun(job: Job, runner: Runner): Promise<Run> {
   logger.info(`Running job ${job.name}`);
@@ -55,64 +61,54 @@ async function finishRun(
     status: isSuccess ? "success" : "failure",
   });
 
-  const newResults: UnsavedResult[] = (results ?? []).map((r) =>
-    toResult(r, savedRun.jobId, savedRun.id)
+  const newlyAddedActiveResults = await updateJobResultState(
+    savedRun,
+    results ?? []
   );
 
-  const exisitingResults = await getJobResults(savedRun.jobId);
-  const allResults = mergeResults(newResults, exisitingResults);
-
-  await upsertResults(allResults);
-
-  const newActiveResults = new Set(
-    newResults.filter((r) => r.status === "active").map((r) => r.internalId)
-  );
-  const existingActiveResults = new Set(
-    exisitingResults
-      .filter((r) => r.status === "active")
-      .map((r) => r.internalId)
-  );
-
-  const resultDiff = [...newActiveResults].filter(
-    (x) => !existingActiveResults.has(x)
-  );
-
-  if (resultDiff.length > 0) {
-    logger.debug(`Diff ${resultDiff.map((r) => `${r}`).join(", ")}`);
-    logger.debug(`Diff length ${resultDiff.length}`);
-  }
-
-  return { run: savedRun, resultDiff: resultDiff.length };
+  return { run: savedRun, resultDiff: newlyAddedActiveResults.length };
 }
 
-export function mergeResults(
-  newResults: UnsavedResult[],
-  existingResults: Result[]
-): (Result | UnsavedResult)[] {
-  const updatedExistingResults: Result[] = existingResults.map(
-    (existingResult) => {
-      const newResult = newResults.find((newResult) =>
-        equalResults(newResult, existingResult)
-      );
-
-      if (newResult) {
-        if (equal(newResult.data, existingResult.data)) {
-          return existingResult;
-        }
-        return { ...existingResult, ...newResult };
-      }
-      return { ...existingResult, status: "expired" as ResultStatus };
-    }
+async function updateJobResultState(run: Run, results: JSONObject[]) {
+  const newResults: UnsavedResult[] = results.map((r) =>
+    toResult(r, run.jobId, run.id)
   );
 
-  const newResultsToInsert = newResults.filter(
+  logger.debug(`Got ${newResults.length} new results`);
+
+  const exisitingResults = await getNonExpiredResults(run.jobId);
+
+  logger.debug(`Found ${exisitingResults.length} existing results`);
+
+  const newlyAddedResults = newResults.filter(
     (newResult) =>
-      !existingResults.some((existingResult) =>
+      !exisitingResults.some((existingResult) =>
         equalResults(newResult, existingResult)
       )
   );
 
-  return newResultsToInsert.concat(updatedExistingResults);
+  logger.debug(`Diff: ${newlyAddedResults.length} newly added results`);
+
+  await upsertResults(newlyAddedResults);
+
+  const expiredResults = exisitingResults
+    .filter(
+      (existingResult) =>
+        !newResults.some((newResult) => equalResults(newResult, existingResult))
+    )
+    .map((r) => ({ ...r, status: "expired" as ResultStatus }));
+
+  logger.debug(`Diff: ${expiredResults.length} expired results`);
+
+  await upsertResults(expiredResults);
+
+  const newlyAddedActiveResults = newlyAddedResults.filter(
+    (r) => r.status === "active"
+  );
+
+  logger.debug(`Diff: ${newlyAddedActiveResults.length} ACTIVE results`);
+
+  return newlyAddedActiveResults;
 }
 
 function equalResults(a: UnsavedResult, b: UnsavedResult) {
