@@ -1,7 +1,7 @@
+import { Coordinates, Runner } from "@cronny/types";
 import axios from "axios";
 import { createLogger } from "../utils/logger.js";
-import { Coordinates, Runner } from "@cronny/types";
-import { filterResults, BaseImmoResult, BaseImmoParams } from "./immo.base.js";
+import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 
 const logger = createLogger("immoscout");
 
@@ -53,17 +53,9 @@ export const run: Runner<BaseImmoParams, BaseImmoResult> = async (params) => {
     return [];
   }
 
-  const transformedResults = rawResults.map(toImmoResult);
+  const results = rawResults.map(toImmoResult);
 
-  const results = filterResults(transformedResults, params.filters);
-  logger.debug(
-    `Found ${transformedResults.length} results, filtered to ${results.length}`
-  );
-
-  return transformedResults.map((result) => ({
-    ...result,
-    status: !results.includes(result) ? "filtered" : "active",
-  }));
+  return filterResults(results, params.filters);
 };
 
 export async function fetchImmoscoutSearch({ url }: BaseImmoParams) {

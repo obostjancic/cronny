@@ -37,17 +37,10 @@ async function fetchStandardImmoSearch({ url, filters }: BaseImmoParams) {
   if (!rawResults) {
     return [];
   }
-  const transformedResults: BaseImmoResult[] = rawResults.map(toImmoResult);
 
-  const results = filterResults(transformedResults, filters);
+  const results = rawResults.map(toImmoResult);
 
-  logger.debug(
-    `Found ${transformedResults.length} results, filtered to ${results.length}`
-  );
-  return transformedResults.map((result) => ({
-    ...result,
-    status: !results.includes(result) ? "filtered" : "active",
-  }));
+  return filterResults(results, filters);
 }
 
 async function fetchResults({

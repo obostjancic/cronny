@@ -1,6 +1,7 @@
-import { Coordinates, JSONValue } from "@cronny/types";
+import { Coordinates } from "@cronny/types";
 import { isWithinPolygon, isWithinRadius } from "../utils/coordinates.js";
 import { Filter, matchDataFilter } from "../utils/filter.js";
+import logger from "../utils/logger.js";
 
 export type CoordinatesFilter = {
   prop: "coordinates";
@@ -31,6 +32,21 @@ export type BaseImmoResult = {
 };
 
 export function filterResults(
+  results: BaseImmoResult[],
+  filters?: Filter<BaseImmoResult>[]
+) {
+  const filtered = matchFilters(results, filters);
+
+  logger.debug(
+    `Found ${results.length} results, filtered to ${filtered.length}`
+  );
+  return results.map((result) => ({
+    ...result,
+    status: !filtered.includes(result) ? "filtered" : "active",
+  }));
+}
+
+function matchFilters(
   results: BaseImmoResult[],
   filters?: Filter<BaseImmoResult>[]
 ) {

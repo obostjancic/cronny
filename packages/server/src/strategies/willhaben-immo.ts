@@ -1,7 +1,7 @@
 import type { Runner } from "@cronny/types";
-import { parseCoordinates } from "../utils/coordinates.js";
+import { geocode, parseCoordinates } from "../utils/coordinates.js";
 import { createLogger } from "../utils/logger.js";
-import { filterResults, BaseImmoParams, BaseImmoResult } from "./immo.base.js";
+import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 import { run as fetchWillhabenResults, WillhabenResult } from "./willhaben.js";
 
 const logger = createLogger("willhaben-immo");
@@ -49,23 +49,30 @@ async function fetchWillhabenImmoSearch({ url, filters }: BaseImmoParams) {
     return [];
   }
 
-  const transformedResults: BaseImmoResult[] = rawResults.map(toImmoResult);
+  const results = await addGeoLocation(rawResults.map(toImmoResult));
 
-  const results = filterResults(transformedResults, filters);
+  return filterResults(results, filters);
+}
 
-  logger.debug(
-    `Found ${transformedResults.length} results, filtered to ${results.length}`
-  );
-  return transformedResults.map((result) => ({
-    ...result,
-    status: !results.includes(result) ? "filtered" : "active",
-  }));
+async function addGeoLocation(
+  results: BaseImmoResult[]
+): Promise<BaseImmoResult[]> {
+  const resultsWithCoords = [];
+  for (const result of results) {
+    if (result.address && !result.coordinates) {
+      result.coordinates = await geocode(result.address);
+    }
+    resultsWithCoords.push(result);
+  }
+
+  return resultsWithCoords;
 }
 
 function toImmoResult(
   result: WillhabenResult | WillhabenImmoResult
 ): BaseImmoResult {
   const size = result["ESTATE_SIZE/LIVING_AREA"] || result["ESTATE_SIZE"];
+
   return {
     id: result.id,
     title: `${result.HEADING}`,
