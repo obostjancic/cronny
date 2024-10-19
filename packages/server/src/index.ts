@@ -1,11 +1,11 @@
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
+import fs from "fs";
 import { Hono } from "hono";
 import { jobsRoutes } from "./routes/jobs.js";
 import { resultRoutes } from "./routes/results.js";
 import { scheduleRuns } from "./schedule.js";
 import { isProd } from "./utils/env.js";
-import fs from "fs";
 
 const app = new Hono();
 

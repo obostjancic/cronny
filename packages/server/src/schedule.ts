@@ -1,7 +1,7 @@
+import type { Job, Runner } from "@cronny/types";
 import { CronJob } from "cron";
 import { cron } from "./cron.js";
 import { getJobs } from "./db/job.js";
-import type { Job, Runner } from "@cronny/types";
 import { createLogger } from "./utils/logger.js";
 
 const logger = createLogger("schedule");

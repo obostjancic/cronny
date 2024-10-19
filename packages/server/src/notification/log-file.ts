@@ -1,6 +1,6 @@
-import { dataDirPath } from "../db/schema.js";
 import { promises as fs } from "fs";
 import path from "path";
+import { dataDirPath } from "../db/schema.js";
 
 export async function notifyLogFile(
   filePath: string,

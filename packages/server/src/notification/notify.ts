@@ -2,8 +2,8 @@ import type { Job, JSONObject, NotificationConfig, Run } from "@cronny/types";
 
 import { getEnv } from "../utils/env.js";
 import { createLogger } from "../utils/logger.js";
-import { sendWhatsappMessage } from "./whatsapp.js";
 import { sendSlack } from "./slack.js";
+import { sendWhatsappMessage } from "./whatsapp.js";
 
 const logger = createLogger("notify");
 

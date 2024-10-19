@@ -1,5 +1,3 @@
-import axios, { AxiosRequestConfig } from "axios";
-
 export const sleep = (ms = 250) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -1,6 +1,6 @@
 import { FlatCache } from "flat-cache";
 
-const cache = new FlatCache({ ttl: 24 * 60 * 60, cacheDir: "../../.data/",  });
+const cache = new FlatCache({ ttl: 24 * 60 * 60, cacheDir: "../../.data/" });
 
 export default {
   get: <T>(key: string) => cache.get(key) as T,

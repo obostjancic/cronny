@@ -1,6 +1,3 @@
-import * as Sentry from "@sentry/node";
-import { iso } from "./date.js";
-
 import { pino } from "pino";
 
 export const logger = pino({

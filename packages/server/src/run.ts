@@ -1,17 +1,12 @@
 import {
   Job,
   JSONObject,
-  Result,
   ResultStatus,
   Run,
   Runner,
   UnsavedResult,
 } from "@cronny/types";
-import {
-  getJobResults,
-  getNonExpiredResults,
-  upsertResults,
-} from "./db/result.js";
+import { getNonExpiredResults, upsertResults } from "./db/result.js";
 import { saveRun, updateRun } from "./db/run.js";
 import { notifyRun } from "./notification/notify.js";
 import { iso } from "./utils/date.js";

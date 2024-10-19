@@ -1,7 +1,7 @@
 import { Result, UnsavedResult } from "@cronny/types";
 import { and, eq, ne } from "drizzle-orm";
-import { db, Results } from "./schema.js";
 import { iso } from "../utils/date.js";
+import { db, Results } from "./schema.js";
 
 export async function getJobResults(jobId: number): Promise<Result[]> {
   return db.select().from(Results).where(eq(Results.jobId, jobId));

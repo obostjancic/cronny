@@ -1,5 +1,5 @@
+import { Button, Drawer, DrawerProps } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Drawer, Button, DrawerProps } from "@mantine/core";
 
 export function Sidebar(props: DrawerProps) {
   const [opened, { open, close }] = useDisclosure(false);
