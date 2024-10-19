@@ -1,6 +1,6 @@
-import NodeCache from "node-cache";
+import { FlatCache } from "flat-cache";
 
-const cache = new NodeCache({ stdTTL: 1000, checkperiod: 120 });
+const cache = new FlatCache({ ttl: 24 * 60 * 60, cacheDir: "../../.data/",  });
 
 export default {
   get: <T>(key: string) => cache.get(key) as T,

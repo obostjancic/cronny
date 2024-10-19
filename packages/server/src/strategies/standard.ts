@@ -1,11 +1,12 @@
-import { createLogger } from "../utils/logger.js";
 import { Coordinates, Runner } from "@cronny/types";
-import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 import axios from "axios";
-import { parse } from "node-html-parser";
+import { parse, type HTMLElement } from "node-html-parser";
 import { geocode } from "../utils/coordinates.js";
+import { createLogger } from "../utils/logger.js";
 import { fetchMultiplePages } from "../utils/request.js";
+import { sanitize } from "../utils/string.js";
 import { replaceURLParams } from "../utils/url.js";
+import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 
 const MAX_ROWS = 15;
 const MAX_PAGES = 5;
@@ -36,7 +37,6 @@ async function fetchStandardImmoSearch({ url, filters }: BaseImmoParams) {
   if (!rawResults) {
     return [];
   }
-
   const transformedResults: BaseImmoResult[] = rawResults.map(toImmoResult);
 
   const results = filterResults(transformedResults, filters);
@@ -68,27 +68,37 @@ async function fetchResultPage(url: string, page = 1) {
       const id = Number(item?.getAttribute("href")?.match(/\d+/g)?.[0]);
 
       const address =
-        item.querySelector(
-          "div.sc-listing-card-body-main-content > div:first-child > div"
-        )?.text ?? "Wien";
+        getString(
+          item.querySelector(
+            "div.sc-listing-card-body-main-content > div:first-child > div"
+          )
+        ) ?? "Wien";
 
       const coordinates = await geocode(address);
 
       return {
         id: id,
-        title: item.querySelector(
-          "div.sc-listing-card-body-main-content > div > div.sc-listing-card-title-no-margin"
-        )?.text,
-        price: item.querySelector(
-          "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(1)"
-        )?.text,
+        title: getString(
+          item.querySelector(
+            "div.sc-listing-card-body-main-content > div > div.sc-listing-card-title-no-margin"
+          )
+        ),
+        price: getString(
+          item.querySelector(
+            "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(1)"
+          )
+        ),
         address,
-        size: item.querySelector(
-          "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(2)"
-        )?.text,
-        rooms: item.querySelector(
-          "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(3)"
-        )?.text,
+        size: getString(
+          item.querySelector(
+            "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(2)"
+          )
+        ),
+        rooms: getString(
+          item.querySelector(
+            "div.sc-listing-card-footer.sc-listing-card-footer-default > div:nth-child(3)"
+          )
+        ),
         url: `https://immobilien.derstandard.at/detail/${id}`,
         coordinates,
       };
@@ -96,11 +106,16 @@ async function fetchResultPage(url: string, page = 1) {
   );
 }
 
+const getString = (element: HTMLElement | null) => sanitize(element?.text);
+
 function toImmoResult(result: RawStandardResult): BaseImmoResult {
+  const price = result.price
+    ? Number(result.price.split(" ")[1].replace(".", "").replace(",", "."))
+    : 0;
   return {
     id: result.id.toString(),
     title: result.title ?? "No title",
-    price: result.price ? Number(result.price.replace(/\D/g, "")) : 0,
+    price: price,
     size: result.size ? Number(result.size.replace(/\D/g, "")) : 0,
     url: result.url ?? "",
     address: result.address ?? "",
