@@ -27,6 +27,7 @@ import {
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import ReactTimeago from "react-timeago";
+import { useDeleteResults } from "../../../api/useDeleteResults";
 import { useGetJob } from "../../../api/useGetJob";
 import { usePatchJob } from "../../../api/usePatchJob";
 import { usePostRun } from "../../../api/usePostRun";
@@ -46,6 +47,7 @@ function JobDetailsPage() {
   } = useGetJob(jobId);
 
   const postRun = usePostRun();
+  const deleteResults = useDeleteResults();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -87,6 +89,23 @@ function JobDetailsPage() {
             }}
           >
             Run
+          </Button>
+          <Button
+            variant="transparent"
+            size="sm"
+            pr={0}
+            onClick={async () => {
+              if (confirm("Are you sure you want to clear the reuslts?")) {
+                await deleteResults.mutate(job.id);
+                notifications.show({
+                  title: "Success",
+                  message: "Cleared results",
+                  autoClose: 2000,
+                });
+              }
+            }}
+          >
+            Clear
           </Button>
         </div>
       </Flex>

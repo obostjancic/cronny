@@ -6,5 +6,9 @@ export async function fetchJson(url: string, options: RequestInit = {}) {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  return await response.json();
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
 }

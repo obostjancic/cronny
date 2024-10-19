@@ -51,3 +51,7 @@ export async function upsertResults(
 ): Promise<Result[]> {
   return Promise.all(newResults.map(upsertResult));
 }
+
+export async function deleteJobResults(jobId: number): Promise<void> {
+  await db.delete(Results).where(eq(Results.jobId, jobId));
+}

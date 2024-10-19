@@ -60,7 +60,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
         </Table.Thead>
         <Table.Tbody>
           {items.map((row) => (
-            <Table.Tr>
+            <Table.Tr key={row.id}>
               {columns.map((column) => {
                 if (column === "url") {
                   return (

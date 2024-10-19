@@ -1,7 +1,7 @@
 import type { Job, UnsavedJob } from "@cronny/types";
 import { Hono } from "hono";
 import { getJob, getJobs, saveJob, updateJob } from "../db/job.js";
-import { getJobResults } from "../db/result.js";
+import { deleteJobResults, getJobResults } from "../db/result.js";
 import { getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { executeRun } from "../run.js";
 import { getRunner, invalidateSchedule } from "../schedule.js";
@@ -50,6 +50,17 @@ jobsRoutes.post("/:id/runs", async (c) => {
   const run = await executeRun(job, runner);
 
   return c.json(run);
+});
+
+jobsRoutes.delete("/:id/runs", async (c) => {
+  const job = await getJob(+c.req.param("id"));
+  if (!job) {
+    return c.status(404);
+  }
+
+  await deleteJobResults(job.id);
+
+  return c.body(null, 204);
 });
 
 jobsRoutes.get("/:id/runs/:runId", async (c) => {
