@@ -105,11 +105,16 @@ function toImmoResult(result: RawStandardResult): BaseImmoResult {
   const price = result.price
     ? Number(result.price.split(" ")[1].replace(".", "").replace(",", "."))
     : 0;
+
+  const size = result.size
+    ? Number(result.size.split(" ")[0].replace(",", "."))
+    : 0;
+
   return {
     id: result.id.toString(),
     title: result.title ?? "No title",
     price: price,
-    size: result.size ? Number(result.size.replace(/\D/g, "")) : 0,
+    size: size,
     url: result.url ?? "",
     address: result.address ?? "",
     coordinates: result.coordinates,
