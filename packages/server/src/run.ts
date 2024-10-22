@@ -107,8 +107,8 @@ async function updateJobResultState(run: Run, results: JSONObject[]) {
   return newlyAddedActiveResults;
 }
 
-function equalResults(a: UnsavedResult, b: UnsavedResult) {
-  if (a.internalId === b.internalId) {
+export function equalResults(a: UnsavedResult, b: UnsavedResult) {
+  if (a.internalId && b.internalId && a.internalId === b.internalId) {
     return true;
   }
 

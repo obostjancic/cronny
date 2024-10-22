@@ -24,8 +24,16 @@ export function equal(a?: JSONObject, b?: JSONObject) {
   if (!a && !b) {
     return true;
   }
+
   try {
-    return JSON.stringify(a) === JSON.stringify(b);
+    const aSorted = Object.keys(a!)
+      .sort()
+      .reduce((acc, key) => ({ ...acc, [key]: a![key] }), {});
+    const bSorted = Object.keys(b!)
+      .sort()
+      .reduce((acc, key) => ({ ...acc, [key]: b![key] }), {});
+
+    return JSON.stringify(aSorted) === JSON.stringify(bSorted);
   } catch {
     return false;
   }
