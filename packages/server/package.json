@@ -1,34 +1,5 @@
 {
-  "name": "@cronny/server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "migrate": "drizzle-kit migrate",
-    "predev": "drizzle-kit generate && drizzle-kit migrate",
-    "studio": "drizzle-kit studio",
-    "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
-    "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
-    "start": "node --env-file=.env dist/index.js",
-    "test": "vitest"
-  },
-  "engines": {
-    "node": ">=20.6.0"
-  },
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@cronny/types": "*",
-    "@playwright/test": "^1.45.3",
-    "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^20.14.12",
-    "drizzle-kit": "^0.24.1",
-    "tsx": "^4.17.0",
-    "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
-  },
   "dependencies": {
     "@hono/node-server": "^1.13.0",
     "@sentry/node": "^8.20.0",
@@ -45,9 +16,38 @@
     "pino": "^9.4.0",
     "pino-http": "^10.3.0",
     "pino-pretty": "^11.2.2",
-    "playwright": "^1.45.3",
+    "playwright": "^1.48.1",
     "rss-parser": "^3.13.0"
   },
+  "description": "",
+  "devDependencies": {
+    "@cronny/types": "*",
+    "@playwright/test": "^1.48.1",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.14.12",
+    "drizzle-kit": "^0.24.1",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "license": "ISC",
+  "main": "index.js",
+  "name": "@cronny/server",
+  "scripts": {
+    "build": "tsc",
+    "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
+    "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
+    "migrate": "drizzle-kit migrate",
+    "predev": "drizzle-kit generate && drizzle-kit migrate",
+    "start": "node --env-file=.env dist/index.js",
+    "studio": "drizzle-kit studio",
+    "test": "vitest"
+  },
+  "type": "module",
+  "version": "1.0.0",
   "volta": {
     "extends": "../../package.json"
   }
