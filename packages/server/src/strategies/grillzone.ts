@@ -1,10 +1,12 @@
-import { ElementHandle, Page, chromium } from "@playwright/test";
-import { format, parse } from "date-fns";
-import { de } from "date-fns/locale";
-import logger from "../utils/logger.js";
-import { sleep } from "../utils/request.js";
-import { isProd } from "../utils/env.js";
 import type { Runner } from "@cronny/types";
+import { ElementHandle, Page, chromium } from "@playwright/test";
+import { format, parse, startOfTomorrow } from "date-fns";
+import { de } from "date-fns/locale";
+import { isProd } from "../utils/env.js";
+import { createLogger } from "../utils/logger.js";
+import { sleep } from "../utils/request.js";
+
+const logger = createLogger("grillzone");
 
 type GrillAreaParams = {
   from: Date;
@@ -13,8 +15,23 @@ type GrillAreaParams = {
 };
 
 export const run: Runner<GrillAreaParams, any> = async (params) => {
-  const data = await fetchCurrentGrillareaState(params!);
+  const data = await fetchCurrentGrillareaState(adjustParams(params));
   return data;
+};
+
+const adjustParams = (params: GrillAreaParams | null): GrillAreaParams => {
+  if (!params) {
+    throw new Error("No params provided");
+  }
+
+  const tomorrow = startOfTomorrow();
+
+  if (new Date(params.from) < tomorrow) {
+    logger.warn("From date is in the past, adjusting to tomorrow");
+    params.from = tomorrow;
+  }
+
+  return params;
 };
 
 export async function fetchCurrentGrillareaState(params: GrillAreaParams) {

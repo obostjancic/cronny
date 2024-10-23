@@ -6,6 +6,7 @@ import { invalidateGetJob } from "../api/useGetJob";
 import { usePatchResult } from "../api/usePatchResult";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 import useSortableData from "../hooks/useSortableData";
+import { formatDate } from "../utils/date/date";
 
 const indicator = (direction?: string) => {
   if (!direction) {
@@ -37,7 +38,15 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
 
   const firstRow = rows[0];
 
-  const allColumns = ["url", "title", "createdAt", "size", "price"];
+  const allColumns = [
+    "url",
+    "area",
+    "day",
+    "title",
+    "createdAt",
+    "size",
+    "price",
+  ];
 
   const columns = allColumns.filter((column) => firstRow[column] !== undefined);
   return (
@@ -79,6 +88,13 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                   return (
                     <Table.Td key={column}>
                       <ReactTimeago date={row[column] as string} />
+                    </Table.Td>
+                  );
+                }
+                if (column === "day") {
+                  return (
+                    <Table.Td key={column}>
+                      <Text size="sm">{formatDate(row[column] as string)}</Text>
                     </Table.Td>
                   );
                 }
