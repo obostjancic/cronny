@@ -7,7 +7,7 @@ const logger = createLogger("cache");
 const cache = new FlatCache({
   ttl: 24 * 60 * 60 * 1000,
   cacheId: "cache",
-  persistInterval: 5 * 1000,
+  persistInterval: 5 * 60 * 1000,
 });
 
 export function cached(fn: Function, key?: string) {
