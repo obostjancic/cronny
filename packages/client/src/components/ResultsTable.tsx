@@ -2,6 +2,7 @@ import { JSONObject, Result } from "@cronny/types";
 import { Button, Container, Flex, Table, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
+import { Fragment } from "react/jsx-runtime";
 import { invalidateGetJob } from "../api/useGetJob";
 import { usePatchResult } from "../api/usePatchResult";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
@@ -88,10 +89,14 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                   return (
                     <Table.Td key={column}>
                       <Text size="sm">{row[column]?.toString()}</Text>
-                      <br />
-                      <Text size="xs" opacity={0.6}>
-                        {row["text"]?.toString()}
-                      </Text>
+                      {row["text"] && (
+                        <Fragment>
+                          <br />
+                          <Text size="xs" opacity={0.6}>
+                            {row["text"]?.toString()}
+                          </Text>
+                        </Fragment>
+                      )}
                     </Table.Td>
                   );
                 }
