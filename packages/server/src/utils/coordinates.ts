@@ -1,7 +1,6 @@
 import { Coordinates } from "@cronny/types";
 import axios from "axios";
 import { sanitizeAddress } from "./address.js";
-import cache from "./cache.js";
 import { getEnv } from "./env.js";
 import { retry } from "./request.js";
 
@@ -59,10 +58,6 @@ export function isWithinPolygon(
 export async function geocode(address: string): Promise<Coordinates | null> {
   const sanitized = sanitizeAddress(address);
 
-  if (cache.get(sanitized)) {
-    return cache.get<Coordinates | null>(sanitized);
-  }
-
   try {
     const apiKey = getEnv("GEOCODE_API_KEY");
     const response = await retry(
@@ -80,18 +75,10 @@ export async function geocode(address: string): Promise<Coordinates | null> {
 
     const match = response.data[0];
 
-    if (!match) {
-      cache.set(sanitized, null);
-      return null;
-    }
-
     const coordinates = parseCoordinates(`${match.lat},${match.lon}`);
-
-    cache.set(sanitized, coordinates);
 
     return coordinates;
   } catch (e) {
-    cache.set(sanitized, null);
     return null;
   }
 }

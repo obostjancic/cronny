@@ -1,6 +1,7 @@
 import { Coordinates, Runner } from "@cronny/types";
 import axios from "axios";
 import { parse, type HTMLElement } from "node-html-parser";
+import { cached } from "../utils/cache.js";
 import { geocode } from "../utils/coordinates.js";
 import { createLogger } from "../utils/logger.js";
 import { fetchMultiplePages } from "../utils/request.js";
@@ -67,7 +68,7 @@ async function fetchResultPage(url: string, page = 1) {
           )
         ) ?? "Wien";
 
-      const coordinates = await geocode(address);
+      const coordinates = await cached(geocode)(address);
 
       return {
         id: id,

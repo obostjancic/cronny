@@ -3,6 +3,7 @@ import { geocode, parseCoordinates } from "../utils/coordinates.js";
 import { createLogger } from "../utils/logger.js";
 import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 import { run as fetchWillhabenResults, WillhabenResult } from "./willhaben.js";
+import { cached } from "../utils/cache.js";
 
 const logger = createLogger("willhaben-immo");
 
@@ -60,7 +61,7 @@ async function addGeoLocation(
   const resultsWithCoords = [];
   for (const result of results) {
     if (result.address && !result.coordinates) {
-      result.coordinates = await geocode(result.address);
+      result.coordinates = await cached(geocode)(result.address);
     }
     resultsWithCoords.push(result);
   }

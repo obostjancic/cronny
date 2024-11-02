@@ -84,6 +84,17 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                     </Table.Td>
                   );
                 }
+                if (column === "title") {
+                  return (
+                    <Table.Td key={column}>
+                      <Text size="sm">{row[column]?.toString()}</Text>
+                      <br />
+                      <Text size="xs" opacity={0.6}>
+                        {row["text"]?.toString()}
+                      </Text>
+                    </Table.Td>
+                  );
+                }
                 if (column === "createdAt") {
                   return (
                     <Table.Td key={column}>
