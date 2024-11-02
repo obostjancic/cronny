@@ -26,15 +26,20 @@ export function equal(a?: JSONObject, b?: JSONObject) {
   }
 
   try {
-    const aSorted = Object.keys(a!)
-      .sort()
-      .reduce((acc, key) => ({ ...acc, [key]: a![key] }), {});
-    const bSorted = Object.keys(b!)
-      .sort()
-      .reduce((acc, key) => ({ ...acc, [key]: b![key] }), {});
-
-    return JSON.stringify(aSorted) === JSON.stringify(bSorted);
+    return stringify(a) === stringify(b);
   } catch {
     return false;
   }
+}
+
+export function stringify(obj?: JSONObject) {
+  if (!obj) {
+    return "";
+  }
+
+  return JSON.stringify(
+    Object.keys(obj!)
+      .sort()
+      .reduce((acc, key) => ({ ...acc, [key]: obj![key] }), {})
+  );
 }

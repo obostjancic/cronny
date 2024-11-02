@@ -1,16 +1,20 @@
 import { FlatCache } from "flat-cache";
+import { stringify } from "./diff.js";
+import { createLogger } from "./logger.js";
 
-const cache = new FlatCache({ ttl: 24 * 60 * 60, cacheDir: "../../.data/" });
+const logger = createLogger("cache");
 
-export default {
-  get: <T>(key: string) => cache.get(key) as T,
-  set: <T>(key: string, value: T) => cache.set(key, value),
-};
+const cache = new FlatCache({
+  ttl: 24 * 60 * 60 * 1000,
+  cacheId: "cache",
+  persistInterval: 5 * 1000,
+});
 
-export function cached(fn: Function) {
+export function cached(fn: Function, key?: string) {
   return async (...args: any[]) => {
-    const key = JSON.stringify(args);
-    if (cache.get(key)) {
+    key = key ?? createKey(args);
+
+    if (cache.getKey(key) !== undefined) {
       return cache.get(key);
     }
 
@@ -19,4 +23,14 @@ export function cached(fn: Function) {
 
     return result;
   };
+}
+
+function createKey(args: any[]) {
+  for (let arg of args) {
+    if (typeof arg === "object") {
+      arg = stringify(arg);
+    }
+  }
+
+  return JSON.stringify(args);
 }

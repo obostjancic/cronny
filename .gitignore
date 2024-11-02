@@ -9,6 +9,9 @@ packages/server/dist
 packages/server/.data
 */.data
 */.data/*
+packages/server/.cache
+*/.cache
+*/.cache/*
 packages/server/.data/gist.log
 packages/server/.data/schedule.json
 packages/server/.data/sqlite.db

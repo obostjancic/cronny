@@ -62,6 +62,7 @@ async function processArticles(articles: RawArticle[]): Promise<Article[]> {
 }
 
 async function processArticle(article: RawArticle): Promise<Article | null> {
+  logger.info(`Processing article ${article.title}`);
   try {
     const text = await fetchArticleText(article.link);
 
