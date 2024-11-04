@@ -4,7 +4,6 @@ import { parse } from "node-html-parser";
 import Parser from "rss-parser";
 import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
-import { getEnv } from "../utils/env.js";
 import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger("klix-rss");
@@ -34,9 +33,13 @@ type RawArticle = {
   categories: { _: string; $: string }[];
 };
 
-export const run: Runner<undefined, Article> = async () => {
+type Params = {
+  simplifyWithPrompt: string;
+};
+
+export const run: Runner<Params, Article> = async (params) => {
   const articles = await fetchFeed();
-  const data = processArticles(articles);
+  const data = processArticles(articles, params?.simplifyWithPrompt!);
   return data;
 };
 
@@ -47,11 +50,14 @@ async function fetchFeed(): Promise<RawArticle[]> {
   return feed.items;
 }
 
-async function processArticles(articles: RawArticle[]): Promise<Article[]> {
+async function processArticles(
+  articles: RawArticle[],
+  simplificationPrompt: string
+): Promise<Article[]> {
   const result = [];
 
   for (const article of articles) {
-    const res = await cached(processArticle)(article);
+    const res = await cached(processArticle)(article, simplificationPrompt);
 
     if (res) {
       result.push(res);
@@ -61,18 +67,24 @@ async function processArticles(articles: RawArticle[]): Promise<Article[]> {
   return result;
 }
 
-async function processArticle(article: RawArticle): Promise<Article | null> {
+async function processArticle(
+  article: RawArticle,
+  simplificationPrompt: string
+): Promise<Article | null> {
   logger.info(`Processing article ${article.title}`);
   try {
     const text = await fetchArticleText(article.link);
 
-    return await purify({
-      id: article.guid,
-      title: article.title,
-      url: article.link,
-      date: new Date(article.pubDate).toISOString(),
-      text,
-    });
+    return await simplify(
+      {
+        id: article.guid,
+        title: article.title,
+        url: article.link,
+        date: new Date(article.pubDate).toISOString(),
+        text,
+      },
+      simplificationPrompt
+    );
   } catch (error) {
     logger.error(`Failed to process article ${article.guid}: ${error}`);
     return null;
@@ -96,15 +108,28 @@ async function fetchArticleText(url: string): Promise<string> {
   return result;
 }
 
-async function purify(article: Article): Promise<Article> {
-  const prompt = getEnv("PURIFICATION_PROMPT");
+async function simplify(article: Article, prompt: string): Promise<Article> {
   const purified = await runPrompt(prompt + " " + article.text);
 
   const [title, ...text] = purified.split(";");
 
   return {
     ...article,
-    text: text.join(". ").trim().replaceAll("  ", " "),
-    title: title,
+    text: sanitizeText(text.join(". ")),
+    title: sanitizeTitle(title),
   };
+}
+
+function sanitizeText(text: string): string {
+  return text
+    .trim()
+    .replaceAll("'. '", "")
+    .replaceAll("  ", " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"');
+}
+
+function sanitizeTitle(title: string): string {
+  return title.replaceAll("## ", "").replaceAll("##", "").trim();
 }
