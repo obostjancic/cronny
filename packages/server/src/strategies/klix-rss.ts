@@ -1,4 +1,5 @@
 import { Runner } from "@cronny/types";
+import { Type, type Static } from "@sinclair/typebox";
 import axios from "axios";
 import { parse } from "node-html-parser";
 import Parser from "rss-parser";
@@ -8,13 +9,15 @@ import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger("klix-rss");
 
-export type Article = {
-  id: string;
-  title: string;
-  url: string;
-  date: string;
-  text?: string;
-};
+export const ResultSchema = Type.Object({
+  id: Type.String(),
+  title: Type.String(),
+  url: Type.String(),
+  date: Type.String(),
+  text: Type.Optional(Type.String()),
+});
+
+type Article = Static<typeof ResultSchema>;
 
 type KlixFeed = {
   title: string;

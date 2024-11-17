@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { pino } from "pino";
 
 export const logger = pino({
@@ -6,24 +7,21 @@ export const logger = pino({
     target: "pino-pretty",
   },
 });
-// export const createLogger = (name: string) => {
-//   name = name ? `[${name}]` : name;
-//   return {
-//     error: (message?: any, ...optionalParams: any[]) => {
-//       console.error(iso(), name, message, ...optionalParams);
-//       Sentry.captureException(message, ...optionalParams);
-//     },
-//     log: (message?: any, ...optionalParams: any[]) => {
-//       console.log(iso(), name, message, ...optionalParams);
-//     },
-//     debug: (message?: any, ...optionalParams: any[]) => {
-//       console.debug(iso(), name, message, ...optionalParams);
-//     },
-//   };
-// };
+
+const errorFn = function (...args: any[]) {
+  // @ts-expect-error idk
+  logger.error(...args);
+  if (!!args[0]) {
+    Sentry.captureException(args[0]);
+    return;
+  }
+};
 
 export const createLogger = (name: string) => {
-  return logger.child({ name });
+  const childLogger = logger.child({ name });
+  childLogger.error = errorFn;
+
+  return childLogger;
 };
 
 export default createLogger("");
