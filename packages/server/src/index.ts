@@ -12,13 +12,13 @@ const app = new Hono();
 // CORS Middleware
 app.use("*", async (c, next) => {
   // Set CORS headers
-  c.header("Access-Control-Allow-Origin", "http://localhost:5174"); // Allow specific origin
+  c.header("Access-Control-Allow-Origin", "http://localhost:*"); // Allow all localhost origins
   c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allowed methods
   c.header("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allowed headers
 
   // Handle preflight requests
   if (c.req.method === "OPTIONS") {
-    return Promise.resolve(c.text("OK", 204)); // Respond with 204 No Content for preflight
+    return Promise.resolve(c.text("OK")); // Respond with 204 No Content for preflight
   }
 
   return next(); // Proceed to the next middleware or route handler
