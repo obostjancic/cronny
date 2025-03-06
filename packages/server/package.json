@@ -5,6 +5,7 @@
     "@hono/node-server": "^1.13.0",
     "@sentry/node": "^8.20.0",
     "@sentry/profiling-node": "^8.20.0",
+    "@sinclair/typebox": "^0.34.28",
     "axios": "^1.7.7",
     "better-sqlite3": "^11.2.1",
     "cron": "^3.1.7",

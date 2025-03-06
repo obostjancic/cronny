@@ -1419,6 +1419,11 @@
   dependencies:
     "@sentry/types" "8.30.0"
 
+"@sinclair/typebox@^0.34.28":
+  version "0.34.28"
+  resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.34.28.tgz#ce6539f4ca22ee2582431800036984b7841fe700"
+  integrity sha512-e2B9vmvaa5ym5hWgCHw5CstP54au6AOLXrhZErLsOyyRzuWJtXl/8TszKtc5x8rw/b+oY7HKS9m9iRI53RK0WQ==
+
 "@tabler/icons-react@^3.16.0":
   version "3.16.0"
   resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-3.16.0.tgz#4a728c0e202800ff10c5f9ce7acd3edd6973c917"
