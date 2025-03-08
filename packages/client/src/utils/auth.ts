@@ -1,7 +1,6 @@
 import axios from "axios";
 import { setAuthToken } from "../api/utils";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const AUTH_KEY = "cronny-auth";
 let isAuthInitialized = false;
 
@@ -14,7 +13,7 @@ export async function initializeAuth() {
   }
 
   try {
-    const response = await axios.post(`${API_URL}/api/auth/login`, {
+    const response = await axios.post(`/api/auth/login`, {
       password,
     });
     const { token } = response.data;
