@@ -1,8 +1,7 @@
 import { Button, Flex, Table } from "@mantine/core";
 import { IconCancel, IconCheck } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetJobs } from "../api/useGetJobs";
-import { usePostJob } from "../api/usePostJob";
+import { useGetJobs, usePostJob } from "../api/useJobs";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 
 export const Route = createFileRoute("/")({
@@ -11,7 +10,6 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const job = useGetJobs();
-
   const postJob = usePostJob();
 
   const openJSONInNewTab = useOpenJSONInNewTab();

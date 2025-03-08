@@ -1,7 +1,8 @@
 {
+  "main": "index.ts",
   "name": "@cronny/types",
   "private": true,
-  "version": "1.0.0",
   "type": "module",
-  "devDependencies": {}
+  "types": "index.ts",
+  "version": "1.0.0"
 }

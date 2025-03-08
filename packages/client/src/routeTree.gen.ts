@@ -12,12 +12,24 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as ClientsIndexImport } from './routes/clients/index'
+import { Route as ClientsClientIdImport } from './routes/clients/$clientId'
 import { Route as JobsJobIdIndexImport } from './routes/jobs/$jobId/index'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ClientsIndexRoute = ClientsIndexImport.update({
+  path: '/clients/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ClientsClientIdRoute = ClientsClientIdImport.update({
+  path: '/clients/$clientId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,6 +49,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/clients/$clientId': {
+      id: '/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId'
+      preLoaderRoute: typeof ClientsClientIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/clients/': {
+      id: '/clients/'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof ClientsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/jobs/$jobId/': {
       id: '/jobs/$jobId/'
       path: '/jobs/$jobId'
@@ -51,6 +77,8 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  ClientsClientIdRoute,
+  ClientsIndexRoute,
   JobsJobIdIndexRoute,
 })
 
@@ -63,11 +91,19 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/clients/$clientId",
+        "/clients/",
         "/jobs/$jobId/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/clients/$clientId": {
+      "filePath": "clients/$clientId.tsx"
+    },
+    "/clients/": {
+      "filePath": "clients/index.tsx"
     },
     "/jobs/$jobId/": {
       "filePath": "jobs/$jobId/index.tsx"

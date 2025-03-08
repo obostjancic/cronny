@@ -1,7 +1,13 @@
 import type { JSONObject, Notify } from "@cronny/types";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  blob,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import path from "path";
 
 export const dataDirPath = "./.data";
@@ -44,3 +50,28 @@ export const Results = sqliteTable("results", {
   status: text("status").notNull().$type<"active" | "expired" | "filtered">(),
   isHidden: integer("isHidden", { mode: "boolean" }).notNull().default(false),
 });
+
+export const Clients = sqliteTable("clients", {
+  id: integer("id").primaryKey().notNull(),
+  name: text("name").notNull(),
+  apiKey: text("apiKey").notNull().unique(),
+  createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
+  updatedAt: text("updatedAt").notNull().default("1970-01-01T00:00:00.000Z"),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+});
+
+export const ClientJobs = sqliteTable(
+  "client_jobs",
+  {
+    clientId: integer("clientId")
+      .references(() => Clients.id)
+      .notNull(),
+    jobId: integer("jobId")
+      .references(() => Jobs.id)
+      .notNull(),
+    createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.clientId, table.jobId] }),
+  })
+);

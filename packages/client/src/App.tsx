@@ -9,7 +9,9 @@ import "@mantine/code-highlight/styles.css";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
+import { useEffect, useState } from "react";
 import "./App.css";
+import { initializeAuth, isInitialized } from "./utils/auth";
 
 const router = createRouter({ routeTree, defaultPreload: "intent" });
 
@@ -28,6 +30,22 @@ const theme = createTheme({
 });
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    initializeAuth().finally(() => {
+      setIsLoading(false);
+    });
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isInitialized()) {
+    return <div>Please log in</div>;
+  }
+
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <Notifications />

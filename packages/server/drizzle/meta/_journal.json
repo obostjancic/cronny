@@ -43,6 +43,13 @@
       "when": 1726513433611,
       "tag": "0005_chilly_gauntlet",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1741465311214,
+      "tag": "0006_normal_nico_minoru",
+      "breakpoints": true
     }
   ]
 }

@@ -72,3 +72,8 @@ jobsRoutes.get("/:id/runs/:runId", async (c) => {
   const run = await getRun(+runId);
   return c.json(run);
 });
+
+jobsRoutes.get("/:id/results/", async (c) => {
+  const results = await getJobResults(+c.req.param("id"));
+  return c.json(results);
+});

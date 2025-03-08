@@ -3,11 +3,11 @@ import {
   Button,
   Checkbox,
   Container,
-  Drawer,
   Flex,
   Group,
   JsonInput,
   JsonInputProps,
+  Modal,
   rem,
   Tabs,
   TextInput,
@@ -27,10 +27,9 @@ import {
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import ReactTimeago from "react-timeago";
-import { useDeleteResults } from "../../../api/useDeleteResults";
-import { useGetJob } from "../../../api/useGetJob";
-import { usePatchJob } from "../../../api/usePatchJob";
-import { usePostRun } from "../../../api/usePostRun";
+import { useGetJob, usePatchJob } from "../../../api/useJobs";
+import { useDeleteResults } from "../../../api/useResults";
+import { usePostRun } from "../../../api/useRuns";
 import { ResultsTable } from "../../../components/ResultsTable";
 import { formatJSON } from "../../../utils/json";
 
@@ -110,14 +109,14 @@ function JobDetailsPage() {
         </div>
       </Flex>
 
-      <Drawer
+      <Modal
         opened={opened}
         onClose={close}
-        position="left"
         title={`Job ${job.name}`}
+        size="90%"
       >
         <EditJobForm initialValues={job} onSubmit={close} />
-      </Drawer>
+      </Modal>
 
       <ResultsTable
         rows={results
@@ -194,7 +193,7 @@ const EditJobForm = ({ initialValues, onSubmit }: EditJobFormProps) => {
 
   const theme = useMantineTheme();
 
-  const patchJob = usePatchJob({
+  const patchJob = usePatchJob(initialValues?.id ?? "", {
     onSuccess: () => {
       console.log("Job updated");
     },
