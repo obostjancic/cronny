@@ -127,6 +127,7 @@ function sanitizeText(text: string): string {
   return text
     .trim()
     .replaceAll("'. '", "")
+    .replaceAll("..", ".")
     .replaceAll("  ", " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
