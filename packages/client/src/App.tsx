@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { withErrorBoundary } from "./components/ErrorBoundary";
 import { routeTree } from "./routeTree.gen";
-import { initializeAuth, isInitialized } from "./utils/auth";
+import { initializeAuth, isInitialized, setAuthPassword } from "./utils/auth";
 import { queryClient } from "./utils/queryClient";
 
 import "@mantine/code-highlight/styles.css";
@@ -43,7 +43,11 @@ function AppContent() {
   }
 
   if (!isInitialized()) {
-    return <div>Please log in</div>;
+    const password = prompt("Enter Password");
+    if (password) {
+      setAuthPassword(password);
+    }
+    window.location.reload();
   }
 
   return (
