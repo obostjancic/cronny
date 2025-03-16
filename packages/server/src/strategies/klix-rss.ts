@@ -135,5 +135,9 @@ function sanitizeText(text: string): string {
 }
 
 function sanitizeTitle(title: string): string {
-  return title.replaceAll("## ", "").replaceAll("##", "").trim();
+  return title
+    .replaceAll("## ", "")
+    .replaceAll("##", "")
+    .replaceAll("*", "")
+    .trim();
 }
