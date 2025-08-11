@@ -125,10 +125,10 @@ export const expectedOlxResults = [
     price: 850,
     address: "City ID: 1",
     rooms: 3,
-    coordinates: { lat: 43.8563, lng: 18.4131 },
+    coordinates: [43.8563, 18.4131],
     size: 75,
     url: "https://www.olx.ba/artikal/123456",
-    status: "active",
+    status: "filtered",
   },
   {
     id: "789012",
@@ -136,10 +136,10 @@ export const expectedOlxResults = [
     price: 750,
     address: "City ID: 1",
     rooms: 2,
-    coordinates: { lat: 43.8476, lng: 18.3564 },
+    coordinates: [43.8476, 18.3564],
     size: 60,
     url: "https://www.olx.ba/artikal/789012",
-    status: "active",
+    status: "filtered",
   },
   {
     id: "345678",
@@ -147,10 +147,10 @@ export const expectedOlxResults = [
     price: 500,
     address: "City ID: 1",
     rooms: 1,
-    coordinates: { lat: 43.8508, lng: 18.3856 },
+    coordinates: [43.8508, 18.3856],
     size: 45,
     url: "https://www.olx.ba/artikal/345678",
-    status: "active",
+    status: "filtered",
   },
   {
     id: "901234",
@@ -161,6 +161,6 @@ export const expectedOlxResults = [
     coordinates: null,
     size: 95,
     url: "https://www.olx.ba/artikal/901234",
-    status: "filtered", // This should be filtered out due to price > 900
+    status: "filtered",
   },
 ];

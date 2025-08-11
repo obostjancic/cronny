@@ -1,11 +1,14 @@
-import { run } from "../../src/strategies/olx.js";
-import { describe, expect, it, vi } from "vitest";
+import { run } from "../../src/strategies/olx.ts";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { mockOlxApiResponse, expectedOlxResults } from "../fixtures/olx.js";
 
 // Mock the fetch function
 global.fetch = vi.fn();
 
 describe("OLX Strategy", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   it("should return a list of properties from OLX URL", async () => {
     // Mock the fetch response
     fetch.mockResolvedValue({
@@ -84,7 +87,7 @@ describe("OLX Strategy", () => {
     const url = new URL(calledUrl);
 
     expect(url.searchParams.get("category_id")).toBe("2");
-    expect(url.searchParams.get("q")).toBe("dvosoban+stan");
+    expect(url.searchParams.get("q")).toBe("dvosoban stan");
     expect(url.searchParams.get("city_id")).toBe("1");
     expect(url.searchParams.get("price_max")).toBe("800");
     expect(url.searchParams.get("area_min")).toBe("50");
