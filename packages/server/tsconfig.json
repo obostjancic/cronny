@@ -11,5 +11,7 @@
     "outDir": "./dist",
     "noUnusedLocals": false,
     "noUnusedParameters": false
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["tests/**/*", "vitest.config.ts", "**/*.spec.js", "**/*.test.js"]
 }
