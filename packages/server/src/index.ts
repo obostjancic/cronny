@@ -9,7 +9,7 @@ import { jobsRoutes } from "./routes/jobs.js";
 import { publicRoutes } from "./routes/public.js";
 import { resultRoutes } from "./routes/results.js";
 import { scheduleRuns } from "./schedule.js";
-import { isProd } from "./utils/env.js";
+import { getEnv, isProd } from "./utils/env.js";
 
 const app = new Hono();
 
@@ -40,7 +40,7 @@ app.route("/api/jobs", jobsRoutes);
 app.route("/api/results", resultRoutes);
 app.route("/api/clients", clientRoutes);
 
-const port = 3000;
+const port = getEnv("PORT") || 3000;
 console.log(`Server is running on port ${port}`);
 
 if (isProd) {
@@ -61,7 +61,7 @@ if (isProd) {
 }
 
 serve({
-  port,
+  port: Number(port),
   fetch: app.fetch,
 });
 scheduleRuns();
