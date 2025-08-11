@@ -1,5 +1,4 @@
-import axios from "axios";
-import { setAuthToken } from "../api/utils";
+import { httpClient } from "../api/client";
 
 const AUTH_KEY = "cronny-auth";
 let isAuthInitialized = false;
@@ -13,16 +12,15 @@ export async function initializeAuth() {
   }
 
   try {
-    const response = await axios.post(`/api/auth/login`, {
+    const response = await httpClient.post<{ token: string }>(`/api/auth/login`, {
       password,
     });
-    const { token } = response.data;
+    const { token } = response;
 
-    setAuthToken(token);
+    httpClient.setAuthToken(token);
     isAuthInitialized = true;
     return true;
-  } catch (error) {
-    console.error("Auth error:", error);
+  } catch {
     isAuthInitialized = false;
     return false;
   }

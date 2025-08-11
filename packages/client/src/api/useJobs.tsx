@@ -9,20 +9,25 @@ import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";
 
 const JOBS_URL = "/api/jobs";
+const RESULTS_URL = "/api/jobs";
+
+export function invalidateGetResults(jobId: number | string) {
+  queryClient.invalidateQueries({ queryKey: [RESULTS_URL, jobId, "results"] });
+}
 
 export function invalidateGetJobs() {
   queryClient.invalidateQueries({ queryKey: [JOBS_URL] });
 }
 
 export function invalidateGetJob(jobId: number | string) {
-  queryClient.invalidateQueries({ queryKey: [JOBS_URL, jobId] });
+  queryClient.invalidateQueries({ queryKey: [JOBS_URL, String(jobId)] });
 }
 
 export function useGetJobs(options?: QueryOptions<Job[], Error>) {
   return useSuspenseQuery<Job[], Error>({
     queryKey: [JOBS_URL],
     queryFn: async () => {
-      return await fetchJson(JOBS_URL);
+      return await fetchJson(JOBS_URL) as Job[];
     },
     ...options,
   });
@@ -35,7 +40,7 @@ export function useGetJob(
   return useSuspenseQuery<JobDetails, Error>({
     queryKey: [JOBS_URL, jobId],
     queryFn: async () => {
-      return await fetchJson(`${JOBS_URL}/${jobId}`);
+      return await fetchJson(`${JOBS_URL}/${jobId}`) as JobDetails;
     },
     ...options,
   });
@@ -47,7 +52,7 @@ export function usePostJob(options?: MutationOptions<Job, Error, UnsavedJob>) {
       return await fetchJson(JOBS_URL, {
         method: "POST",
         data: data,
-      });
+      }) as Job;
     },
     onSettled: (...args) => {
       invalidateGetJobs();
@@ -66,13 +71,14 @@ export function usePatchJob(
       return await fetchJson(`${JOBS_URL}/${jobId}`, {
         method: "PATCH",
         data: data,
-      });
+      }) as Job;
     },
     onSettled: (...args) => {
       const data = args[0];
       if (data) {
         invalidateGetJob(data.id);
         invalidateGetJobs();
+        invalidateGetResults(data.id);
       }
       options?.onSettled?.(...args);
     },

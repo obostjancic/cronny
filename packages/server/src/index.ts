@@ -17,7 +17,7 @@ const app = new Hono();
 app.use("*", async (c, next) => {
   // Set CORS headers
   c.header("Access-Control-Allow-Origin", "*"); // Allow all origins
-  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allowed methods
+  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"); // Allowed methods
   c.header(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-API-Key"
@@ -53,10 +53,6 @@ if (isProd) {
   );
   app.get("*", (c) => {
     return c.html(indexHtml);
-  });
-} else {
-  app.use("*", (c) => {
-    return fetch(`http://localhost:5173${c.req.path}`);
   });
 }
 

@@ -77,3 +77,14 @@ jobsRoutes.get("/:id/results/", async (c) => {
   const results = await getJobResults(+c.req.param("id"));
   return c.json(results);
 });
+
+jobsRoutes.delete("/:id/results", async (c) => {
+  const job = await getJob(+c.req.param("id"));
+  if (!job) {
+    return c.status(404);
+  }
+
+  await deleteJobResults(job.id);
+
+  return c.body(null, 204);
+});

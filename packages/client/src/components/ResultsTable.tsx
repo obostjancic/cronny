@@ -8,6 +8,7 @@ import { usePatchResult } from "../api/useResults";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 import useSortableData from "../hooks/useSortableData";
 import { formatDate } from "../utils/date/date";
+import { formatPrice, formatNumber } from "../utils/format";
 
 const indicator = (direction?: string) => {
   if (!direction) {
@@ -52,7 +53,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
   const columns = allColumns.filter((column) => firstRow[column] !== undefined);
   return (
     <Container p={0} pt="xs" fluid>
-      <Table striped stickyHeader highlightOnHover withTableBorder>
+      <Table stickyHeader highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             {columns.map((column) => (
@@ -114,6 +115,20 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                     </Table.Td>
                   );
                 }
+                if (column === "price") {
+                  return (
+                    <Table.Td key={column}>
+                      <Text size="sm">{formatPrice(row[column] as number)}</Text>
+                    </Table.Td>
+                  );
+                }
+                if (column === "size") {
+                  return (
+                    <Table.Td key={column}>
+                      <Text size="sm">{formatNumber(row[column] as number)} m²</Text>
+                    </Table.Td>
+                  );
+                }
 
                 return (
                   <Table.Td key={column} maw="300px">
@@ -161,6 +176,7 @@ function ChangeResultStateButton(props: {
       onClick={async () => {
         props.onClick({
           id: props.row.id,
+          jobId: props.row.jobId,
           isHidden: !props.row.isHidden,
         });
       }}

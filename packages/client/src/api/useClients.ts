@@ -31,7 +31,7 @@ export function useGetClients(options?: QueryOptions<Client[], Error>) {
   return useSuspenseQuery<Client[], Error>({
     queryKey: [CLIENTS_URL],
     queryFn: async () => {
-      return await fetchJson(CLIENTS_URL);
+      return await fetchJson(CLIENTS_URL) as Client[];
     },
     ...options,
   });
@@ -44,7 +44,7 @@ export function useGetClient(
   return useSuspenseQuery<Client, Error>({
     queryKey: [CLIENTS_URL, id],
     queryFn: async () => {
-      return await fetchJson(`${CLIENTS_URL}/${id}`);
+      return await fetchJson(`${CLIENTS_URL}/${id}`) as Client;
     },
     ...options,
   });
@@ -58,7 +58,7 @@ export function usePostClient(
       return await fetchJson(CLIENTS_URL, {
         method: "POST",
         data: data,
-      });
+      }) as Client;
     },
     onSettled: (...args) => {
       invalidateGetClients();
@@ -77,7 +77,7 @@ export function usePatchClient(
       return await fetchJson(`${CLIENTS_URL}/${id}`, {
         method: "PATCH",
         data: data,
-      });
+      }) as Client;
     },
     onSettled: (...args) => {
       const data = args[0];

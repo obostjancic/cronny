@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as ClientsIndexImport } from './routes/clients/index'
+import { Route as JobsNewImport } from './routes/jobs/new'
 import { Route as ClientsClientIdImport } from './routes/clients/$clientId'
 import { Route as JobsJobIdIndexImport } from './routes/jobs/$jobId/index'
 
@@ -25,6 +26,11 @@ const IndexRoute = IndexImport.update({
 
 const ClientsIndexRoute = ClientsIndexImport.update({
   path: '/clients/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const JobsNewRoute = JobsNewImport.update({
+  path: '/jobs/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -56,6 +62,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsClientIdImport
       parentRoute: typeof rootRoute
     }
+    '/jobs/new': {
+      id: '/jobs/new'
+      path: '/jobs/new'
+      fullPath: '/jobs/new'
+      preLoaderRoute: typeof JobsNewImport
+      parentRoute: typeof rootRoute
+    }
     '/clients/': {
       id: '/clients/'
       path: '/clients'
@@ -78,6 +91,7 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
   ClientsClientIdRoute,
+  JobsNewRoute,
   ClientsIndexRoute,
   JobsJobIdIndexRoute,
 })
@@ -92,6 +106,7 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/clients/$clientId",
+        "/jobs/new",
         "/clients/",
         "/jobs/$jobId/"
       ]
@@ -101,6 +116,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/clients/$clientId": {
       "filePath": "clients/$clientId.tsx"
+    },
+    "/jobs/new": {
+      "filePath": "jobs/new.tsx"
     },
     "/clients/": {
       "filePath": "clients/index.tsx"

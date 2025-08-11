@@ -1,19 +1,11 @@
-import { JobDetails } from "@cronny/types";
 import {
   Button,
-  Checkbox,
   Container,
   Flex,
-  Group,
-  JsonInput,
-  JsonInputProps,
   Modal,
   rem,
   Tabs,
-  TextInput,
-  useMantineTheme,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
@@ -25,13 +17,12 @@ import {
   IconPencil,
 } from "@tabler/icons-react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useState } from "react";
 import ReactTimeago from "react-timeago";
-import { useGetJob, usePatchJob } from "../../../api/useJobs";
+import { useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
+import JobForm from "../../../components/JobForm";
 import { ResultsTable } from "../../../components/ResultsTable";
-import { formatJSON } from "../../../utils/json";
 
 export const Route = createFileRoute("/jobs/$jobId/")({
   component: () => <JobDetailsPage />,
@@ -115,7 +106,7 @@ function JobDetailsPage() {
         title={`Job ${job.name}`}
         size="90%"
       >
-        <EditJobForm initialValues={job} onSubmit={close} />
+        <JobForm initialValues={job} onSubmit={close} isEdit={true} />
       </Modal>
 
       <ResultsTable
@@ -173,118 +164,3 @@ function JobDetailsPage() {
   );
 }
 
-type EditJobFormProps = {
-  initialValues: Partial<JobDetails>;
-  onSubmit: () => void;
-};
-
-const EditJobForm = ({ initialValues, onSubmit }: EditJobFormProps) => {
-  const form = useForm({
-    initialValues: initialValues || {
-      id: undefined,
-      strategy: "",
-      name: "",
-      enabled: false,
-      cron: "",
-      params: null,
-      notify: null,
-    },
-  });
-
-  const theme = useMantineTheme();
-
-  const patchJob = usePatchJob(initialValues?.id ?? "", {
-    onSuccess: () => {
-      console.log("Job updated");
-    },
-  });
-
-  const handleFormSubmit = async (values: Partial<JobDetails>) => {
-    await patchJob.mutate(values);
-    onSubmit();
-    notifications.show({
-      title: "Success",
-      message: "Job updated",
-      autoClose: 2000,
-    });
-  };
-
-  return (
-    <form
-      onSubmit={form.onSubmit(handleFormSubmit)}
-      style={{
-        display: "flex",
-        gap: theme.spacing.xs,
-        flexDirection: "column",
-      }}
-    >
-      <TextInput
-        label="Strategy"
-        placeholder="Strategy"
-        required
-        {...form.getInputProps("strategy")}
-      />
-
-      <TextInput
-        label="Name"
-        placeholder="Name"
-        required
-        {...form.getInputProps("name")}
-      />
-
-      <Checkbox
-        label="Enabled"
-        {...form.getInputProps("enabled", { type: "checkbox" })}
-      />
-
-      <TextInput
-        label="Cron"
-        placeholder="Cron"
-        required
-        {...form.getInputProps("cron")}
-      />
-
-      <JSONInput
-        label="Params"
-        placeholder="{}"
-        formatOnBlur
-        autosize
-        maxRows={10}
-        {...form.getInputProps("params")}
-      />
-
-      <JSONInput
-        label="Notify"
-        placeholder="{}"
-        formatOnBlur
-        autosize
-        maxRows={10}
-        {...form.getInputProps("notify")}
-      />
-
-      <Group mt="md">
-        <Button disabled={patchJob.isPending} type="submit">
-          Save
-        </Button>
-      </Group>
-    </form>
-  );
-};
-
-const JSONInput = (props: JsonInputProps) => {
-  const [rawJson, setRawJson] = useState(formatJSON(props.value));
-
-  const handleJsonChange = (value: string) => {
-    setRawJson(value);
-    try {
-      const parsedValue = JSON.parse(value);
-      props.onChange?.(parsedValue);
-    } catch {
-      // Invalid JSON, do not update form state
-    }
-  };
-
-  return <JsonInput {...props} onChange={handleJsonChange} value={rawJson} />;
-};
-
-export default EditJobForm;

@@ -16,7 +16,13 @@ function Index() {
 
   return (
     <div className="p-2">
-      <Table stickyHeader striped highlightOnHover withTableBorder>
+      <Flex justify="space-between" align="center" mb="md">
+        <h2>Jobs</h2>
+        <Button variant="transparent" component={Link} to="/jobs/new">
+          Add New Job
+        </Button>
+      </Flex>
+      <Table stickyHeader highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Id</Table.Th>
@@ -30,7 +36,7 @@ function Index() {
         </Table.Thead>
         <Table.Tbody>
           {job.data?.map((job) => (
-            <Table.Tr>
+            <Table.Tr key={job.id}>
               <Table.Td>{job.id}</Table.Td>
               <Table.Td>
                 <Link to={`/jobs/${job.id}`} key={job.id}>

@@ -1,0 +1,166 @@
+export const mockOlxApiResponse = {
+  data: [
+    {
+      id: 123456,
+      title: "Trosoban stan u centru grada",
+      display_price: "850 KM",
+      category_id: 2,
+      available: true,
+      status: "active",
+      sponsored: 0,
+      labels: ["top", "featured"],
+      image: "https://images.olx.ba/image1.jpg",
+      city_id: 1,
+      location: {
+        lat: 43.8563,
+        lon: 18.4131,
+      },
+      special_labels: [
+        {
+          value: 3,
+          label: "Broj soba",
+          unit: null,
+        },
+        {
+          value: 75,
+          label: "Površina",
+          unit: "m²",
+        },
+      ],
+    },
+    {
+      id: 789012,
+      title: "Dvosoban stan na odličnoj lokaciji",
+      display_price: "750 KM",
+      category_id: 2,
+      available: true,
+      status: "active",
+      sponsored: 1,
+      labels: ["urgent"],
+      image: "https://images.olx.ba/image2.jpg",
+      city_id: 1,
+      location: {
+        lat: 43.8476,
+        lon: 18.3564,
+      },
+      special_labels: [
+        {
+          value: 2,
+          label: "Broj soba",
+          unit: null,
+        },
+        {
+          value: 60,
+          label: "Površina",
+          unit: "m²",
+        },
+      ],
+    },
+    {
+      id: 345678,
+      title: "Jednosoban stan - povoljno",
+      display_price: "500 KM",
+      category_id: 2,
+      available: true,
+      status: "active",
+      sponsored: 0,
+      labels: [],
+      image: "https://images.olx.ba/image3.jpg",
+      city_id: 1,
+      location: {
+        lat: 43.8508,
+        lon: 18.3856,
+      },
+      special_labels: [
+        {
+          value: 1,
+          label: "Broj soba",
+          unit: null,
+        },
+        {
+          value: 45,
+          label: "Površina",
+          unit: "m²",
+        },
+      ],
+    },
+    {
+      id: 901234,
+      title: "Četvorosoban stan za porodicu",
+      display_price: "1200 KM",
+      category_id: 2,
+      available: true,
+      status: "active",
+      sponsored: 0,
+      labels: ["new"],
+      image: "https://images.olx.ba/image4.jpg",
+      city_id: 1,
+      location: null, // No location data
+      special_labels: [
+        {
+          value: 4,
+          label: "Broj soba",
+          unit: null,
+        },
+        {
+          value: 95,
+          label: "Površina",
+          unit: "m²",
+        },
+      ],
+    },
+  ],
+  meta: {
+    total: 4,
+    current_page: 1,
+    per_page: 25,
+    last_page: 1,
+  },
+};
+
+export const expectedOlxResults = [
+  {
+    id: "123456",
+    title: "Trosoban stan u centru grada",
+    price: 850,
+    address: "City ID: 1",
+    rooms: 3,
+    coordinates: { lat: 43.8563, lng: 18.4131 },
+    size: 75,
+    url: "https://www.olx.ba/artikal/123456",
+    status: "active",
+  },
+  {
+    id: "789012",
+    title: "Dvosoban stan na odličnoj lokaciji",
+    price: 750,
+    address: "City ID: 1",
+    rooms: 2,
+    coordinates: { lat: 43.8476, lng: 18.3564 },
+    size: 60,
+    url: "https://www.olx.ba/artikal/789012",
+    status: "active",
+  },
+  {
+    id: "345678",
+    title: "Jednosoban stan - povoljno",
+    price: 500,
+    address: "City ID: 1",
+    rooms: 1,
+    coordinates: { lat: 43.8508, lng: 18.3856 },
+    size: 45,
+    url: "https://www.olx.ba/artikal/345678",
+    status: "active",
+  },
+  {
+    id: "901234",
+    title: "Četvorosoban stan za porodicu",
+    price: 1200,
+    address: "City ID: 1",
+    rooms: 4,
+    coordinates: null,
+    size: 95,
+    url: "https://www.olx.ba/artikal/901234",
+    status: "filtered", // This should be filtered out due to price > 900
+  },
+];

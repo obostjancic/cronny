@@ -75,7 +75,7 @@ export function EditClientForm({
         });
       }
       onSubmit();
-    } catch (error) {
+    } catch {
       notifications.show({
         title: "Error",
         message: "Failed to save client",

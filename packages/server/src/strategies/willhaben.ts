@@ -32,9 +32,7 @@ export const run: Runner<WillhabenParams, WillhabenResult> = async (params) => {
   return data;
 };
 
-async function fetchWillhabenSearch({
-  url,
-}: WillhabenParams): Promise<WillhabenResult[]> {
+async function fetchWillhabenSearch({ url }: WillhabenParams): Promise<WillhabenResult[]> {
   const extendedUrl = replaceURLParams(url, { rows: MAX_ROWS });
   return fetchMultiplePages(
     extendedUrl,
@@ -67,8 +65,7 @@ function extractResultList(html: string): WillhabenResult[] {
 
   const json = JSON.parse(script.text);
   const { searchResult } = json.props.pageProps;
-  const advertSummary: AdvertSummary =
-    searchResult?.advertSummaryList?.advertSummary;
+  const advertSummary: AdvertSummary = searchResult?.advertSummaryList?.advertSummary;
 
   if (!advertSummary) {
     return [];

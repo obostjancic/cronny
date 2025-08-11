@@ -39,7 +39,7 @@ function Clients() {
       </Group>
 
       <Card>
-        <Table stickyHeader striped highlightOnHover withTableBorder>
+        <Table stickyHeader highlightOnHover>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Name</Table.Th>
