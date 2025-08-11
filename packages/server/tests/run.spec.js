@@ -1,4 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
+import fs from "fs";
+import path from "path";
+
+// Ensure the .data directory exists before importing modules that use the database
+beforeAll(() => {
+  const dataDirPath = "./.data";
+  if (!fs.existsSync(dataDirPath)) {
+    fs.mkdirSync(dataDirPath, { recursive: true });
+  }
+});
+
 import { equalResults } from "../src/run";
 
 const a = {
