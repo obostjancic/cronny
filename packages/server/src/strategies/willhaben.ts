@@ -32,7 +32,9 @@ export const run: Runner<WillhabenParams, WillhabenResult> = async (params) => {
   return data;
 };
 
-async function fetchWillhabenSearch({ url }: WillhabenParams): Promise<WillhabenResult[]> {
+async function fetchWillhabenSearch({
+  url,
+}: WillhabenParams): Promise<WillhabenResult[]> {
   const extendedUrl = replaceURLParams(url, { rows: MAX_ROWS });
   return fetchMultiplePages(
     extendedUrl,
@@ -52,7 +54,9 @@ async function fetchWillhabenSearchPage(
 }
 
 async function fetchHtml(url: string): Promise<string> {
-  const response = await axios.get(url);
+  const response = await axios.get(
+    `https://willhaben-fetch.ognjen-bostjancic.workers.dev/?url=${encodeURIComponent(url)}`
+  );
   return response.data;
 }
 
@@ -65,7 +69,8 @@ function extractResultList(html: string): WillhabenResult[] {
 
   const json = JSON.parse(script.text);
   const { searchResult } = json.props.pageProps;
-  const advertSummary: AdvertSummary = searchResult?.advertSummaryList?.advertSummary;
+  const advertSummary: AdvertSummary =
+    searchResult?.advertSummaryList?.advertSummary;
 
   if (!advertSummary) {
     return [];
