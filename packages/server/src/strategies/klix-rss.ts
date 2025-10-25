@@ -73,6 +73,7 @@ async function fetchAllArticleTexts(
 ): Promise<ArticleWithText[]> {
   const articlesWithText: ArticleWithText[] = [];
 
+  //comment
   for (const rawArticle of rawArticles) {
     logger.info(`Fetching article: ${rawArticle.title}`);
 
