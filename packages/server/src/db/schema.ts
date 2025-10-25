@@ -9,8 +9,13 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 import path from "path";
+import { fileURLToPath } from "url";
 
-export const dataDirPath = "./.data";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Use absolute path relative to the server package root
+export const dataDirPath = path.join(__dirname, "../../.data");
 
 const sqlite = new Database(path.join(dataDirPath, "sqlite.db"));
 export const db = drizzle(sqlite);
@@ -73,5 +78,5 @@ export const ClientJobs = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.clientId, table.jobId] }),
-  })
+  }),
 );
