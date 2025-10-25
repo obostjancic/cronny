@@ -41,3 +41,4 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           TARGET: /home/deployments/cronny
+          EXCLUDE: /packages/server/.data/, /packages/server/.cache/
