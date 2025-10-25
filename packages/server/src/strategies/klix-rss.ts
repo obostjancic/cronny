@@ -125,6 +125,10 @@ async function fetchArticleText(
 
     const result = [excerpt, ...paragraphs].join("\n");
 
+    if (!result) {
+      throw new Error(`No text found for article ${url}`);
+    }
+
     return result;
   } finally {
     await page.close();
