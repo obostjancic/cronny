@@ -1,12 +1,11 @@
 import { Runner } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
-import { Browser, chromium } from "@playwright/test";
 import { parse } from "node-html-parser";
 import Parser from "rss-parser";
 import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
-import { isProd } from "../utils/env.js";
 import { createLogger } from "../utils/logger.js";
+import { fetchViaProxy } from "../utils/request.js";
 
 const logger = createLogger("klix-rss");
 
@@ -72,70 +71,50 @@ async function fetchFeed(): Promise<RawArticle[]> {
 async function fetchAllArticleTexts(
   rawArticles: RawArticle[],
 ): Promise<ArticleWithText[]> {
-  const browser = await chromium.launch({
-    headless: isProd,
-  });
+  const articlesWithText: ArticleWithText[] = [];
 
-  try {
-    const articlesWithText: ArticleWithText[] = [];
+  for (const rawArticle of rawArticles) {
+    logger.info(`Fetching article: ${rawArticle.title}`);
 
-    for (const rawArticle of rawArticles.slice(0, 5)) {
-      logger.info(`Fetching article: ${rawArticle.title}`);
+    try {
+      const text = await fetchArticleText(rawArticle.link);
 
-      try {
-        const text = await fetchArticleText(browser, rawArticle.link);
-
-        articlesWithText.push({
-          id: rawArticle.guid,
-          title: rawArticle.title,
-          url: rawArticle.link,
-          date: new Date(rawArticle.pubDate).toISOString(),
-          text,
-        });
-      } catch (error) {
-        logger.error(`Failed to fetch article ${rawArticle.guid}: ${error}`);
-      }
+      articlesWithText.push({
+        id: rawArticle.guid,
+        title: rawArticle.title,
+        url: rawArticle.link,
+        date: new Date(rawArticle.pubDate).toISOString(),
+        text,
+      });
+    } catch (error) {
+      logger.error(`Failed to fetch article ${rawArticle.guid}: ${error}`);
     }
-
-    return articlesWithText;
-  } finally {
-    await browser.close();
   }
+
+  return articlesWithText;
 }
 
-async function fetchArticleText(
-  browser: Browser,
-  url: string,
-): Promise<string> {
-  const page = await browser.newPage();
+async function fetchArticleText(url: string): Promise<string> {
+  logger.debug(`Fetching ${url}`);
 
-  try {
-    logger.debug(`Fetching ${url}`);
-    await page.goto(url);
-    logger.debug(`Fetched ${url}, parsing HTML`);
-    const html = await page.content();
-    logger.debug(`Parsed HTML for ${html}`);
-    const textElement = parse(html).querySelector("#tekst");
-    const excerpt = textElement?.querySelector("#excerpt > span")?.innerText;
-    const paragraphs =
-      textElement
-        ?.querySelectorAll("#text > p")
-        ?.map((p) => p.innerText)
-        .filter(Boolean) ?? [];
+  const response = await fetchViaProxy(url);
+  const html = response.data as string;
 
-    const result = [excerpt, ...paragraphs].join("\n");
+  const textElement = parse(html).querySelector("#tekst");
+  const excerpt = textElement?.querySelector("#excerpt > span")?.innerText;
+  const paragraphs =
+    textElement
+      ?.querySelectorAll("#text > p")
+      ?.map((p) => p.innerText)
+      .filter(Boolean) ?? [];
 
-    if (!result) {
-      throw new Error(`No text found for article ${url}`);
-    }
+  const result = [excerpt, ...paragraphs].join("\n");
 
-    return result;
-  } catch (error) {
-    logger.error(`Failed to fetch article ${url}: ${error}`);
-    throw error;
-  } finally {
-    await page.close();
+  if (!result) {
+    throw new Error(`No text found for article ${url}`);
   }
+
+  return result;
 }
 
 async function processArticles(

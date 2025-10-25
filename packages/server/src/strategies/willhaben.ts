@@ -1,8 +1,7 @@
 import type { Runner } from "@cronny/types";
-import axios from "axios";
 import { parse } from "node-html-parser";
 import { createLogger } from "../utils/logger.js";
-import { fetchMultiplePages } from "../utils/request.js";
+import { fetchMultiplePages, fetchViaProxy } from "../utils/request.js";
 import { replaceURLParams } from "../utils/url.js";
 
 const MAX_ROWS = 90;
@@ -40,13 +39,13 @@ async function fetchWillhabenSearch({
     extendedUrl,
     fetchWillhabenSearchPage,
     MAX_ROWS,
-    MAX_PAGES
+    MAX_PAGES,
   );
 }
 
 async function fetchWillhabenSearchPage(
   url: string,
-  page = 1
+  page = 1,
 ): Promise<WillhabenResult[]> {
   const urlWithPage = replaceURLParams(url, { page });
   const html = await fetchHtml(urlWithPage);
@@ -54,9 +53,7 @@ async function fetchWillhabenSearchPage(
 }
 
 async function fetchHtml(url: string): Promise<string> {
-  const response = await axios.get(
-    `https://willhaben-fetch.ognjen-bostjancic.workers.dev/?url=${encodeURIComponent(url)}`
-  );
+  const response = await fetchViaProxy(url);
   return response.data;
 }
 

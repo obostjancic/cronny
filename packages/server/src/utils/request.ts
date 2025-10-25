@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const sleep = (ms = 250) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -9,7 +11,7 @@ export interface RetryOpts {
 
 export const retry = async <T>(
   fn: () => Promise<T>,
-  { retries = 3, delay = 1000, backoff = 2 }: RetryOpts = {}
+  { retries = 3, delay = 1000, backoff = 2 }: RetryOpts = {},
 ): Promise<T> => {
   try {
     return await fn();
@@ -26,7 +28,7 @@ export async function fetchMultiplePages<T>(
   url: string,
   fetchPageFunction: (url: string, page: number) => Promise<T[]>,
   maxRows: number,
-  maxPages = 10
+  maxPages = 10,
 ): Promise<T[]> {
   const allResults: T[] = [];
   let page = 1;
@@ -40,4 +42,12 @@ export async function fetchMultiplePages<T>(
   }
 
   return allResults;
+}
+
+export async function fetchViaProxy(
+  url: string,
+  config?: Parameters<typeof axios.get>[1],
+  proxyUrl = "https://willhaben-fetch.ognjen-bostjancic.workers.dev",
+) {
+  return axios.get(`${proxyUrl}/?url=${encodeURIComponent(url)}`, config);
 }
