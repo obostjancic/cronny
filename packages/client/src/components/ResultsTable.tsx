@@ -61,7 +61,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                 {column}
                 &nbsp;
                 {indicator(
-                  sortConfig?.key === column ? sortConfig.direction : undefined
+                  sortConfig?.key === column ? sortConfig.direction : undefined,
                 )}
               </Table.Th>
             ))}
@@ -92,8 +92,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                       <Text size="sm">{row[column]?.toString()}</Text>
                       {row["text"] && (
                         <Fragment>
-                          <br />
-                          <Text size="xs" opacity={0.6}>
+                          <Text size="xs" opacity={0.7}>
                             {row["text"]?.toString()}
                           </Text>
                         </Fragment>
@@ -118,14 +117,18 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
                 if (column === "price") {
                   return (
                     <Table.Td key={column}>
-                      <Text size="sm">{formatPrice(row[column] as number)}</Text>
+                      <Text size="sm">
+                        {formatPrice(row[column] as number)}
+                      </Text>
                     </Table.Td>
                   );
                 }
                 if (column === "size") {
                   return (
                     <Table.Td key={column}>
-                      <Text size="sm">{formatNumber(row[column] as number)} m²</Text>
+                      <Text size="sm">
+                        {formatNumber(row[column] as number)} m²
+                      </Text>
                     </Table.Td>
                   );
                 }
