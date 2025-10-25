@@ -112,9 +112,9 @@ async function fetchArticleText(
   try {
     logger.debug(`Fetching ${url}`);
     await page.goto(url);
-
+    logger.debug(`Fetched ${url}, parsing HTML`);
     const html = await page.content();
-
+    logger.debug(`Parsed HTML for ${html}`);
     const textElement = parse(html).querySelector("#tekst");
     const excerpt = textElement?.querySelector("#excerpt > span")?.innerText;
     const paragraphs =
@@ -130,6 +130,9 @@ async function fetchArticleText(
     }
 
     return result;
+  } catch (error) {
+    logger.error(`Failed to fetch article ${url}: ${error}`);
+    throw error;
   } finally {
     await page.close();
   }
