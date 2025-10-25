@@ -33,12 +33,12 @@ export type BaseImmoResult = {
 
 export function filterResults(
   results: BaseImmoResult[],
-  filters?: Filter<BaseImmoResult>[]
+  filters?: Filter<BaseImmoResult>[],
 ) {
   const filtered = matchFilters(results, filters);
 
   logger.debug(
-    `Found ${results.length} results, filtered to ${filtered.length}`
+    `Found ${results.length} results, filtered to ${filtered.length}`,
   );
   return results.map((result) => ({
     ...result,
@@ -48,7 +48,7 @@ export function filterResults(
 
 function matchFilters(
   results: BaseImmoResult[],
-  filters?: Filter<BaseImmoResult>[]
+  filters?: Filter<BaseImmoResult>[],
 ) {
   if (!filters) {
     return results;
@@ -64,7 +64,7 @@ function matchFilters(
 
 function matchFilter(
   result: BaseImmoResult,
-  filter: Filter<BaseImmoResult>
+  filter: Filter<BaseImmoResult>,
 ): boolean {
   if (filter.prop === "coordinates") {
     return matchCoordsFilter(result, filter as CoordinatesFilter);
@@ -75,7 +75,7 @@ function matchFilter(
 
 function matchCoordsFilter(
   result: BaseImmoResult,
-  coordinatesFilter: CoordinatesFilter
+  coordinatesFilter: CoordinatesFilter,
 ) {
   if (!result.coordinates) {
     return false;

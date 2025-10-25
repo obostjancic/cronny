@@ -1,12 +1,10 @@
 import { getEnv } from "./env.js";
 
-import { GoogleGenerativeAI, StartChatParams } from "@google/generative-ai";
+import { GenerateContentParameters, GoogleGenAI } from "@google/genai";
 
 const apiKey = getEnv("GEMINI_API_KEY");
-const genAI = new GoogleGenerativeAI(apiKey);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+const genAI = new GoogleGenAI({
+  apiKey,
 });
 
 const DEFAULT_CONFIG = {
@@ -18,15 +16,20 @@ const DEFAULT_CONFIG = {
 };
 
 export async function runPrompt(
+  systemPrompt: string,
   prompt: string,
-  config: StartChatParams["generationConfig"] = DEFAULT_CONFIG
+  config: GenerateContentParameters = DEFAULT_CONFIG,
 ): Promise<string> {
-  const chatSession = model.startChat({
-    generationConfig: config,
-    history: [],
+  console.log("Running prompt:", prompt);
+  const result = await genAI.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: prompt,
+    config: {
+      ...DEFAULT_CONFIG,
+      ...config,
+      systemInstruction: systemPrompt,
+    },
   });
 
-  const result = await chatSession.sendMessage(prompt);
-
-  return result.response.text();
+  return result.text ?? "";
 }
