@@ -156,8 +156,6 @@ function sanitizeText(text: string): string {
     .replaceAll("'. '", "")
     .replaceAll("..", ".")
     .replaceAll("  ", " ")
-    .replaceAll("[", "")
-    .replaceAll("]", "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"');
@@ -168,5 +166,7 @@ function sanitizeTitle(title: string): string {
     .replaceAll("## ", "")
     .replaceAll("##", "")
     .replaceAll("*", "")
+    .replaceAll("[", "")
+    .replaceAll("]", "")
     .trim();
 }
