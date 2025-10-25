@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = {
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
-  config: GenerateContentParameters = DEFAULT_CONFIG,
+  config?: GenerateContentParameters,
 ): Promise<string> {
   console.log("Running prompt:", prompt);
   const result = await genAI.models.generateContent({
@@ -26,7 +26,7 @@ export async function runPrompt(
     contents: prompt,
     config: {
       ...DEFAULT_CONFIG,
-      ...config,
+      ...(config || {}),
       systemInstruction: systemPrompt,
     },
   });
