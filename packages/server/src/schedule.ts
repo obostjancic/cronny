@@ -17,9 +17,13 @@ export async function scheduleRuns(): Promise<void> {
       continue;
     }
     logger.info(`Scheduling ${job.name}`);
-    const runner = await getRunner(job);
+    try {
+      const runner = await getRunner(job);
 
-    schedule.push(cron(job, runner));
+      schedule.push(cron(job, runner));
+    } catch (error) {
+      logger.error(`Failed to schedule ${job.name}: ${error}`);
+    }
   }
 }
 
