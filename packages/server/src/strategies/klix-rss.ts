@@ -143,6 +143,7 @@ function sanitizeText(text: string): string {
   return text
     .trim()
     .replaceAll("'. '", "")
+    .replaceAll(" . ", "")
     .replaceAll("..", ".")
     .replaceAll("  ", " ")
     .replace(/&nbsp;/g, " ")

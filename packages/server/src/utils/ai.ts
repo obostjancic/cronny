@@ -1,6 +1,10 @@
+import { create } from "flat-cache";
 import { getEnv } from "./env.js";
 
 import { GenerateContentParameters, GoogleGenAI } from "@google/genai";
+import { createLogger } from "./logger.js";
+
+const logger = createLogger("ai");
 
 const apiKey = getEnv("GEMINI_API_KEY");
 const genAI = new GoogleGenAI({
@@ -20,6 +24,7 @@ export async function runPrompt(
   prompt: string,
   config?: GenerateContentParameters,
 ): Promise<string> {
+  logger.info(`Running prompt ${prompt.slice(0, 25)}...`);
   const result = await genAI.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: prompt,
