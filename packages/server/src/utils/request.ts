@@ -47,7 +47,7 @@ export async function fetchMultiplePages<T>(
 export async function fetchViaProxy(
   url: string,
   config?: Parameters<typeof axios.get>[1],
-  proxyUrl = "https://willhaben-fetch.ognjen-bostjancic.workers.dev",
+  proxyUrl = "https://proxy.ognjen-bostjancic.workers.dev",
 ) {
   return axios.get(`${proxyUrl}/?url=${encodeURIComponent(url)}`, config);
 }
