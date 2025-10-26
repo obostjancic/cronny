@@ -20,7 +20,6 @@ export async function runPrompt(
   prompt: string,
   config?: GenerateContentParameters,
 ): Promise<string> {
-  console.log("Running prompt:", prompt);
   const result = await genAI.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: prompt,

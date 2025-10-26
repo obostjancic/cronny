@@ -1,13 +1,14 @@
 import { Runner } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
 import { parse } from "node-html-parser";
-import Parser from "rss-parser";
 import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
 import { createLogger } from "../utils/logger.js";
 import { fetchViaProxy } from "../utils/request.js";
 
 const logger = createLogger("klix-rss");
+
+const KLIX_NAJNOVIJE_URL = "https://www.klix.ba/najnovije";
 
 export const ResultSchema = Type.Object({
   id: Type.String(),
@@ -19,29 +20,11 @@ export const ResultSchema = Type.Object({
 
 type Article = Static<typeof ResultSchema>;
 
-type KlixFeed = {
-  title: string;
-  link: string;
-  description: string;
-  language: string;
-  pubDate: string;
-  items: Article[];
-};
-
 type RawArticle = {
-  guid: string;
-  title: string;
-  link: string;
-  pubDate: string;
-  categories: { _: string; $: string }[];
-};
-
-type ArticleWithText = {
   id: string;
   title: string;
   url: string;
   date: string;
-  text: string;
 };
 
 type Params = {
@@ -49,10 +32,8 @@ type Params = {
 };
 
 export const run: Runner<Params, Article> = async (params) => {
-  const rawArticles = await fetchFeed();
-
-  const articlesWithText = await fetchAllArticleTexts(rawArticles);
-
+  const rawArticles = await fetchArticleList();
+  const articlesWithText = await fetchArticleTexts(rawArticles);
   const processedArticles = await processArticles(
     articlesWithText,
     params?.systemPrompt!,
@@ -61,46 +42,55 @@ export const run: Runner<Params, Article> = async (params) => {
   return processedArticles;
 };
 
-async function fetchFeed(): Promise<RawArticle[]> {
-  const parser = new Parser<KlixFeed, RawArticle>();
-  const feed = await parser.parseURL("https://www.klix.ba/rss");
+async function fetchArticleList(): Promise<RawArticle[]> {
+  logger.info(`Fetching article list from ${KLIX_NAJNOVIJE_URL}`);
 
-  return feed.items;
+  const response = await fetchViaProxy(KLIX_NAJNOVIJE_URL);
+  const html = response.data as string;
+  const root = parse(html);
+
+  const articles = root.querySelectorAll("article");
+
+  return articles.map((article) => {
+    const anchorTag = article.querySelector("a");
+    const href = anchorTag?.getAttribute("href") || "";
+    const id = href.split("/").pop() || "";
+    const title = anchorTag?.getAttribute("title") || "";
+
+    return {
+      id,
+      title,
+      url: `https://www.klix.ba${href}`,
+      date: new Date().toISOString(),
+    };
+  });
 }
 
-async function fetchAllArticleTexts(
+async function fetchArticleTexts(
   rawArticles: RawArticle[],
-): Promise<ArticleWithText[]> {
-  const articlesWithText: ArticleWithText[] = [];
+): Promise<Article[]> {
+  const articles: Article[] = [];
 
   for (const rawArticle of rawArticles) {
     logger.info(`Fetching article: ${rawArticle.title}`);
 
     try {
-      const text = await fetchArticleText(rawArticle.link);
-
-      articlesWithText.push({
-        id: rawArticle.guid,
-        title: rawArticle.title,
-        url: rawArticle.link,
-        date: new Date(rawArticle.pubDate).toISOString(),
-        text,
-      });
+      const text = await fetchArticleText(rawArticle.url);
+      articles.push({ ...rawArticle, text });
     } catch (error) {
-      logger.error(`Failed to fetch article ${rawArticle.guid}: ${error}`);
+      logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
     }
   }
 
-  return articlesWithText;
+  return articles;
 }
 
 async function fetchArticleText(url: string): Promise<string> {
-  logger.debug(`Fetching ${url}`);
-
   const response = await fetchViaProxy(url);
   const html = response.data as string;
+  const root = parse(html);
 
-  const textElement = parse(html).querySelector("#tekst");
+  const textElement = root.querySelector("#tekst");
   const excerpt = textElement?.querySelector("#excerpt > span")?.innerText;
   const paragraphs =
     textElement
@@ -108,24 +98,24 @@ async function fetchArticleText(url: string): Promise<string> {
       ?.map((p) => p.innerText)
       .filter(Boolean) ?? [];
 
-  const result = [excerpt, ...paragraphs].join("\n");
+  const text = [excerpt, ...paragraphs].join("\n");
 
-  if (!result) {
+  if (!text) {
     throw new Error(`No text found for article ${url}`);
   }
 
-  return result;
+  return text;
 }
 
 async function processArticles(
-  articles: ArticleWithText[],
-  simplificationPrompt: string,
+  articles: Article[],
+  prompt: string,
 ): Promise<Article[]> {
   const result: Article[] = [];
 
   for (const article of articles) {
     try {
-      const simplified = await cached(simplify)(article, simplificationPrompt);
+      const simplified = await cached(simplifyArticle)(article, prompt);
       result.push(simplified);
     } catch (error) {
       logger.error(`Failed to process article ${article.id}: ${error}`);
@@ -135,12 +125,11 @@ async function processArticles(
   return result;
 }
 
-async function simplify(
-  article: ArticleWithText,
+async function simplifyArticle(
+  article: Article,
   prompt: string,
 ): Promise<Article> {
-  const purified = await runPrompt(prompt, article.text);
-
+  const purified = await runPrompt(prompt, article.text ?? "");
   const [title, ...text] = purified.split(";");
 
   return {
