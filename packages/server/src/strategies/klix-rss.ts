@@ -36,7 +36,7 @@ export const run: Runner<Params, Article> = async (params) => {
   const articlesWithText = await fetchArticleTexts(rawArticles);
   const processedArticles = await processArticles(
     articlesWithText,
-    params?.systemPrompt!
+    params?.systemPrompt!,
   );
 
   return processedArticles;
@@ -67,7 +67,7 @@ async function fetchArticleList(): Promise<RawArticle[]> {
 }
 
 async function fetchArticleTexts(
-  rawArticles: RawArticle[]
+  rawArticles: RawArticle[],
 ): Promise<Article[]> {
   const articles: Article[] = [];
 
@@ -75,7 +75,7 @@ async function fetchArticleTexts(
     logger.info(`Fetching article: ${rawArticle.title}`);
 
     try {
-      const text = await fetchArticleText(rawArticle.url);
+      const text = await cached(fetchArticleText)(rawArticle.url);
       articles.push({ ...rawArticle, text });
     } catch (error) {
       logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
@@ -109,7 +109,7 @@ async function fetchArticleText(url: string): Promise<string> {
 
 async function processArticles(
   articles: Article[],
-  prompt: string
+  prompt: string,
 ): Promise<Article[]> {
   const result: Article[] = [];
 
@@ -117,7 +117,7 @@ async function processArticles(
     try {
       const simplified = await cached(simplifyArticle, article.id)(
         article,
-        prompt
+        prompt,
       );
       result.push(simplified);
     } catch (error) {
@@ -130,7 +130,7 @@ async function processArticles(
 
 async function simplifyArticle(
   article: Article,
-  prompt: string
+  prompt: string,
 ): Promise<Article> {
   const purified = await runPrompt(prompt, article.text ?? "");
   const [title, ...text] = purified.split(";");
