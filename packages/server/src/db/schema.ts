@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import path from "path";
 import { fileURLToPath } from "url";
+import { mkdirSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,9 +18,13 @@ const __dirname = path.dirname(__filename);
 // Use absolute path relative to the server package root
 export const dataDirPath = path.join(__dirname, "../../.data");
 
-const sqlite = new Database(
-  process.env.DATABASE_PATH || path.join(dataDirPath, "db.sqlite")
-);
+const dbPath = process.env.DATABASE_PATH || path.join(dataDirPath, "db.sqlite");
+
+// Ensure the directory exists
+const dbDir = path.dirname(dbPath);
+mkdirSync(dbDir, { recursive: true });
+
+const sqlite = new Database(dbPath);
 export const db = drizzle(sqlite);
 
 export const Jobs = sqliteTable("jobs", {
