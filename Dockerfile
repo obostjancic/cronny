@@ -68,9 +68,6 @@ COPY packages/server/drizzle ./packages/server/drizzle
 # Create data directory for SQLite
 RUN mkdir -p /app/packages/server/.data
 
-# Declare volume for persistent data
-VOLUME ["/app/packages/server/.data"]
-
 # Create non-root user
 RUN groupadd --gid 1001 nodejs && \
     useradd --uid 1001 --gid nodejs --shell /bin/bash --create-home cronny && \
