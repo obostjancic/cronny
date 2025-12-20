@@ -14,6 +14,7 @@
     "flat-cache": "^6.1.0",
     "hono": "^4.6.2",
     "lowdb": "^7.0.1",
+    "nanoid": "^5.0.9",
     "node-html-parser": "^6.1.13",
     "pino": "^9.4.0",
     "pino-http": "^10.3.0",
@@ -44,8 +45,9 @@
     "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
     "db:push": "drizzle-kit push",
+    "migrate": "node dist/migrate.js",
     "predev": "drizzle-kit generate && drizzle-kit push",
-    "start": "node --env-file=.env dist/index.js",
+    "start": "node dist/index.js",
     "studio": "drizzle-kit studio",
     "test": "vitest"
   },

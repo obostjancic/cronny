@@ -1,0 +1,68 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+.pnp
+.pnp.js
+
+# Build artifacts
+dist
+build
+packages/*/dist
+packages/*/build
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# Development
+.env.development
+.env.local
+.env.test
+*.log
+logs
+
+# Data directories
+.data
+*/.data
+packages/server/.data
+.cache
+*/.cache
+.db.json
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Misc
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig*.json

@@ -17,7 +17,9 @@ const __dirname = path.dirname(__filename);
 // Use absolute path relative to the server package root
 export const dataDirPath = path.join(__dirname, "../../.data");
 
-const sqlite = new Database(path.join(dataDirPath, "sqlite.db"));
+const sqlite = new Database(
+  process.env.DATABASE_PATH || path.join(dataDirPath, "db.sqlite")
+);
 export const db = drizzle(sqlite);
 
 export const Jobs = sqliteTable("jobs", {
