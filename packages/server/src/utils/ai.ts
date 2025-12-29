@@ -1,7 +1,6 @@
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
 import { createLogger } from "./logger.js";
-import { getEnv } from "./env.js";
 
 const logger = createLogger("ai");
 
@@ -21,9 +20,7 @@ export async function runPrompt(
   logger.info(`Running prompt ${prompt.slice(0, 25)}...`);
 
   const { text } = await generateText({
-    model: openrouter(model, {
-      apiKey: getEnv("OPENROUTER_API_KEY"),
-    }),
+    model: openrouter(model),
     prompt,
     system: systemPrompt,
   });
