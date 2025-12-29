@@ -1,15 +1,8 @@
-import { create } from "flat-cache";
-import { getEnv } from "./env.js";
-
-import { GenerateContentParameters, GoogleGenAI } from "@google/genai";
+import { openrouter } from "@openrouter/ai-sdk-provider";
+import { generateText } from "ai";
 import { createLogger } from "./logger.js";
 
 const logger = createLogger("ai");
-
-const apiKey = getEnv("GEMINI_API_KEY");
-const genAI = new GoogleGenAI({
-  apiKey,
-});
 
 const DEFAULT_CONFIG = {
   temperature: 0,
@@ -21,19 +14,15 @@ const DEFAULT_CONFIG = {
 
 export async function runPrompt(
   systemPrompt: string,
-  prompt: string,
-  config?: GenerateContentParameters,
+  prompt: string
 ): Promise<string> {
   logger.info(`Running prompt ${prompt.slice(0, 25)}...`);
-  const result = await genAI.models.generateContent({
-    model: "gemini-2.5-flash-lite",
-    contents: prompt,
-    config: {
-      ...DEFAULT_CONFIG,
-      ...(config || {}),
-      systemInstruction: systemPrompt,
-    },
+
+  const { text } = await generateText({
+    model: openrouter("google/gemma-3n-e2b-it:free"),
+    prompt,
+    system: systemPrompt,
   });
 
-  return result.text ?? "";
+  return text ?? "";
 }

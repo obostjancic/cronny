@@ -1,11 +1,12 @@
 {
   "author": "",
   "dependencies": {
-    "@google/genai": "^1.27.0",
     "@hono/node-server": "^1.13.0",
+    "@openrouter/ai-sdk-provider": "^1.5.4",
     "@sentry/node": "^8.20.0",
     "@sentry/profiling-node": "^8.20.0",
     "@sinclair/typebox": "^0.34.28",
+    "ai": "^6.0.3",
     "axios": "^1.7.7",
     "better-sqlite3": "^11.2.1",
     "cron": "^3.1.7",
@@ -42,9 +43,9 @@
   "name": "@cronny/server",
   "scripts": {
     "build": "tsc",
+    "db:push": "drizzle-kit push",
     "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
-    "db:push": "drizzle-kit push",
     "migrate": "node dist/migrate.js",
     "predev": "drizzle-kit generate && drizzle-kit push",
     "start": "node dist/index.js",
