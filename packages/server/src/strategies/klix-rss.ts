@@ -29,15 +29,13 @@ type RawArticle = {
 
 type Params = {
   systemPrompt: string;
+  model?: string;
 };
 
 export const run: Runner<Params, Article> = async (params) => {
   const rawArticles = await fetchArticleList();
   const articlesWithText = await fetchArticleTexts(rawArticles);
-  const processedArticles = await processArticles(
-    articlesWithText,
-    params?.systemPrompt!,
-  );
+  const processedArticles = await processArticles(articlesWithText, params!);
 
   return processedArticles;
 };
@@ -109,7 +107,7 @@ async function fetchArticleText(url: string): Promise<string> {
 
 async function processArticles(
   articles: Article[],
-  prompt: string,
+  params: Params,
 ): Promise<Article[]> {
   const result: Article[] = [];
 
@@ -117,7 +115,7 @@ async function processArticles(
     try {
       const simplified = await cached(simplifyArticle, article.id)(
         article,
-        prompt,
+        params,
       );
       result.push(simplified);
     } catch (error) {
@@ -130,9 +128,13 @@ async function processArticles(
 
 async function simplifyArticle(
   article: Article,
-  prompt: string,
+  params: Params,
 ): Promise<Article> {
-  const purified = await runPrompt(prompt, article.text ?? "");
+  const purified = await runPrompt(
+    params.systemPrompt,
+    article.text ?? "",
+    params.model,
+  );
   const [title, ...text] = purified.split(";");
 
   return {
