@@ -15,15 +15,36 @@ const DEFAULT_CONFIG = {
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
-  model = "google/gemini-2.0-flash-exp:free"
+  model = "google/gemini-2.0-flash-exp:free",
 ): Promise<string> {
   logger.info(`Running prompt ${prompt.slice(0, 25)}...`);
 
-  const { text } = await generateText({
-    model: openrouter(model),
-    prompt,
-    system: systemPrompt,
-  });
+  try {
+    const { text } = await generateText({
+      model: openrouter(model),
+      prompt,
+      system: systemPrompt,
+    });
 
-  return text ?? "";
+    return text ?? "";
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (
+      model.includes("free") &&
+      errorMessage.includes("free-models-per-day-high-balance")
+    ) {
+      logger.warn(`Free model rate limit hit, retrying with paid model`);
+
+      const { text } = await generateText({
+        model: openrouter("mistralai/ministral-3b-2512"),
+        prompt,
+        system: systemPrompt,
+      });
+
+      return text ?? "";
+    }
+
+    throw error;
+  }
 }
