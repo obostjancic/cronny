@@ -37,7 +37,7 @@ export async function runPrompt(
       logger.warn(`Free model rate limit hit, retrying with paid model`);
 
       const { text } = await generateText({
-        model: openrouter("mistralai/ministral-3b-2512"),
+        model: openrouter("google/gemini-2.5-flash-lite"),
         prompt,
         system: systemPrompt,
       });
