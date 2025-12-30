@@ -4,14 +4,6 @@ import { createLogger } from "./logger.js";
 
 const logger = createLogger("ai");
 
-const DEFAULT_CONFIG = {
-  temperature: 0,
-  topP: 0.5,
-  topK: 40,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
-
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
