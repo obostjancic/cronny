@@ -9,4 +9,12 @@ Sentry.init({
 
   enabled: isProd,
   environment: getEnv("NODE_ENV"),
+  integrations: [
+    Sentry.pinoIntegration(),
+    Sentry.honoIntegration(),
+    Sentry.vercelAIIntegration({
+      recordInputs: true,
+      recordOutputs: true,
+    }),
+  ],
 });
