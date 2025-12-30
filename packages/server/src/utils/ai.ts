@@ -16,6 +16,12 @@ export async function runPrompt(
       model: openrouter(model),
       prompt,
       system: systemPrompt,
+      experimental_telemetry: {
+        functionId: "runPrompt",
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
+      },
     });
 
     return text ?? "";
@@ -32,6 +38,12 @@ export async function runPrompt(
         model: openrouter("google/gemma-3-27b-it"),
         prompt,
         system: systemPrompt,
+        experimental_telemetry: {
+          functionId: "runPrompt fallback",
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+        },
       });
 
       return text ?? "";
