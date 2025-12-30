@@ -1,3 +1,4 @@
+import "./instrument.js";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import fs from "fs";
@@ -17,10 +18,13 @@ const app = new Hono();
 app.use("*", async (c, next) => {
   // Set CORS headers
   c.header("Access-Control-Allow-Origin", "*"); // Allow all origins
-  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"); // Allowed methods
+  c.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  ); // Allowed methods
   c.header(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-API-Key"
+    "Content-Type, Authorization, X-API-Key",
   ); // Allowed headers
 
   // Handle preflight requests
@@ -49,7 +53,7 @@ if (isProd) {
     serveStatic({
       root: "../client/dist",
       index: "index.html",
-    })
+    }),
   );
   app.get("*", (c) => {
     return c.html(indexHtml);
