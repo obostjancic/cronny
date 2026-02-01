@@ -214,8 +214,13 @@ export function JobFormV2({
       [result.fieldName]: result.cleanedUrl,
     });
 
-    // Extract geo data if present
-    if (result.geo) {
+    // Only extract geo data if user hasn't already defined a geo filter
+    // (don't overwrite manually drawn polygons or set radius centers)
+    const hasExistingGeo =
+      form.values.geoFilterType !== "none" &&
+      (form.values.polygonPoints.length >= 3 || form.values.radiusCenter !== null);
+
+    if (result.geo && !hasExistingGeo) {
       if (result.geo.type === "polygon" && result.geo.polygon) {
         form.setFieldValue("geoFilterType", "polygon");
         form.setFieldValue("polygonPoints", result.geo.polygon);
@@ -226,13 +231,18 @@ export function JobFormV2({
           form.setFieldValue("radius", result.geo.radius);
         }
       }
+      notifications.show({
+        title: "URL processed",
+        message: `Extracted geo filter and cleaned URL`,
+        autoClose: 3000,
+      });
+    } else {
+      notifications.show({
+        title: "URL cleaned",
+        message: `Removed ${result.extractedParams.length} parameter(s) from URL`,
+        autoClose: 2000,
+      });
     }
-
-    notifications.show({
-      title: "URL processed",
-      message: `Extracted ${result.extractedParams.length} parameter(s) and cleaned URL`,
-      autoClose: 3000,
-    });
   };
 
   const handleFormSubmit = async (values: FormValues) => {

@@ -61,10 +61,17 @@ export function MapRadiusPicker({
 
   return (
     <div>
-      <Text size="sm" c="dimmed" mb="xs">
-        Click on the map to set the center point
-      </Text>
-      <div style={{ height: "400px", width: "100%", borderRadius: "8px", overflow: "hidden" }}>
+      {!center && (
+        <Text size="sm" c="orange" fw={500} mb="xs" style={{ padding: "8px", backgroundColor: "var(--mantine-color-orange-light)", borderRadius: "4px" }}>
+          Click anywhere on the map to set the center point
+        </Text>
+      )}
+      {center && (
+        <Text size="sm" c="dimmed" mb="xs">
+          Click to move the center point, or adjust the radius below
+        </Text>
+      )}
+      <div style={{ height: "400px", width: "100%", borderRadius: "8px", overflow: "hidden", border: !center ? "2px dashed var(--mantine-color-orange-5)" : undefined }}>
         <MapContainer
           center={mapCenter}
           zoom={12}
