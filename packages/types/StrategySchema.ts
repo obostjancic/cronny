@@ -251,7 +251,9 @@ export function getStrategiesByCategory(
 
 export interface DataFilter {
   prop: string;
-  value: string | number | string[];
+  value?: string | number | string[];
+  min?: number;
+  max?: number;
   negate?: boolean;
 }
 

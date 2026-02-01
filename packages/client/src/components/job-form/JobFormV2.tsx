@@ -207,12 +207,15 @@ export function JobFormV2({
     cleanedUrl: string;
     fieldName: string;
     extractedParams: string[];
+    extractedFilters?: { priceMin?: number; priceMax?: number; sizeMin?: number; sizeMax?: number; roomsMin?: number; roomsMax?: number };
   }) => {
     // Update the URL field to the cleaned version
     form.setFieldValue("strategyParams", {
       ...form.values.strategyParams,
       [result.fieldName]: result.cleanedUrl,
     });
+
+    const extractedItems: string[] = [];
 
     // Only extract geo data if user hasn't already defined a geo filter
     // (don't overwrite manually drawn polygons or set radius centers)
@@ -231,9 +234,39 @@ export function JobFormV2({
           form.setFieldValue("radius", result.geo.radius);
         }
       }
+      extractedItems.push("geo filter");
+    }
+
+    // Extract numeric filters from URL parameters
+    if (result.extractedFilters) {
+      const newFilters: DataFilter[] = [...form.values.dataFilters];
+      const { priceMin, priceMax, sizeMin, sizeMax, roomsMin, roomsMax } = result.extractedFilters;
+
+      // Check if filter already exists for a property
+      const hasFilter = (prop: string) => newFilters.some(f => f.prop === prop);
+
+      if ((priceMin !== undefined || priceMax !== undefined) && !hasFilter("price")) {
+        newFilters.push({ prop: "price", min: priceMin, max: priceMax });
+        extractedItems.push("price filter");
+      }
+      if ((sizeMin !== undefined || sizeMax !== undefined) && !hasFilter("size")) {
+        newFilters.push({ prop: "size", min: sizeMin, max: sizeMax });
+        extractedItems.push("size filter");
+      }
+      if ((roomsMin !== undefined || roomsMax !== undefined) && !hasFilter("rooms")) {
+        newFilters.push({ prop: "rooms", min: roomsMin, max: roomsMax });
+        extractedItems.push("rooms filter");
+      }
+
+      if (newFilters.length > form.values.dataFilters.length) {
+        form.setFieldValue("dataFilters", newFilters);
+      }
+    }
+
+    if (extractedItems.length > 0) {
       notifications.show({
         title: "URL processed",
-        message: `Extracted geo filter and cleaned URL`,
+        message: `Extracted ${extractedItems.join(", ")} and cleaned URL`,
         autoClose: 3000,
       });
     } else {

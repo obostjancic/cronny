@@ -30,7 +30,7 @@ export function DataFilterBuilder({
   onChange,
 }: DataFilterBuilderProps) {
   const addFilter = () => {
-    onChange([...filters, { prop: "price", value: "" }]);
+    onChange([...filters, { prop: "price" }]);
   };
 
   const removeFilter = (index: number) => {
@@ -93,23 +93,32 @@ function FilterRow({ filter, onChange, onRemove }: FilterRowProps) {
       <Select
         size="xs"
         value={filter.prop}
-        onChange={(value) => onChange({ prop: value || "price" })}
+        onChange={(value) => onChange({ prop: value || "price", value: undefined, min: undefined, max: undefined })}
         data={PROPERTY_OPTIONS}
         w={120}
       />
       {isNumericProp ? (
-        <NumberInput
-          size="xs"
-          placeholder="Value"
-          value={filter.value as number}
-          onChange={(value) => onChange({ value: value || 0 })}
-          style={{ flex: 1 }}
-        />
+        <>
+          <NumberInput
+            size="xs"
+            placeholder="Min"
+            value={filter.min ?? ""}
+            onChange={(value) => onChange({ min: value === "" ? undefined : (value as number), value: undefined })}
+            style={{ flex: 1 }}
+          />
+          <NumberInput
+            size="xs"
+            placeholder="Max"
+            value={filter.max ?? ""}
+            onChange={(value) => onChange({ max: value === "" ? undefined : (value as number), value: undefined })}
+            style={{ flex: 1 }}
+          />
+        </>
       ) : (
         <TextInput
           size="xs"
           placeholder="Value (use % for wildcards)"
-          value={filter.value as string}
+          value={(filter.value as string) || ""}
           onChange={(e) => onChange({ value: e.currentTarget.value })}
           style={{ flex: 1 }}
         />

@@ -8,13 +8,14 @@ import {
   Textarea,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { ParsedGeoData, parseAndCleanUrl } from "./urlGeoParser";
+import { ExtractedFilters, ParsedGeoData, parseAndCleanUrl } from "./urlGeoParser";
 
 interface UrlExtractionResult {
   geo?: ParsedGeoData;
   cleanedUrl: string;
   fieldName: string;
   extractedParams: string[];
+  extractedFilters?: ExtractedFilters;
 }
 
 interface StrategyParamsFormProps {
@@ -44,6 +45,7 @@ export function StrategyParamsForm({
           cleanedUrl: result.cleanedUrl,
           fieldName,
           extractedParams: result.extractedParams,
+          extractedFilters: result.extractedFilters,
         });
       }
     }
