@@ -28,7 +28,6 @@ import { GeoFilterSection } from "./GeoFilterSection";
 import { NotifyConfigForm } from "./NotifyConfigForm";
 import { StrategyParamsForm } from "./StrategyParamsForm";
 import { StrategySelector } from "./StrategySelector";
-import { ParsedGeoData } from "./urlGeoParser";
 
 interface JobFormV2Props {
   initialValues?: Partial<JobDetails>;
@@ -203,27 +202,37 @@ export function JobFormV2({
   const patchJob = usePatchJob(initialValues?.id ?? "");
   const postJob = usePostJob();
 
-  const handleGeoExtracted = (geo: ParsedGeoData) => {
-    if (geo.type === "polygon" && geo.polygon) {
-      form.setFieldValue("geoFilterType", "polygon");
-      form.setFieldValue("polygonPoints", geo.polygon);
-      notifications.show({
-        title: "Geo data extracted",
-        message: `Extracted ${geo.polygon.length}-point polygon from URL`,
-        autoClose: 3000,
-      });
-    } else if (geo.type === "radius" && geo.center) {
-      form.setFieldValue("geoFilterType", "radius");
-      form.setFieldValue("radiusCenter", geo.center);
-      if (geo.radius) {
-        form.setFieldValue("radius", geo.radius);
+  const handleUrlExtracted = (result: {
+    geo?: { type: "polygon" | "radius"; polygon?: [number, number][]; center?: [number, number]; radius?: number };
+    cleanedUrl: string;
+    fieldName: string;
+    extractedParams: string[];
+  }) => {
+    // Update the URL field to the cleaned version
+    form.setFieldValue("strategyParams", {
+      ...form.values.strategyParams,
+      [result.fieldName]: result.cleanedUrl,
+    });
+
+    // Extract geo data if present
+    if (result.geo) {
+      if (result.geo.type === "polygon" && result.geo.polygon) {
+        form.setFieldValue("geoFilterType", "polygon");
+        form.setFieldValue("polygonPoints", result.geo.polygon);
+      } else if (result.geo.type === "radius" && result.geo.center) {
+        form.setFieldValue("geoFilterType", "radius");
+        form.setFieldValue("radiusCenter", result.geo.center);
+        if (result.geo.radius) {
+          form.setFieldValue("radius", result.geo.radius);
+        }
       }
-      notifications.show({
-        title: "Geo data extracted",
-        message: "Extracted radius filter from URL",
-        autoClose: 3000,
-      });
     }
+
+    notifications.show({
+      title: "URL processed",
+      message: `Extracted ${result.extractedParams.length} parameter(s) and cleaned URL`,
+      autoClose: 3000,
+    });
   };
 
   const handleFormSubmit = async (values: FormValues) => {
@@ -312,8 +321,9 @@ export function JobFormV2({
         />
 
         <Checkbox
-          label="Enabled"
-          {...form.getInputProps("enabled", { type: "checkbox" })}
+          label="Paused"
+          checked={!form.values.enabled}
+          onChange={(e) => form.setFieldValue("enabled", !e.currentTarget.checked)}
         />
 
         <TextInput
@@ -358,7 +368,7 @@ export function JobFormV2({
                 onChange={(values) =>
                   form.setFieldValue("strategyParams", values)
                 }
-                onGeoExtracted={supportsGeo ? handleGeoExtracted : undefined}
+                onUrlExtracted={supportsGeo ? handleUrlExtracted : undefined}
               />
             ) : (
               <Text size="sm" c="dimmed">

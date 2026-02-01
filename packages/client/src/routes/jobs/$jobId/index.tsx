@@ -10,16 +10,17 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
-  IconCancel,
-  IconCheck,
   IconClockCancel,
   IconEyeOff,
   IconFilterOff,
   IconPencil,
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconTrash,
 } from "@tabler/icons-react";
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import ReactTimeago from "react-timeago";
-import { useGetJob } from "../../../api/useJobs";
+import { useDeleteJob, useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
 import { JobFormV2 } from "../../../components/job-form";
@@ -34,13 +35,27 @@ const iconStyle = { width: rem(16), height: rem(16) };
 function JobDetailsPage() {
   const { jobId } = useParams({ from: "/jobs/$jobId/" });
   const { data: jobDetails } = useGetJob(jobId);
+  const navigate = useNavigate();
 
   const { results, runs, ...job } = jobDetails;
 
   const postRun = usePostRun();
   const deleteResults = useDeleteResults();
+  const deleteJob = useDeleteJob();
 
   const [opened, { open, close }] = useDisclosure(false);
+
+  const handleDelete = async () => {
+    if (confirm(`Are you sure you want to delete "${job.name}"? This cannot be undone.`)) {
+      await deleteJob.mutateAsync(job.id);
+      notifications.show({
+        title: "Deleted",
+        message: `Job "${job.name}" has been deleted`,
+        autoClose: 2000,
+      });
+      navigate({ to: "/" });
+    }
+  };
 
   return (
     <Container fluid p={0}>
@@ -50,22 +65,33 @@ function JobDetailsPage() {
         <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>
           <IconPencil style={iconStyle} /> Edit
         </Button>
+        <Button variant="transparent" size="sm" pl={0} pr={0} color="red" onClick={handleDelete}>
+          <IconTrash style={iconStyle} /> Delete
+        </Button>
       </Flex>
 
       <Flex gap="md" pb="xs" align="center" wrap="wrap" justify="space-between">
         <Flex align="center" gap="xs">
-          Enabled:
           {job.enabled ? (
-            <IconCheck style={iconStyle} />
+            <>
+              <IconPlayerPlay style={iconStyle} color="green" />
+              Active
+            </>
           ) : (
-            <IconCancel style={iconStyle} />
+            <>
+              <IconPlayerPause style={iconStyle} color="orange" />
+              Paused
+            </>
           )}
         </Flex>
 
         <div>Strategy: {job.strategy}</div>
         <div>Schedule: {job.cron}</div>
         <div>
-          Last run: <ReactTimeago date={runs[0]?.start} />
+          Last run: {runs[0]?.start ? <ReactTimeago date={runs[0].start} /> : "Never"}
+          {jobDetails.nextRun && (
+            <> | Next: <ReactTimeago date={jobDetails.nextRun} /></>
+          )}
           <Button
             variant="transparent"
             size="sm"
@@ -86,7 +112,7 @@ function JobDetailsPage() {
             size="sm"
             pr={0}
             onClick={async () => {
-              if (confirm("Are you sure you want to clear the reuslts?")) {
+              if (confirm("Are you sure you want to clear the results?")) {
                 await deleteResults.mutate(job.id);
                 notifications.show({
                   title: "Success",

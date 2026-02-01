@@ -67,3 +67,16 @@ export function usePatchJob(jobId: number | string) {
     },
   });
 }
+
+export function useDeleteJob() {
+  return useMutation({
+    mutationFn: async (jobId: number | string): Promise<void> => {
+      await fetchJson(`${JOBS_URL}/${jobId}`, {
+        method: "DELETE",
+      });
+    },
+    onSettled: () => {
+      invalidateGetJobs();
+    },
+  });
+}

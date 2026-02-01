@@ -7,13 +7,20 @@ import {
   Textarea,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { ParsedGeoData, parseGeoFromUrl } from "./urlGeoParser";
+import { ParsedGeoData, parseAndCleanUrl } from "./urlGeoParser";
+
+interface UrlExtractionResult {
+  geo?: ParsedGeoData;
+  cleanedUrl: string;
+  fieldName: string;
+  extractedParams: string[];
+}
 
 interface StrategyParamsFormProps {
   schema: StrategySchema;
   values: Record<string, any>;
   onChange: (values: Record<string, any>) => void;
-  onGeoExtracted?: (geo: ParsedGeoData) => void;
+  onUrlExtracted?: (result: UrlExtractionResult) => void;
   errors?: Record<string, string>;
 }
 
@@ -21,17 +28,22 @@ export function StrategyParamsForm({
   schema,
   values,
   onChange,
-  onGeoExtracted,
+  onUrlExtracted,
   errors,
 }: StrategyParamsFormProps) {
   const handleFieldChange = (fieldName: string, value: any, fieldType: string) => {
     onChange({ ...values, [fieldName]: value });
 
-    // Try to extract geo data from URL fields
-    if (fieldType === "url" && value && onGeoExtracted) {
-      const geoData = parseGeoFromUrl(value);
-      if (geoData) {
-        onGeoExtracted(geoData);
+    // Try to extract data from URL fields and clean the URL
+    if (fieldType === "url" && value && onUrlExtracted) {
+      const result = parseAndCleanUrl(value);
+      if (result && result.extractedParams.length > 0) {
+        onUrlExtracted({
+          geo: result.geo,
+          cleanedUrl: result.cleanedUrl,
+          fieldName,
+          extractedParams: result.extractedParams,
+        });
       }
     }
   };

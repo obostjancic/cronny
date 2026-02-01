@@ -30,3 +30,7 @@ export async function updateJob(
 
   return updatedJobs[0];
 }
+
+export async function deleteJob(id: number): Promise<void> {
+  await db.delete(Jobs).where(eq(Jobs.id, id));
+}

@@ -57,3 +57,7 @@ export async function getPreviousRun(runId: number): Promise<Run | undefined> {
 
   return savedRuns[1];
 }
+
+export async function deleteJobRuns(jobId: number): Promise<void> {
+  await db.delete(Runs).where(eq(Runs.jobId, jobId));
+}

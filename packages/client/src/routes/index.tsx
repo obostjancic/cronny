@@ -1,6 +1,7 @@
-import { Button, Flex, Table } from "@mantine/core";
-import { IconCancel, IconCheck } from "@tabler/icons-react";
+import { JobWithTiming } from "@cronny/types";
+import { Badge, Button, Flex, Table } from "@mantine/core";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import ReactTimeago from "react-timeago";
 import { useGetJobs, usePostJob } from "../api/useJobs";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const job = useGetJobs();
+  const jobs = useGetJobs();
   const postJob = usePostJob();
 
   const openJSONInNewTab = useOpenJSONInNewTab();
@@ -25,19 +26,17 @@ function Index() {
       <Table stickyHeader highlightOnHover>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Id</Table.Th>
             <Table.Th>Name</Table.Th>
             <Table.Th>Strategy</Table.Th>
-            <Table.Th>Enabled</Table.Th>
-            <Table.Th>Schedule</Table.Th>
-            <Table.Th>Raw</Table.Th>
+            <Table.Th>Status</Table.Th>
+            <Table.Th>Last Run</Table.Th>
+            <Table.Th>Next Run</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {job.data?.map((job) => (
+          {(jobs.data as JobWithTiming[])?.map((job) => (
             <Table.Tr key={job.id}>
-              <Table.Td>{job.id}</Table.Td>
               <Table.Td>
                 <Link to="/jobs/$jobId" params={{ jobId: String(job.id) }}>
                   {job.name}
@@ -45,36 +44,41 @@ function Index() {
               </Table.Td>
               <Table.Td>{job.strategy}</Table.Td>
               <Table.Td>
-                <Flex align="center">
-                  {job.enabled ? <IconCheck /> : <IconCancel />}
+                {job.enabled ? (
+                  <Badge color="green" variant="light">Active</Badge>
+                ) : (
+                  <Badge color="orange" variant="light">Paused</Badge>
+                )}
+              </Table.Td>
+              <Table.Td>
+                {job.lastRun ? <ReactTimeago date={job.lastRun} /> : "Never"}
+              </Table.Td>
+              <Table.Td>
+                {job.nextRun ? <ReactTimeago date={job.nextRun} /> : "-"}
+              </Table.Td>
+              <Table.Td>
+                <Flex gap="xs">
+                  <Button
+                    variant="transparent"
+                    size="xs"
+                    onClick={() => openJSONInNewTab(job)}
+                  >
+                    JSON
+                  </Button>
+                  <Button
+                    variant="transparent"
+                    size="xs"
+                    onClick={() => {
+                      postJob.mutate({
+                        ...job,
+                        id: undefined,
+                        enabled: false,
+                      });
+                    }}
+                  >
+                    Duplicate
+                  </Button>
                 </Flex>
-              </Table.Td>
-              <Table.Td>{job.cron}</Table.Td>
-              <Table.Td>
-                <Button
-                  variant="transparent"
-                  size="xs"
-                  onClick={() => {
-                    openJSONInNewTab(job);
-                  }}
-                >
-                  JSON
-                </Button>
-              </Table.Td>
-              <Table.Td>
-                <Button
-                  variant="transparent"
-                  size="xs"
-                  onClick={() => {
-                    postJob.mutate({
-                      ...job,
-                      id: undefined,
-                      enabled: false,
-                    });
-                  }}
-                >
-                  Duplicate
-                </Button>
               </Table.Td>
             </Table.Tr>
           ))}

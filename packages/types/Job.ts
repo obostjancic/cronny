@@ -19,10 +19,15 @@ export type Notify = {
 
 export type Job = UnsavedJob & { id: number };
 
+export type JobWithTiming = Job & {
+  lastRun?: string;
+  nextRun?: string;
+};
+
 export type NotificationConfig = {
   transport: "file" | "email" | "slack" | "telegram" | "whatsapp" | "webhook";
   params: JSONObject;
   onResultChangeOnly?: boolean;
 };
 
-export type JobDetails = Job & { results: Result[]; runs: Run[] };
+export type JobDetails = Job & { results: Result[]; runs: Run[]; nextRun?: string };
