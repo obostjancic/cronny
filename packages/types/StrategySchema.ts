@@ -5,7 +5,8 @@ export type FieldType =
   | "number"
   | "date"
   | "select"
-  | "multiselect";
+  | "multiselect"
+  | "combobox";
 
 export interface SelectOption {
   value: string;
@@ -200,13 +201,18 @@ export const STRATEGY_SCHEMAS: StrategySchema[] = [
       {
         name: "model",
         label: "AI Model",
-        type: "select",
+        type: "combobox",
         required: false,
-        description: "The AI model to use for processing",
+        placeholder: "google/gemma-3-27b-it:free",
+        description: "OpenRouter model ID (leave empty for default)",
         options: [
-          { value: "gpt-4o-mini", label: "GPT-4o Mini (Default)" },
-          { value: "gpt-4o", label: "GPT-4o" },
-          { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+          { value: "google/gemma-3-27b-it:free", label: "Gemma 3 27B (Free)" },
+          { value: "google/gemma-3-27b-it", label: "Gemma 3 27B" },
+          { value: "anthropic/claude-3.5-sonnet", label: "Claude 3.5 Sonnet" },
+          { value: "anthropic/claude-3-haiku", label: "Claude 3 Haiku" },
+          { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
+          { value: "openai/gpt-4o", label: "GPT-4o" },
+          { value: "meta-llama/llama-3.1-8b-instruct:free", label: "Llama 3.1 8B (Free)" },
         ],
       },
     ],
