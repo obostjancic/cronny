@@ -1,6 +1,7 @@
 {
   "author": "",
   "dependencies": {
+    "@cronny/types": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "@openrouter/ai-sdk-provider": "^1.5.4",
     "@sentry/node": "^10.32.1",
@@ -26,7 +27,6 @@
   },
   "description": "",
   "devDependencies": {
-    "@cronny/types": "workspace:*",
     "@playwright/test": "^1.48.1",
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.14.12",

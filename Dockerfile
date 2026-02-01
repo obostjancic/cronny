@@ -59,6 +59,7 @@ COPY packages/types/package.json ./packages/types/
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy built artifacts from builder
+COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/packages/server/dist ./packages/server/dist
 COPY --from=builder /app/packages/client/dist ./packages/client/dist
 

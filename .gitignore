@@ -16,6 +16,9 @@ packages/server/.data/gist.log
 packages/server/.data/schedule.json
 packages/server/.data/sqlite.db
 packages/server/dist
+packages/types/dist
+packages/client/dist
+*.tsbuildinfo
 
 # Docker
 docker-compose.override.yml

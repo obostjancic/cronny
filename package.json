@@ -8,7 +8,7 @@
     "dev": "pnpm --filter @cronny/server dev",
     "dev:all": "concurrently \"pnpm --filter @cronny/client dev\" \"pnpm --filter @cronny/server dev\"",
     "debug": "pnpm --filter @cronny/server debug",
-    "build": "pnpm --filter @cronny/server build && pnpm --filter @cronny/client build",
+    "build": "pnpm --filter @cronny/types build && pnpm --filter @cronny/server build && pnpm --filter @cronny/client build",
     "start:prod": "pnpm --filter @cronny/server migrate && pnpm --filter @cronny/server start",
     "start": "pnpm run start:prod",
     "test": "pnpm --filter @cronny/server test"
