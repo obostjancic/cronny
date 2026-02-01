@@ -1,6 +1,6 @@
 import { Container, Flex } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import JobForm from "../../components/JobForm";
+import { JobFormV2 } from "../../components/job-form";
 
 export const Route = createFileRoute("/jobs/new")({
   component: () => <NewJobPage />,
@@ -10,7 +10,6 @@ function NewJobPage() {
   const navigate = useNavigate();
 
   const handleSubmit = () => {
-    // Navigate back to jobs list after creation
     navigate({ to: "/" });
   };
 
@@ -21,7 +20,7 @@ function NewJobPage() {
         <h3>Create New Job</h3>
       </Flex>
 
-      <JobForm onSubmit={handleSubmit} isEdit={false} />
+      <JobFormV2 onSubmit={handleSubmit} isEdit={false} />
     </Container>
   );
 }

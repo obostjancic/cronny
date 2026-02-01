@@ -4,9 +4,13 @@ import { clientAuthMiddleware } from "../middleware/clientAuth.js";
 
 const publicRoutes = new Hono();
 
-publicRoutes.use("*", clientAuthMiddleware);
+// Health check endpoint (no auth required)
+publicRoutes.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
 
-publicRoutes.get("/results", async (c) => {
+// Results endpoint requires client auth
+publicRoutes.get("/results", clientAuthMiddleware, async (c) => {
   const client = c.get("client");
 
   const res = await Promise.all(

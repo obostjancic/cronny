@@ -1,25 +1,26 @@
 # Build stage
 FROM node:22.14.0-slim AS builder
 
-# Install build dependencies for native modules
+# Install pnpm and build dependencies for native modules
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/client/package.json ./packages/client/
 COPY packages/server/package.json ./packages/server/
 COPY packages/types/package.json ./packages/types/
 
 # Install dependencies
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN yarn build
+RUN pnpm build
 
 # Install Playwright browsers (needed for server scraping)
 RUN cd packages/server && npx playwright install --with-deps chromium
@@ -27,7 +28,8 @@ RUN cd packages/server && npx playwright install --with-deps chromium
 # Production stage
 FROM node:22.14.0-slim
 
-# Install runtime dependencies for Playwright
+# Install pnpm and runtime dependencies for Playwright
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 RUN apt-get update && apt-get install -y \
     chromium \
     libnss3 \
@@ -43,26 +45,24 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
 
 # Set production environment variables
 ENV NODE_ENV=production \
-    PORT=3000 \
-    DATABASE_PATH=/app/packages/server/.data/db.sqlite
+    PORT=3000
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/client/package.json ./packages/client/
 COPY packages/server/package.json ./packages/server/
 COPY packages/types/package.json ./packages/types/
 
 # Install production dependencies only
-RUN yarn install --frozen-lockfile --production
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy built artifacts from builder
 COPY --from=builder /app/packages/server/dist ./packages/server/dist
 COPY --from=builder /app/packages/client/dist ./packages/client/dist
 
-# Copy server source files needed at runtime
-COPY packages/server/src ./packages/server/src
+# Copy server drizzle migrations
 COPY packages/server/drizzle ./packages/server/drizzle
 
 # Create data directory for SQLite
@@ -73,7 +73,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD node -e "require('http').get('http://localhost:3000/api/public/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start the application
-CMD ["yarn", "start:prod"]
+CMD ["pnpm", "start:prod"]

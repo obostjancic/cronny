@@ -1,10 +1,5 @@
 import type { Job, JobDetails, UnsavedJob } from "@cronny/types";
-import {
-  useMutation,
-  useSuspenseQuery,
-  type MutationOptions,
-  type QueryOptions,
-} from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";
 
@@ -23,65 +18,52 @@ export function invalidateGetJob(jobId: number | string) {
   queryClient.invalidateQueries({ queryKey: [JOBS_URL, String(jobId)] });
 }
 
-export function useGetJobs(options?: QueryOptions<Job[], Error>) {
-  return useSuspenseQuery<Job[], Error>({
+export function useGetJobs() {
+  return useSuspenseQuery({
     queryKey: [JOBS_URL],
-    queryFn: async () => {
-      return await fetchJson(JOBS_URL) as Job[];
+    queryFn: async (): Promise<Job[]> => {
+      return (await fetchJson(JOBS_URL)) as Job[];
     },
-    ...options,
   });
 }
 
-export function useGetJob(
-  jobId: number | string,
-  options?: QueryOptions<JobDetails, Error>
-) {
-  return useSuspenseQuery<JobDetails, Error>({
+export function useGetJob(jobId: number | string) {
+  return useSuspenseQuery({
     queryKey: [JOBS_URL, jobId],
-    queryFn: async () => {
-      return await fetchJson(`${JOBS_URL}/${jobId}`) as JobDetails;
+    queryFn: async (): Promise<JobDetails> => {
+      return (await fetchJson(`${JOBS_URL}/${jobId}`)) as JobDetails;
     },
-    ...options,
   });
 }
 
-export function usePostJob(options?: MutationOptions<Job, Error, UnsavedJob>) {
+export function usePostJob() {
   return useMutation({
-    mutationFn: async (data) => {
-      return await fetchJson(JOBS_URL, {
+    mutationFn: async (data: UnsavedJob): Promise<Job> => {
+      return (await fetchJson(JOBS_URL, {
         method: "POST",
         data: data,
-      }) as Job;
+      })) as Job;
     },
-    onSettled: (...args) => {
+    onSettled: () => {
       invalidateGetJobs();
-      options?.onSettled?.(...args);
     },
-    ...options,
   });
 }
 
-export function usePatchJob(
-  jobId: number | string,
-  options?: MutationOptions<Job, Error, Partial<Job>>
-) {
+export function usePatchJob(jobId: number | string) {
   return useMutation({
-    mutationFn: async (data) => {
-      return await fetchJson(`${JOBS_URL}/${jobId}`, {
+    mutationFn: async (data: Partial<Job>): Promise<Job> => {
+      return (await fetchJson(`${JOBS_URL}/${jobId}`, {
         method: "PATCH",
         data: data,
-      }) as Job;
+      })) as Job;
     },
-    onSettled: (...args) => {
-      const data = args[0];
+    onSettled: (data) => {
       if (data) {
         invalidateGetJob(data.id);
         invalidateGetJobs();
         invalidateGetResults(data.id);
       }
-      options?.onSettled?.(...args);
     },
-    ...options,
   });
 }

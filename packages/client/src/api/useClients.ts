@@ -1,10 +1,5 @@
 import type { Client } from "@cronny/types";
-import {
-  useMutation,
-  useSuspenseQuery,
-  type MutationOptions,
-  type QueryOptions,
-} from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";
 
@@ -27,66 +22,51 @@ export function invalidateGetClient(id: number) {
   queryClient.invalidateQueries({ queryKey: [CLIENTS_URL, id] });
 }
 
-export function useGetClients(options?: QueryOptions<Client[], Error>) {
-  return useSuspenseQuery<Client[], Error>({
+export function useGetClients() {
+  return useSuspenseQuery({
     queryKey: [CLIENTS_URL],
-    queryFn: async () => {
-      return await fetchJson(CLIENTS_URL) as Client[];
+    queryFn: async (): Promise<Client[]> => {
+      return (await fetchJson(CLIENTS_URL)) as Client[];
     },
-    ...options,
   });
 }
 
-export function useGetClient(
-  id: number,
-  options?: QueryOptions<Client, Error>
-) {
-  return useSuspenseQuery<Client, Error>({
+export function useGetClient(id: number) {
+  return useSuspenseQuery({
     queryKey: [CLIENTS_URL, id],
-    queryFn: async () => {
-      return await fetchJson(`${CLIENTS_URL}/${id}`) as Client;
+    queryFn: async (): Promise<Client> => {
+      return (await fetchJson(`${CLIENTS_URL}/${id}`)) as Client;
     },
-    ...options,
   });
 }
 
-export function usePostClient(
-  options?: MutationOptions<Client, Error, CreateClientInput>
-) {
+export function usePostClient() {
   return useMutation({
-    mutationFn: async (data) => {
-      return await fetchJson(CLIENTS_URL, {
+    mutationFn: async (data: CreateClientInput): Promise<Client> => {
+      return (await fetchJson(CLIENTS_URL, {
         method: "POST",
         data: data,
-      }) as Client;
+      })) as Client;
     },
-    onSettled: (...args) => {
+    onSettled: () => {
       invalidateGetClients();
-      options?.onSettled?.(...args);
     },
-    ...options,
   });
 }
 
-export function usePatchClient(
-  id: number,
-  options?: MutationOptions<Client, Error, UpdateClientInput>
-) {
+export function usePatchClient(id: number) {
   return useMutation({
-    mutationFn: async (data) => {
-      return await fetchJson(`${CLIENTS_URL}/${id}`, {
+    mutationFn: async (data: UpdateClientInput): Promise<Client> => {
+      return (await fetchJson(`${CLIENTS_URL}/${id}`, {
         method: "PATCH",
         data: data,
-      }) as Client;
+      })) as Client;
     },
-    onSettled: (...args) => {
-      const data = args[0];
+    onSettled: (data) => {
       if (data) {
         invalidateGetClient(data.id);
         invalidateGetClients();
       }
-      options?.onSettled?.(...args);
     },
-    ...options,
   });
 }

@@ -4,22 +4,20 @@
   "main": "index.js",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently \"yarn workspace @cronny/client dev\" \"yarn workspace @cronny/server dev\"",
-    "debug": "concurrently \"yarn workspace @cronny/client dev\" \"yarn workspace @cronny/server debug\"",
-    "build": "yarn workspace @cronny/server build && yarn workspace @cronny/client build",
-    "start:prod": "yarn workspace @cronny/server migrate && yarn workspace @cronny/server start",
-    "start": "yarn start:prod",
-    "test": "yarn workspace @cronny/server test"
+    "dev": "pnpm --filter @cronny/server dev",
+    "dev:all": "concurrently \"pnpm --filter @cronny/client dev\" \"pnpm --filter @cronny/server dev\"",
+    "debug": "pnpm --filter @cronny/server debug",
+    "build": "pnpm --filter @cronny/server build && pnpm --filter @cronny/client build",
+    "start:prod": "pnpm --filter @cronny/server migrate && pnpm --filter @cronny/server start",
+    "start": "pnpm run start:prod",
+    "test": "pnpm --filter @cronny/server test"
   },
   "volta": {
-    "yarn": "1.22.19",
     "node": "22.14.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
-  }
+  },
+  "packageManager": "pnpm@9.15.4"
 }

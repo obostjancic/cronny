@@ -17,7 +17,7 @@ jobsRoutes.post("/", async (c) => {
   const body = await c.req.json<UnsavedJob>();
   const job = await saveJob(body);
 
-  await invalidateSchedule();
+  invalidateSchedule();
 
   return c.json(job);
 });

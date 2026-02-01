@@ -52,7 +52,7 @@ function Clients() {
             {clients.map((client) => (
               <Table.Tr key={client.id}>
                 <Table.Td>
-                  <Link to={`/clients/${client.id}`}>{client.name}</Link>
+                  <Link to="/clients/$clientId" params={{ clientId: String(client.id) }}>{client.name}</Link>
                 </Table.Td>
                 <Table.Td>
                   <code>{client.apiKey}</code>

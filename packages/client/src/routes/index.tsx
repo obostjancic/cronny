@@ -39,7 +39,7 @@ function Index() {
             <Table.Tr key={job.id}>
               <Table.Td>{job.id}</Table.Td>
               <Table.Td>
-                <Link to={`/jobs/${job.id}`} key={job.id}>
+                <Link to="/jobs/$jobId" params={{ jobId: String(job.id) }}>
                   {job.name}
                 </Link>
               </Table.Td>

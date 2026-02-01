@@ -11,7 +11,10 @@ import { queryClient } from "./utils/queryClient";
 
 import "@mantine/code-highlight/styles.css";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 
 const router = createRouter({ routeTree, defaultPreload: "intent" });
 

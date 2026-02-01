@@ -1,3 +1,4 @@
+import { Result } from "@cronny/types";
 import {
   Button,
   Container,
@@ -21,7 +22,7 @@ import ReactTimeago from "react-timeago";
 import { useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
-import JobForm from "../../../components/JobForm";
+import { JobFormV2 } from "../../../components/job-form";
 import { ResultsTable } from "../../../components/ResultsTable";
 
 export const Route = createFileRoute("/jobs/$jobId/")({
@@ -32,9 +33,9 @@ const iconStyle = { width: rem(16), height: rem(16) };
 
 function JobDetailsPage() {
   const { jobId } = useParams({ from: "/jobs/$jobId/" });
-  const {
-    data: { results, runs, ...job },
-  } = useGetJob(jobId);
+  const { data: jobDetails } = useGetJob(jobId);
+
+  const { results, runs, ...job } = jobDetails;
 
   const postRun = usePostRun();
   const deleteResults = useDeleteResults();
@@ -106,13 +107,13 @@ function JobDetailsPage() {
         title={`Job ${job.name}`}
         size="90%"
       >
-        <JobForm initialValues={job} onSubmit={close} isEdit={true} />
+        <JobFormV2 initialValues={job} onSubmit={close} isEdit={true} />
       </Modal>
 
       <ResultsTable
         rows={results
-          .filter((r) => !r.isHidden && r.status === "active")
-          .map((r) => ({ ...r.data, ...r }))}
+          .filter((r: Result) => !r.isHidden && r.status === "active")
+          .map((r: Result) => ({ ...r.data, ...r }))}
       />
       <Container fluid p={0} pt="xl">
         <Tabs defaultValue="hidden">
@@ -140,22 +141,22 @@ function JobDetailsPage() {
           <Tabs.Panel value="hidden">
             <ResultsTable
               rows={results
-                .filter((r) => r.isHidden)
-                .map((r) => ({ ...r.data, ...r }))}
+                .filter((r: Result) => r.isHidden)
+                .map((r: Result) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>
           <Tabs.Panel value="filtered">
             <ResultsTable
               rows={results
-                .filter((r) => !r.isHidden && r.status === "filtered")
-                .map((r) => ({ ...r.data, ...r }))}
+                .filter((r: Result) => !r.isHidden && r.status === "filtered")
+                .map((r: Result) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>
           <Tabs.Panel value="expired">
             <ResultsTable
               rows={results
-                .filter((r) => !r.isHidden && r.status === "expired")
-                .map((r) => ({ ...r.data, ...r }))}
+                .filter((r: Result) => !r.isHidden && r.status === "expired")
+                .map((r: Result) => ({ ...r.data, ...r }))}
             />
           </Tabs.Panel>
         </Tabs>
@@ -163,4 +164,3 @@ function JobDetailsPage() {
     </Container>
   );
 }
-

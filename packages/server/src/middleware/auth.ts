@@ -19,7 +19,7 @@ export async function authMiddleware(c: Context, next: Next) {
 
   const token = authHeader.split(" ")[1];
   try {
-    await verify(token, getEnv("API_SECRET"));
+    await verify(token, getEnv("API_SECRET"), "HS256");
     return next();
   } catch (e) {
     return c.json({ error: "Invalid token" }, 401);

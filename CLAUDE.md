@@ -9,22 +9,22 @@ Cronny is a web scraping and job scheduling platform for Austrian real estate we
 ## Development Commands
 
 ### Core Development
-- `yarn dev` - Run both client and server in development mode (client on :5173, server on :3000)
-- `yarn debug` - Run client + server with Node.js debugger attached
-- `yarn build` - Build both packages for production
-- `yarn start:prod` - Run database migrations + start production server
+- `pnpm dev` - Run both client and server in development mode (client on :5173, server on :3000)
+- `pnpm debug` - Run client + server with Node.js debugger attached
+- `pnpm build` - Build both packages for production
+- `pnpm start:prod` - Run database migrations + start production server
 
 ### Server-Specific (`packages/server/`)
-- `yarn dev` - Development server with hot reload (tsx + watch)
-- `yarn migrate` - Run Drizzle database migrations
-- `yarn studio` - Launch Drizzle Studio (database GUI)
-- `yarn test` - Run Vitest tests
+- `pnpm dev` - Development server with hot reload (tsx + watch)
+- `pnpm migrate` - Run Drizzle database migrations
+- `pnpm studio` - Launch Drizzle Studio (database GUI)
+- `pnpm test` - Run Vitest tests
 
 ### Client-Specific (`packages/client/`)
-- `yarn dev` - Vite development server (http://localhost:5173)
-- `yarn build` - TypeScript compilation + Vite production build
-- `yarn preview` - Serve production build locally
-- `yarn lint` - Run ESLint to check code quality
+- `pnpm dev` - Vite development server (http://localhost:5173)
+- `pnpm build` - TypeScript compilation + Vite production build
+- `pnpm preview` - Serve production build locally
+- `pnpm lint` - Run ESLint to check code quality
 
 ## Architecture Overview
 
@@ -71,11 +71,11 @@ When adding new scrapers, create files in `packages/server/src/strategies/` impl
 
 ## Database Operations
 
-Use `yarn migrate` to run schema changes. The database file is created at `packages/server/.data/db.sqlite` in development. Access Drizzle Studio with `yarn studio` for visual database inspection.
+Use `pnpm migrate` to run schema changes. The database file is created at `packages/server/.data/db.sqlite` in development. Access Drizzle Studio with `pnpm studio` for visual database inspection.
 
 ## Testing
 
-Server tests are in `/tests/` with strategy-specific tests using HTML/JS fixtures. Run with `yarn test` from server directory. Tests create a separate `.data` directory to avoid conflicts with development database.
+Server tests are in `/tests/` with strategy-specific tests using HTML/JS fixtures. Run with `pnpm test` from server directory. Tests create a separate `.data` directory to avoid conflicts with development database.
 
 ## Authentication
 
@@ -99,8 +99,20 @@ The client uses a centralized HTTP client (`packages/client/src/api/client.ts`) 
 
 ## Node.js Version
 
-Project uses Node.js 22.14.0 (managed via Volta). The codebase uses ES modules throughout.
+Project uses Node.js 22.14.0. The codebase uses ES modules throughout.
 
 ## Important Notes
 
-**Package Manager**: This project uses Yarn, not npm. Always use `yarn` commands instead of `npm` commands.
+**Package Manager**: This project uses pnpm. Always use `pnpm` commands instead of `npm` or `yarn` commands.
+
+**Conventional Commits**: This project uses conventional commits. Commit messages must follow the format:
+- `feat: description` - New features
+- `fix: description` - Bug fixes
+- `refactor: description` - Code refactoring
+- `chore: description` - Maintenance tasks
+- `docs: description` - Documentation changes
+- `style: description` - Code style changes
+- `test: description` - Test changes
+- `perf: description` - Performance improvements
+
+Optionally include a scope: `feat(client): add new component`

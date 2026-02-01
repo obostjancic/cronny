@@ -12,24 +12,34 @@
   "dependencies": {
     "@mantine/code-highlight": "^7.12.1",
     "@mantine/core": "^7.12.1",
+    "@mantine/dates": "7.12.2",
     "@mantine/form": "^7.12.2",
     "@mantine/hooks": "^7.12.1",
     "@mantine/notifications": "^7.12.2",
+    "@react-leaflet/core": "^3.0.0",
     "@sentry/react": "^8.26.0",
     "@tabler/icons-react": "^3.16.0",
     "@tanstack/react-query": "^5.52.1",
     "@tanstack/react-router": "^1.50.0",
+    "axios": "^1.7.7",
     "date-fns": "^3.6.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "dayjs": "^1.11.19",
+    "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-leaflet": "^5.0.0",
     "react-timeago": "^7.2.0"
   },
   "devDependencies": {
+    "@cronny/types": "workspace:*",
     "@eslint/js": "^9.9.0",
     "@tanstack/router-devtools": "^1.50.0",
     "@tanstack/router-plugin": "^1.49.3",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/leaflet": "^1.9.21",
+    "@types/leaflet-draw": "^1.0.13",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
     "@types/react-timeago": "^4.1.7",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.9.0",
@@ -40,8 +50,5 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
-  },
-  "volta": {
-    "extends": "../../package.json"
   }
 }

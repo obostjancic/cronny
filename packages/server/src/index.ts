@@ -9,8 +9,9 @@ import { clientRoutes } from "./routes/clients.js";
 import { jobsRoutes } from "./routes/jobs.js";
 import { publicRoutes } from "./routes/public.js";
 import { resultRoutes } from "./routes/results.js";
+import { strategiesRoutes } from "./routes/strategies.js";
 import { scheduleRuns } from "./schedule.js";
-import { getEnv, isProd } from "./utils/env.js";
+import { getEnv } from "./utils/env.js";
 
 const app = new Hono();
 
@@ -29,7 +30,7 @@ app.use("*", async (c, next) => {
 
   // Handle preflight requests
   if (c.req.method === "OPTIONS") {
-    return Promise.resolve(c.text("OK", 204)); // Respond with 204 No Content for preflight
+    return c.body(null, 204);
   }
 
   return next(); // Proceed to the next middleware or route handler
@@ -43,15 +44,18 @@ app.route("/api/auth", authRoutes);
 app.route("/api/jobs", jobsRoutes);
 app.route("/api/results", resultRoutes);
 app.route("/api/clients", clientRoutes);
+app.route("/api/strategies", strategiesRoutes);
 
 const port = getEnv("PORT") || 3000;
 console.log(`Server is running on port ${port}`);
 
-if (isProd) {
-  const indexHtml = fs.readFileSync("../client/dist/index.html", "utf-8");
+// Serve static files if client dist exists
+const clientDistPath = "../client/dist";
+if (fs.existsSync(clientDistPath)) {
+  const indexHtml = fs.readFileSync(`${clientDistPath}/index.html`, "utf-8");
   app.use(
     serveStatic({
-      root: "../client/dist",
+      root: clientDistPath,
       index: "index.html",
     }),
   );

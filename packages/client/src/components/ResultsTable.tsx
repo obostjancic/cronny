@@ -3,7 +3,6 @@ import { Button, Container, Flex, Table, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import ReactTimeago from "react-timeago";
 import { Fragment } from "react/jsx-runtime";
-import { invalidateGetJob } from "../api/useJobs";
 import { usePatchResult } from "../api/useResults";
 import useOpenJSONInNewTab from "../hooks/useOpenJSONinNewTab";
 import useSortableData from "../hooks/useSortableData";
@@ -26,13 +25,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
 
   const openJSONInNewTab = useOpenJSONInNewTab();
 
-  const patchResult = usePatchResult({
-    onSettled: (data) => {
-      if (data) {
-        invalidateGetJob(data.jobId);
-      }
-    },
-  });
+  const patchResult = usePatchResult();
 
   if (!rows || rows.length === 0) {
     return <Flex p="md">No results</Flex>;
