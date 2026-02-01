@@ -209,71 +209,31 @@ export function JobFormV2({
     extractedParams: string[];
     extractedFilters?: { priceMin?: number; priceMax?: number; sizeMin?: number; sizeMax?: number; roomsMin?: number; roomsMax?: number };
   }) => {
-    // Update the URL field to the cleaned version
-    form.setFieldValue("strategyParams", {
-      ...form.values.strategyParams,
-      [result.fieldName]: result.cleanedUrl,
-    });
+    // URL is kept as-is (not cleaned) - platform will filter by its params
+    // We just notify the user about detected filters
+    const detectedItems: string[] = [];
 
-    const extractedItems: string[] = [];
-
-    // Only extract geo data if user hasn't already defined a geo filter
-    // (don't overwrite manually drawn polygons or set radius centers)
-    const hasExistingGeo =
-      form.values.geoFilterType !== "none" &&
-      (form.values.polygonPoints.length >= 3 || form.values.radiusCenter !== null);
-
-    if (result.geo && !hasExistingGeo) {
-      if (result.geo.type === "polygon" && result.geo.polygon) {
-        form.setFieldValue("geoFilterType", "polygon");
-        form.setFieldValue("polygonPoints", result.geo.polygon);
-      } else if (result.geo.type === "radius" && result.geo.center) {
-        form.setFieldValue("geoFilterType", "radius");
-        form.setFieldValue("radiusCenter", result.geo.center);
-        if (result.geo.radius) {
-          form.setFieldValue("radius", result.geo.radius);
-        }
-      }
-      extractedItems.push("geo filter");
+    if (result.geo) {
+      detectedItems.push("location filter");
     }
-
-    // Extract numeric filters from URL parameters
     if (result.extractedFilters) {
-      const newFilters: DataFilter[] = [...form.values.dataFilters];
       const { priceMin, priceMax, sizeMin, sizeMax, roomsMin, roomsMax } = result.extractedFilters;
-
-      // Check if filter already exists for a property
-      const hasFilter = (prop: string) => newFilters.some(f => f.prop === prop);
-
-      if ((priceMin !== undefined || priceMax !== undefined) && !hasFilter("price")) {
-        newFilters.push({ prop: "price", min: priceMin, max: priceMax });
-        extractedItems.push("price filter");
+      if (priceMin !== undefined || priceMax !== undefined) {
+        detectedItems.push(`price ${priceMin ?? ""}–${priceMax ?? ""}`);
       }
-      if ((sizeMin !== undefined || sizeMax !== undefined) && !hasFilter("size")) {
-        newFilters.push({ prop: "size", min: sizeMin, max: sizeMax });
-        extractedItems.push("size filter");
+      if (sizeMin !== undefined || sizeMax !== undefined) {
+        detectedItems.push(`size ${sizeMin ?? ""}–${sizeMax ?? ""}`);
       }
-      if ((roomsMin !== undefined || roomsMax !== undefined) && !hasFilter("rooms")) {
-        newFilters.push({ prop: "rooms", min: roomsMin, max: roomsMax });
-        extractedItems.push("rooms filter");
-      }
-
-      if (newFilters.length > form.values.dataFilters.length) {
-        form.setFieldValue("dataFilters", newFilters);
+      if (roomsMin !== undefined || roomsMax !== undefined) {
+        detectedItems.push(`rooms ${roomsMin ?? ""}–${roomsMax ?? ""}`);
       }
     }
 
-    if (extractedItems.length > 0) {
+    if (detectedItems.length > 0) {
       notifications.show({
-        title: "URL processed",
-        message: `Extracted ${extractedItems.join(", ")} and cleaned URL`,
-        autoClose: 3000,
-      });
-    } else {
-      notifications.show({
-        title: "URL cleaned",
-        message: `Removed ${result.extractedParams.length} parameter(s) from URL`,
-        autoClose: 2000,
+        title: "URL contains filters",
+        message: `Detected: ${detectedItems.join(", ")}. Platform will apply these filters.`,
+        autoClose: 4000,
       });
     }
   };

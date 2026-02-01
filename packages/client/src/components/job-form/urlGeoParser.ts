@@ -21,11 +21,6 @@ export interface ParsedUrlData {
   extractedFilters?: ExtractedFilters;
 }
 
-// Parameters that should be stripped from URLs after extraction
-const GEO_PARAMS = ["location_br", "location_tl", "location", "lat", "lng", "radius"];
-const FILTER_PARAMS = ["price_from", "price_to", "size_from", "size_to", "rooms_from", "rooms_to"];
-const ALL_EXTRACTABLE_PARAMS = [...GEO_PARAMS, ...FILTER_PARAMS];
-
 export function parseAndCleanUrl(url: string): ParsedUrlData | null {
   try {
     const urlObj = new URL(url);
@@ -64,42 +59,50 @@ export function parseAndCleanUrl(url: string): ParsedUrlData | null {
 
     if (priceFrom) {
       const val = Number(priceFrom);
-      if (!isNaN(val)) extractedFilters.priceMin = val;
+      if (!isNaN(val)) {
+        extractedFilters.priceMin = val;
+        extractedParams.push("price_from");
+      }
     }
     if (priceTo) {
       const val = Number(priceTo);
-      if (!isNaN(val)) extractedFilters.priceMax = val;
+      if (!isNaN(val)) {
+        extractedFilters.priceMax = val;
+        extractedParams.push("price_to");
+      }
     }
     if (sizeFrom) {
       const val = Number(sizeFrom);
-      if (!isNaN(val)) extractedFilters.sizeMin = val;
+      if (!isNaN(val)) {
+        extractedFilters.sizeMin = val;
+        extractedParams.push("size_from");
+      }
     }
     if (sizeTo) {
       const val = Number(sizeTo);
-      if (!isNaN(val)) extractedFilters.sizeMax = val;
+      if (!isNaN(val)) {
+        extractedFilters.sizeMax = val;
+        extractedParams.push("size_to");
+      }
     }
     if (roomsFrom) {
       const val = Number(roomsFrom);
-      if (!isNaN(val)) extractedFilters.roomsMin = val;
+      if (!isNaN(val)) {
+        extractedFilters.roomsMin = val;
+        extractedParams.push("rooms_from");
+      }
     }
     if (roomsTo) {
       const val = Number(roomsTo);
-      if (!isNaN(val)) extractedFilters.roomsMax = val;
-    }
-
-    // Remove extracted params from URL
-    for (const param of ALL_EXTRACTABLE_PARAMS) {
-      if (params.has(param)) {
-        params.delete(param);
-        if (!extractedParams.includes(param)) {
-          extractedParams.push(param);
-        }
+      if (!isNaN(val)) {
+        extractedFilters.roomsMax = val;
+        extractedParams.push("rooms_to");
       }
     }
 
-    // Build cleaned URL
-    const cleanedUrl = urlObj.origin + urlObj.pathname +
-      (params.toString() ? "?" + params.toString() : "");
+    // URL is not cleaned - params stay in place so platform can filter
+    // cleanedUrl is now just the original URL
+    const cleanedUrl = url;
 
     const hasFilters = Object.keys(extractedFilters).length > 0;
     return { geo, cleanedUrl, extractedParams, extractedFilters: hasFilters ? extractedFilters : undefined };
