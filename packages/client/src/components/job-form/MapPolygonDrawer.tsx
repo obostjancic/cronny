@@ -22,7 +22,13 @@ function DrawControl({
   const map = useMap();
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
   const drawControlRef = useRef<L.Control.Draw | null>(null);
+  const initializedRef = useRef(false);
+  const onChangeRef = useRef(onChange);
 
+  // Keep onChange ref updated without triggering effects
+  onChangeRef.current = onChange;
+
+  // Initialize feature group and draw control only once
   useEffect(() => {
     if (!drawnItemsRef.current) {
       drawnItemsRef.current = new L.FeatureGroup();
@@ -31,15 +37,7 @@ function DrawControl({
 
     const drawnItems = drawnItemsRef.current;
 
-    // Initialize with existing polygon if value exists
-    if (value.length >= 3) {
-      drawnItems.clearLayers();
-      const polygon = L.polygon(value.map(([lat, lng]) => [lat, lng]));
-      drawnItems.addLayer(polygon);
-      map.fitBounds(polygon.getBounds(), { padding: [50, 50] });
-    }
-
-    // Add draw control
+    // Add draw control only once
     if (!drawControlRef.current) {
       drawControlRef.current = new L.Control.Draw({
         position: "topright",
@@ -76,7 +74,7 @@ function DrawControl({
       const polygon = event.layer as L.Polygon;
       const latLngs = polygon.getLatLngs()[0] as L.LatLng[];
       const points = latLngs.map((ll): [number, number] => [ll.lat, ll.lng]);
-      onChange(points);
+      onChangeRef.current(points);
     };
 
     const handleEdited = (e: L.LeafletEvent) => {
@@ -85,12 +83,12 @@ function DrawControl({
         const polygon = layer as L.Polygon;
         const latLngs = polygon.getLatLngs()[0] as L.LatLng[];
         const points = latLngs.map((ll): [number, number] => [ll.lat, ll.lng]);
-        onChange(points);
+        onChangeRef.current(points);
       });
     };
 
     const handleDeleted = () => {
-      onChange([]);
+      onChangeRef.current([]);
     };
 
     map.on(L.Draw.Event.CREATED, handleCreated);
@@ -102,7 +100,23 @@ function DrawControl({
       map.off(L.Draw.Event.EDITED, handleEdited);
       map.off(L.Draw.Event.DELETED, handleDeleted);
     };
-  }, [map, value, onChange]);
+  }, [map]);
+
+  // Initialize polygon from value only once on first render
+  useEffect(() => {
+    if (initializedRef.current) return;
+    if (!drawnItemsRef.current) return;
+
+    const drawnItems = drawnItemsRef.current;
+
+    if (value.length >= 3) {
+      drawnItems.clearLayers();
+      const polygon = L.polygon(value.map(([lat, lng]) => [lat, lng]));
+      drawnItems.addLayer(polygon);
+      map.fitBounds(polygon.getBounds(), { padding: [50, 50] });
+      initializedRef.current = true;
+    }
+  }, [map, value]);
 
   return null;
 }
