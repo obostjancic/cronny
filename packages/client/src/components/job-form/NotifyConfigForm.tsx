@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, Paper, Select, Text, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Checkbox, Group, Paper, Select, Text, TextInput } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 interface NotifyConfig {
@@ -104,6 +104,14 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             data={TRIGGER_OPTIONS}
             w={120}
           />
+          {config.trigger === "onSuccess" && (
+            <Checkbox
+              size="xs"
+              label="Only on new results"
+              checked={config.onResultChangeOnly || false}
+              onChange={(e) => onChange({ onResultChangeOnly: e.currentTarget.checked })}
+            />
+          )}
         </Group>
         <ActionIcon variant="subtle" color="red" size="sm" onClick={onRemove}>
           <IconTrash size={14} />
@@ -115,8 +123,8 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
           size="xs"
           label="Webhook URL"
           placeholder="https://hooks.slack.com/services/..."
-          value={config.webhookUrl || ""}
-          onChange={(e) => onChange({ webhookUrl: e.currentTarget.value })}
+          value={config.webhook || ""}
+          onChange={(e) => onChange({ webhook: e.currentTarget.value })}
         />
       )}
 

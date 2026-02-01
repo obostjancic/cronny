@@ -95,6 +95,7 @@ function parseInitialValues(
       notifyConfigs.push({
         type: notify.onSuccess.transport,
         trigger: "onSuccess",
+        onResultChangeOnly: notify.onSuccess.onResultChangeOnly,
         ...notify.onSuccess.params,
       });
     }
@@ -150,10 +151,11 @@ function transformToJobPayload(
   if (values.notifyConfigs.length > 0) {
     notify = {};
     for (const config of values.notifyConfigs) {
-      const { type, trigger, ...rest } = config;
+      const { type, trigger, onResultChangeOnly, ...rest } = config;
       const notificationConfig = {
         transport: type as any,
         params: rest,
+        ...(onResultChangeOnly && { onResultChangeOnly }),
       };
       if (trigger === "onFailure") {
         notify.onFailure = notificationConfig;
