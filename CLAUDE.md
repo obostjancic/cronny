@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cronny is a web scraping and job scheduling platform for Austrian real estate websites. It's a TypeScript monorepo with a React frontend and Hono backend, using SQLite for data storage and Playwright for web scraping.
+Cronny is a web scraping and job scheduling platform for real estate websites (Austrian and Bosnian). It's a TypeScript monorepo with a React frontend and Hono backend, using SQLite for data storage and Playwright for web scraping.
 
 ## Development Commands
 
@@ -38,11 +38,16 @@ packages/
 
 ### Key Patterns
 
-**Strategy Pattern for Web Scraping**: Each website (derstandard.at, willhaben.at, immoscout24.at) has its own strategy implementation in `/packages/server/src/strategies/`. All strategies implement a standardized `Runner` interface.
+**Strategy Pattern for Web Scraping**: Each website (derstandard.at, willhaben.at, immoscout24.at, olx.ba) has its own strategy implementation in `/packages/server/src/strategies/`. All strategies implement a standardized `Runner` interface. Real estate strategies extend `immo.base.ts` for shared filtering logic.
 
 **Job Scheduling System**: Jobs stored in SQLite with cron expressions, executed via node-cron with dynamic strategy loading based on job configuration.
 
 **Database Schema**: Core entities are Jobs, Runs, Results, Clients, and ClientJobs. Uses Drizzle ORM with SQLite.
+
+**Filtering System**: Results can be filtered by:
+- Data filters (price, size, rooms) with min/max range support - defined in `packages/server/src/utils/filter.ts`
+- Geo filters (polygon/radius) - defined in `packages/server/src/strategies/immo.base.ts`
+- URL parameters are preserved for platform-side filtering; our filters provide additional refinement
 
 ### Technology Stack
 
@@ -67,7 +72,7 @@ packages/
 - `packages/client/src/api/client.ts` - HTTP client with environment-based API URL handling
 
 ### Strategy Development
-When adding new scrapers, create files in `packages/server/src/strategies/` implementing the `Runner` interface. Include corresponding test files in `tests/strategies/` with fixtures in `tests/fixtures/`.
+When adding new scrapers, create files in `packages/server/src/strategies/` implementing the `Runner` interface. For real estate scrapers, extend from `immo.base.ts` to get geo/data filtering. Include corresponding test files in `tests/strategies/` with fixtures in `tests/fixtures/`. Register new strategies in `packages/types/StrategySchema.ts`.
 
 ## Database Operations
 
@@ -116,3 +121,7 @@ Project uses Node.js 22.14.0. The codebase uses ES modules throughout.
 - `perf: description` - Performance improvements
 
 Optionally include a scope: `feat(client): add new component`
+
+## Deployment
+
+Production deployment uses Railway. Deploy with `railway up` from the project root. The app is built using a Dockerfile and served as a single container with the client as static files.
