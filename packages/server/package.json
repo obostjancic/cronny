@@ -3,7 +3,7 @@
   "dependencies": {
     "@cronny/types": "workspace:*",
     "@hono/node-server": "^1.13.0",
-    "@openrouter/ai-sdk-provider": "^1.5.4",
+    "@openrouter/ai-sdk-provider": "^2.1.1",
     "@sentry/node": "^10.32.1",
     "@sentry/profiling-node": "^10.32.1",
     "@sinclair/typebox": "^0.34.28",
