@@ -19,7 +19,21 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
-import ReactTimeago from "react-timeago";
+import ReactTimeago, { Formatter } from "react-timeago";
+
+const shortFormatter: Formatter = (value, unit, suffix) => {
+  const unitMap: Record<string, string> = {
+    second: "s",
+    minute: "m",
+    hour: "h",
+    day: "d",
+    week: "w",
+    month: "mo",
+    year: "y",
+  };
+  const short = unitMap[unit] || unit;
+  return suffix === "ago" ? `${value}${short} ago` : `${value}${short} from now`;
+};
 import { useDeleteJob, useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
@@ -88,9 +102,9 @@ function JobDetailsPage() {
         <div>Strategy: {job.strategy}</div>
         <div>Schedule: {job.cron}</div>
         <div>
-          Last run: {runs[0]?.start ? <ReactTimeago date={runs[0].start} /> : "Never"}
+          Last run: {runs[0]?.start ? <ReactTimeago date={runs[0].start} formatter={shortFormatter} /> : "Never"}
           {jobDetails.nextRun && (
-            <> | Next: <ReactTimeago date={jobDetails.nextRun} /></>
+            <> | Next: <ReactTimeago date={jobDetails.nextRun} formatter={shortFormatter} /></>
           )}
           <Button
             variant="transparent"
