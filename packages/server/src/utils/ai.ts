@@ -16,34 +16,22 @@ export async function runPrompt(
       model: openrouter(model),
       prompt,
       system: systemPrompt,
-      experimental_telemetry: {
-        functionId: "runPrompt",
-        isEnabled: true,
-        recordInputs: true,
-        recordOutputs: true,
-      },
     });
 
     return text ?? "";
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
-    if (
-      model.includes("free") &&
-      errorMessage.includes("free-models-per-day-high-balance")
-    ) {
-      logger.warn(`Free model rate limit hit, retrying with paid model`);
+    if (model.includes(":free")) {
+      const paidModel = model.replace(":free", "");
+      logger.warn(
+        `Free model failed (${errorMessage}), retrying with paid model ${paidModel}`,
+      );
 
       const { text } = await generateText({
-        model: openrouter("google/gemma-3-27b-it"),
+        model: openrouter(paidModel),
         prompt,
         system: systemPrompt,
-        experimental_telemetry: {
-          functionId: "runPrompt fallback",
-          isEnabled: true,
-          recordInputs: true,
-          recordOutputs: true,
-        },
       });
 
       return text ?? "";
