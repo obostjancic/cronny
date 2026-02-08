@@ -58,15 +58,15 @@ async function fetchWillhabenImmoSearch({ url, filters }: BaseImmoParams) {
 async function addGeoLocation(
   results: BaseImmoResult[]
 ): Promise<BaseImmoResult[]> {
-  const resultsWithCoords = [];
-  for (const result of results) {
-    if (result.address && !result.coordinates) {
-      result.coordinates = await cached(geocode)(result.address);
-    }
-    resultsWithCoords.push(result);
-  }
-
-  return resultsWithCoords;
+  const cachedGeocode = cached(geocode);
+  return Promise.all(
+    results.map(async (result) => {
+      if (result.address && !result.coordinates) {
+        result.coordinates = await cachedGeocode(result.address);
+      }
+      return result;
+    })
+  );
 }
 
 function toImmoResult(

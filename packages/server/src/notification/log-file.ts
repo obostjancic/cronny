@@ -12,7 +12,12 @@ export async function notifyLogFile(
 }
 
 async function writeIntoLogFile(filePath: string, data: string): Promise<void> {
-  const logFile = path.join(dataDirPath, filePath);
+  const logFile = path.resolve(dataDirPath, filePath);
+  const resolvedDataDir = path.resolve(dataDirPath);
+
+  if (!logFile.startsWith(resolvedDataDir + path.sep)) {
+    throw new Error(`Invalid file path: ${filePath} escapes data directory`);
+  }
 
   return fs.appendFile(logFile, data, "utf-8");
 }

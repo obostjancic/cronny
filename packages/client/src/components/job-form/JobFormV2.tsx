@@ -265,22 +265,29 @@ export function JobFormV2({
       payload = transformToJobPayload(values);
     }
 
+    const mutationCallbacks = {
+      onSuccess: () => {
+        notifications.show({
+          title: "Success",
+          message: isEdit ? "Job updated" : "Job created",
+          autoClose: 2000,
+        });
+        onSubmit();
+      },
+      onError: (error: Error) => {
+        notifications.show({
+          title: "Error",
+          message: error.message || (isEdit ? "Failed to update job" : "Failed to create job"),
+          color: "red",
+        });
+      },
+    };
+
     if (isEdit && initialValues?.id) {
-      patchJob.mutate(payload);
-      notifications.show({
-        title: "Success",
-        message: "Job updated",
-        autoClose: 2000,
-      });
+      patchJob.mutate(payload, mutationCallbacks);
     } else {
-      postJob.mutate(payload as UnsavedJob);
-      notifications.show({
-        title: "Success",
-        message: "Job created",
-        autoClose: 2000,
-      });
+      postJob.mutate(payload as UnsavedJob, mutationCallbacks);
     }
-    onSubmit();
   };
 
   const isLoading = patchJob.isPending || postJob.isPending;

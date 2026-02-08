@@ -74,7 +74,10 @@ export async function upsertResult(
 export async function upsertResults(
   newResults: UnsavedResult[]
 ): Promise<Result[]> {
-  return Promise.all(newResults.map(upsertResult));
+  const settled = await Promise.allSettled(newResults.map(upsertResult));
+  return settled
+    .filter((r): r is PromiseFulfilledResult<Result> => r.status === "fulfilled")
+    .map((r) => r.value);
 }
 
 export async function deleteJobResults(jobId: number): Promise<void> {

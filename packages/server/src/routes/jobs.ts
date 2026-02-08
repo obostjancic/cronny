@@ -7,6 +7,12 @@ import { deleteJobRuns, getJobRuns, getLastRun, getRun } from "../db/run.js";
 import { executeRun } from "../run.js";
 import { getRunner, invalidateSchedule } from "../schedule.js";
 
+function parseId(raw: string): number | null {
+  const id = Number(raw);
+  if (!Number.isInteger(id) || id <= 0) return null;
+  return id;
+}
+
 function getNextRunTime(cronExpression: string): string | undefined {
   try {
     const cronJob = new CronJob(cronExpression, () => {});
@@ -38,26 +44,30 @@ jobsRoutes.post("/", async (c) => {
   const body = await c.req.json<UnsavedJob>();
   const job = await saveJob(body);
 
-  invalidateSchedule();
+  await invalidateSchedule();
 
   return c.json(job);
 });
 
 jobsRoutes.get("/:id", async (c) => {
-  const job = await getJob(+c.req.param("id"));
-  if (!job) {
-    return c.notFound();
-  }
-  const runs = await getJobRuns(+c.req.param("id"));
-  const results = await getJobResults(+c.req.param("id"));
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
+  const job = await getJob(jobId);
+  if (!job) return c.notFound();
+
+  const runs = await getJobRuns(jobId);
+  const results = await getJobResults(jobId);
   const nextRun = job.enabled ? getNextRunTime(job.cron) : undefined;
 
   return c.json({ ...job, results, runs, nextRun });
 });
 
 jobsRoutes.patch("/:id", async (c) => {
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
   const { id, ...patch } = await c.req.json<Partial<Job>>();
-  const jobId = Number(c.req.param("id") ?? id);
   const job = await updateJob(jobId, patch);
 
   await invalidateSchedule();
@@ -66,11 +76,11 @@ jobsRoutes.patch("/:id", async (c) => {
 });
 
 jobsRoutes.delete("/:id", async (c) => {
-  const jobId = +c.req.param("id");
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
   const job = await getJob(jobId);
-  if (!job) {
-    return c.status(404);
-  }
+  if (!job) return c.notFound();
 
   // Delete in order: results -> runs -> job
   await deleteJobResults(jobId);
@@ -83,10 +93,11 @@ jobsRoutes.delete("/:id", async (c) => {
 });
 
 jobsRoutes.post("/:id/runs", async (c) => {
-  const job = await getJob(+c.req.param("id"));
-  if (!job) {
-    return c.status(404);
-  }
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
+  const job = await getJob(jobId);
+  if (!job) return c.notFound();
 
   const runner = await getRunner(job);
   const run = await executeRun(job, runner);
@@ -95,10 +106,11 @@ jobsRoutes.post("/:id/runs", async (c) => {
 });
 
 jobsRoutes.delete("/:id/runs", async (c) => {
-  const job = await getJob(+c.req.param("id"));
-  if (!job) {
-    return c.status(404);
-  }
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
+  const job = await getJob(jobId);
+  if (!job) return c.notFound();
 
   await deleteJobResults(job.id);
 
@@ -106,25 +118,36 @@ jobsRoutes.delete("/:id/runs", async (c) => {
 });
 
 jobsRoutes.get("/:id/runs/:runId", async (c) => {
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
   const runId = c.req.param("runId");
   if (runId === "latest") {
-    const run = await getLastRun(+c.req.param("id"));
+    const run = await getLastRun(jobId);
     return c.json(run);
   }
-  const run = await getRun(+runId);
+
+  const parsedRunId = parseId(runId);
+  if (!parsedRunId) return c.json({ error: "Invalid run ID" }, 400);
+
+  const run = await getRun(parsedRunId);
   return c.json(run);
 });
 
 jobsRoutes.get("/:id/results/", async (c) => {
-  const results = await getJobResults(+c.req.param("id"));
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
+  const results = await getJobResults(jobId);
   return c.json(results);
 });
 
 jobsRoutes.delete("/:id/results", async (c) => {
-  const job = await getJob(+c.req.param("id"));
-  if (!job) {
-    return c.status(404);
-  }
+  const jobId = parseId(c.req.param("id"));
+  if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
+
+  const job = await getJob(jobId);
+  if (!job) return c.notFound();
 
   await deleteJobResults(job.id);
 

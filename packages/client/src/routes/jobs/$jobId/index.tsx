@@ -96,12 +96,23 @@ function JobDetailsPage() {
             variant="transparent"
             size="sm"
             pr={0}
-            onClick={async () => {
-              await postRun.mutate(job.id);
-              notifications.show({
-                title: "Success",
-                message: "Run has been started",
-                autoClose: 2000,
+            loading={postRun.isPending}
+            onClick={() => {
+              postRun.mutate(job.id, {
+                onSuccess: () => {
+                  notifications.show({
+                    title: "Success",
+                    message: "Run has been started",
+                    autoClose: 2000,
+                  });
+                },
+                onError: (error) => {
+                  notifications.show({
+                    title: "Error",
+                    message: error.message || "Failed to start run",
+                    color: "red",
+                  });
+                },
               });
             }}
           >
@@ -111,13 +122,24 @@ function JobDetailsPage() {
             variant="transparent"
             size="sm"
             pr={0}
-            onClick={async () => {
+            loading={deleteResults.isPending}
+            onClick={() => {
               if (confirm("Are you sure you want to clear the results?")) {
-                await deleteResults.mutate(job.id);
-                notifications.show({
-                  title: "Success",
-                  message: "Cleared results",
-                  autoClose: 2000,
+                deleteResults.mutate(job.id, {
+                  onSuccess: () => {
+                    notifications.show({
+                      title: "Success",
+                      message: "Cleared results",
+                      autoClose: 2000,
+                    });
+                  },
+                  onError: (error) => {
+                    notifications.show({
+                      title: "Error",
+                      message: error.message || "Failed to clear results",
+                      color: "red",
+                    });
+                  },
                 });
               }
             }}

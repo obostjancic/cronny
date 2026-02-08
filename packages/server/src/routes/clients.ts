@@ -15,14 +15,20 @@ clientRoutes.get("/", async (c) => {
 
 clientRoutes.post("/", async (c) => {
   const { name, allowedJobs } = await c.req.json();
+  if (!name || typeof name !== "string") {
+    return c.json({ error: "Name is required" }, 400);
+  }
   const client = await createClient({ name, allowedJobs });
   return c.json(client);
 });
 
 clientRoutes.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const client = await findClientById(+id);
+  const id = Number(c.req.param("id"));
+  if (!Number.isInteger(id) || id <= 0) {
+    return c.json({ error: "Invalid client ID" }, 400);
+  }
 
+  const client = await findClientById(id);
   if (!client) {
     return c.json({ error: "Client not found" }, 404);
   }
@@ -31,11 +37,14 @@ clientRoutes.get("/:id", async (c) => {
 });
 
 clientRoutes.patch("/:id", async (c) => {
-  const id = c.req.param("id");
-  const { name, allowedJobs } = await c.req.json();
+  const id = Number(c.req.param("id"));
+  if (!Number.isInteger(id) || id <= 0) {
+    return c.json({ error: "Invalid client ID" }, 400);
+  }
 
-  await updateClient(+id, { name, allowedJobs });
-  return c.json({ success: true });
+  const { name, allowedJobs } = await c.req.json();
+  const client = await updateClient(id, { name, allowedJobs });
+  return c.json(client);
 });
 
 export { clientRoutes };

@@ -9,6 +9,8 @@ const useOpenJSONInNewTab = () => {
     const jsonUrl = URL.createObjectURL(jsonBlob);
 
     window.open(jsonUrl, "_blank");
+
+    setTimeout(() => URL.revokeObjectURL(jsonUrl), 1000);
   }, []);
 
   return openJsonInNewTab;

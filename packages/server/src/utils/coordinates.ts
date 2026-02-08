@@ -55,6 +55,10 @@ export function isWithinPolygon(
   return inside;
 }
 
+import { createLogger } from "./logger.js";
+
+const geoLogger = createLogger("geocode");
+
 export async function geocode(address: string): Promise<Coordinates | null> {
   const sanitized = sanitizeAddress(address);
 
@@ -79,6 +83,7 @@ export async function geocode(address: string): Promise<Coordinates | null> {
 
     return coordinates;
   } catch (e) {
+    geoLogger.error(`Failed to geocode address "${sanitized}": ${e}`);
     return null;
   }
 }

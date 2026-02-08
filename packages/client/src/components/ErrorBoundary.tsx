@@ -1,3 +1,4 @@
+import React from "react";
 import { Alert, Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
@@ -63,18 +64,53 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  onReset: () => void;
+}
+
+interface ErrorBoundaryState {
+  error: Error | null;
+}
+
+class ErrorBoundaryClass extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { error };
+  }
+
+  resetErrorBoundary = () => {
+    this.props.onReset();
+    this.setState({ error: null });
+  };
+
+  render() {
+    if (this.state.error) {
+      return (
+        <ErrorFallback
+          error={this.state.error}
+          resetErrorBoundary={this.resetErrorBoundary}
+        />
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>
 ) {
   return function WithErrorBoundaryWrapper(props: P) {
     const { reset } = useQueryErrorResetBoundary();
 
-    try {
-      return <Component {...props} />;
-    } catch (error) {
-      return (
-        <ErrorFallback error={error as Error} resetErrorBoundary={reset} />
-      );
-    }
+    return (
+      <ErrorBoundaryClass onReset={reset}>
+        <Component {...props} />
+      </ErrorBoundaryClass>
+    );
   };
 }

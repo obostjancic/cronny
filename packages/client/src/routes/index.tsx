@@ -1,5 +1,6 @@
 import { JobWithTiming } from "@cronny/types";
 import { Badge, Button, Flex, Table } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ReactTimeago from "react-timeago";
 import { useGetJobs, usePostJob } from "../api/useJobs";
@@ -69,11 +70,29 @@ function Index() {
                     variant="transparent"
                     size="xs"
                     onClick={() => {
-                      postJob.mutate({
-                        ...job,
-                        id: undefined,
-                        enabled: false,
-                      });
+                      postJob.mutate(
+                        {
+                          ...job,
+                          id: undefined,
+                          enabled: false,
+                        },
+                        {
+                          onSuccess: () => {
+                            notifications.show({
+                              title: "Success",
+                              message: `Duplicated "${job.name}"`,
+                              autoClose: 2000,
+                            });
+                          },
+                          onError: (error) => {
+                            notifications.show({
+                              title: "Error",
+                              message: error.message || "Failed to duplicate job",
+                              color: "red",
+                            });
+                          },
+                        }
+                      );
                     }}
                   >
                     Duplicate

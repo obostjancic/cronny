@@ -21,7 +21,7 @@ export async function saveJob(job: UnsavedJob): Promise<Job> {
 export async function updateJob(
   id: number,
   job: Partial<UnsavedJob>
-): Promise<any> {
+): Promise<Job> {
   const updatedJobs = await db
     .update(Jobs)
     .set(job)

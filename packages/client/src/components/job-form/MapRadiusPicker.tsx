@@ -45,7 +45,8 @@ function MapCenterUpdater({ center }: { center: [number, number] | null }) {
     if (center) {
       map.setView(center, map.getZoom());
     }
-  }, [center, map]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- map object reference is stable
+  }, [center]);
 
   return null;
 }

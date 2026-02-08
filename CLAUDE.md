@@ -9,7 +9,7 @@ Cronny is a web scraping and job scheduling platform for real estate websites (A
 ## Development Commands
 
 ### Core Development
-- `pnpm dev` - Run both client and server in development mode (client on :5173, server on :3000)
+- `pnpm dev` - Run both client and server in development mode (client on :5174, server on :3000)
 - `pnpm debug` - Run client + server with Node.js debugger attached
 - `pnpm build` - Build both packages for production
 - `pnpm start:prod` - Run database migrations + start production server
@@ -21,7 +21,7 @@ Cronny is a web scraping and job scheduling platform for real estate websites (A
 - `pnpm test` - Run Vitest tests
 
 ### Client-Specific (`packages/client/`)
-- `pnpm dev` - Vite development server (http://localhost:5173)
+- `pnpm dev` - Vite development server (http://localhost:5174)
 - `pnpm build` - TypeScript compilation + Vite production build
 - `pnpm preview` - Serve production build locally
 - `pnpm lint` - Run ESLint to check code quality

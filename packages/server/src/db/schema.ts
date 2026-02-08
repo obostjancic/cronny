@@ -3,6 +3,7 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import {
   blob,
+  index,
   integer,
   primaryKey,
   sqliteTable,
@@ -37,31 +38,44 @@ export const Jobs = sqliteTable("jobs", {
   notify: blob("notify", { mode: "json" }).$type<Notify>(),
 });
 
-export const Runs = sqliteTable("runs", {
-  id: integer("id").primaryKey().notNull(),
-  jobId: integer("jobId")
-    .references(() => Jobs.id)
-    .notNull(),
-  start: text("start").notNull(),
-  end: text("end"),
-  status: text("status").notNull().$type<"running" | "success" | "failure">(),
-});
+export const Runs = sqliteTable(
+  "runs",
+  {
+    id: integer("id").primaryKey().notNull(),
+    jobId: integer("jobId")
+      .references(() => Jobs.id, { onDelete: "cascade" })
+      .notNull(),
+    start: text("start").notNull(),
+    end: text("end"),
+    status: text("status").notNull().$type<"running" | "success" | "failure">(),
+  },
+  (table) => ({
+    jobIdIdx: index("runs_job_id_idx").on(table.jobId),
+  }),
+);
 
-export const Results = sqliteTable("results", {
-  id: integer("id").primaryKey().notNull(),
-  createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
-  updatedAt: text("updatedAt").notNull().default("1970-01-01T00:00:00.000Z"),
-  internalId: text("internalId").notNull(),
-  runId: integer("runId")
-    .references(() => Runs.id)
-    .notNull(),
-  jobId: integer("jobId")
-    .references(() => Jobs.id)
-    .notNull(),
-  data: blob("data", { mode: "json" }).notNull().$type<JSONObject>(),
-  status: text("status").notNull().$type<"active" | "expired" | "filtered">(),
-  isHidden: integer("isHidden", { mode: "boolean" }).notNull().default(false),
-});
+export const Results = sqliteTable(
+  "results",
+  {
+    id: integer("id").primaryKey().notNull(),
+    createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
+    updatedAt: text("updatedAt").notNull().default("1970-01-01T00:00:00.000Z"),
+    internalId: text("internalId").notNull(),
+    runId: integer("runId")
+      .references(() => Runs.id, { onDelete: "cascade" })
+      .notNull(),
+    jobId: integer("jobId")
+      .references(() => Jobs.id, { onDelete: "cascade" })
+      .notNull(),
+    data: blob("data", { mode: "json" }).notNull().$type<JSONObject>(),
+    status: text("status").notNull().$type<"active" | "expired" | "filtered">(),
+    isHidden: integer("isHidden", { mode: "boolean" }).notNull().default(false),
+  },
+  (table) => ({
+    jobIdIdx: index("results_job_id_idx").on(table.jobId),
+    internalIdIdx: index("results_internal_id_idx").on(table.jobId, table.internalId),
+  }),
+);
 
 export const Clients = sqliteTable("clients", {
   id: integer("id").primaryKey().notNull(),
@@ -76,14 +90,15 @@ export const ClientJobs = sqliteTable(
   "client_jobs",
   {
     clientId: integer("clientId")
-      .references(() => Clients.id)
+      .references(() => Clients.id, { onDelete: "cascade" })
       .notNull(),
     jobId: integer("jobId")
-      .references(() => Jobs.id)
+      .references(() => Jobs.id, { onDelete: "cascade" })
       .notNull(),
     createdAt: text("createdAt").notNull().default("1970-01-01T00:00:00.000Z"),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.clientId, table.jobId] }),
+    clientIdIdx: index("client_jobs_client_id_idx").on(table.clientId),
   }),
 );

@@ -45,7 +45,7 @@ function stopRuns(): void {
   schedule = [];
 }
 
-export function invalidateSchedule(): void {
+export async function invalidateSchedule(): Promise<void> {
   stopRuns();
-  scheduleRuns();
+  await scheduleRuns();
 }

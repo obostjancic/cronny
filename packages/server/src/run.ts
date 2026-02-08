@@ -31,7 +31,7 @@ export async function executeRun(job: Job, runner: Runner): Promise<Run> {
     resultDiff = res.resultDiff;
   }
   if (job.notify) {
-    notifyRun(job, run, resultDiff);
+    await notifyRun(job, run, resultDiff);
   }
 
   return run;
@@ -72,26 +72,47 @@ async function updateJobResultState(run: Run, results: JSONObject[]) {
 
   logger.debug(`Got ${newResults.length} new results`);
 
-  const exisitingResults = await getNonExpiredResults(run.jobId);
+  const existingResults = await getNonExpiredResults(run.jobId);
 
-  logger.debug(`Found ${exisitingResults.length} existing results`);
+  logger.debug(`Found ${existingResults.length} existing results`);
+
+  // Build a Set of existing internalIds for O(1) lookup
+  const existingIdSet = new Set(
+    existingResults.filter((r) => r.internalId).map((r) => r.internalId)
+  );
 
   const newlyAddedResults = newResults.filter(
-    (newResult) =>
-      !exisitingResults.some((existingResult) =>
-        equalResults(newResult, existingResult)
-      )
+    (newResult) => {
+      if (newResult.internalId && existingIdSet.has(newResult.internalId)) {
+        return false;
+      }
+      // Fall back to deep comparison only for results without matching internalId
+      if (!newResult.internalId) {
+        return !existingResults.some((existing) => equalResults(newResult, existing));
+      }
+      return true;
+    }
   );
 
   logger.debug(`Diff: ${newlyAddedResults.length} newly added results`);
 
   await upsertResults(newlyAddedResults);
 
-  const expiredResults = exisitingResults
-    .filter(
-      (existingResult) =>
-        !newResults.some((newResult) => equalResults(newResult, existingResult))
-    )
+  // Build a Set of new internalIds for O(1) lookup
+  const newIdSet = new Set(
+    newResults.filter((r) => r.internalId).map((r) => r.internalId)
+  );
+
+  const expiredResults = existingResults
+    .filter((existing) => {
+      if (existing.internalId && newIdSet.has(existing.internalId)) {
+        return false;
+      }
+      if (!existing.internalId) {
+        return !newResults.some((newResult) => equalResults(newResult, existing));
+      }
+      return true;
+    })
     .map((r) => ({ ...r, status: "expired" as ResultStatus }));
 
   logger.debug(`Diff: ${expiredResults.length} expired results`);

@@ -26,24 +26,16 @@ export async function notifyRun(
 async function notifySuccess(job: Job, resultDiff: number): Promise<void> {
   const { transport, params, onResultChangeOnly } = job.notify!.onSuccess!;
 
-  if (onResultChangeOnly) {
-    if (resultDiff <= 0) {
-      logger.debug(`${job.name}: No new results found!`);
-      return;
-    }
-
-    await notify({
-      transport,
-      params,
-      message: constructMessage(job, resultDiff),
-    });
-  } else {
-    await notify({
-      transport,
-      params,
-      message: constructMessage(job, resultDiff),
-    });
+  if (onResultChangeOnly && resultDiff <= 0) {
+    logger.debug(`${job.name}: No new results found!`);
+    return;
   }
+
+  await notify({
+    transport,
+    params,
+    message: constructMessage(job, resultDiff),
+  });
 }
 
 async function notifyFailure(job: Job): Promise<void> {
@@ -71,19 +63,19 @@ async function notify({
 
   switch (transport) {
     case "email":
-      // sendEmail(params, message);
+      logger.warn("Email transport is not yet implemented");
       break;
     case "slack":
-      sendSlack(params.webhook as string, message);
+      await sendSlack(params.webhook as string, message);
       break;
     case "telegram":
-      // sendTelegram(params, message);
+      logger.warn("Telegram transport is not yet implemented");
       break;
     case "whatsapp":
-      sendWhatsappMessage(params.phone as string, message);
+      await sendWhatsappMessage(params.phone as string, message);
       break;
     case "webhook":
-      // sendWebhook(params, message);
+      logger.warn("Webhook transport is not yet implemented");
       break;
     default:
       logger.error(`Unsupported transport: ${transport}`);

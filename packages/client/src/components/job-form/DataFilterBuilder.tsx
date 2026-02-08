@@ -68,7 +68,7 @@ export function DataFilterBuilder({
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         {filters.map((filter, index) => (
           <FilterRow
-            key={index}
+            key={`${filter.prop}-${index}`}
             filter={filter}
             onChange={(updates) => updateFilter(index, updates)}
             onRemove={() => removeFilter(index)}

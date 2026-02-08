@@ -68,7 +68,7 @@ export function NotifyConfigForm({ value, onChange }: NotifyConfigFormProps) {
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
         {configs.map((config, index) => (
           <NotifyConfigRow
-            key={index}
+            key={`${config.type}-${config.trigger}-${index}`}
             config={config}
             onChange={(updates) => updateConfig(index, updates)}
             onRemove={() => removeConfig(index)}

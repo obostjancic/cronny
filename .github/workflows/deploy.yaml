@@ -22,17 +22,17 @@ jobs:
           # Convert repository variables to VITE_ prefixed variables
           echo "$VARS_JSON" | jq -r 'keys[] as $k | "VITE_\($k)=\(.[$k])"' >> $GITHUB_ENV
 
-      - name: Setup Yarn
-        run: corepack enable
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: yarn build
+        run: pnpm build
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: SSH deploy
         uses: easingthemes/ssh-deploy@v5.1.0
