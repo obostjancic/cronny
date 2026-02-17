@@ -38,6 +38,39 @@ export interface StrategySchema {
   supportsGeoFilters?: boolean;
 }
 
+const MODEL_OPTIONS: SelectOption[] = [
+  { value: "google/gemma-3-27b-it:free", label: "Gemma 3 27B (Free)" },
+  { value: "google/gemma-3-27b-it", label: "Gemma 3 27B" },
+  { value: "google/gemma-3-12b-it:free", label: "Gemma 3 12B (Free)" },
+  { value: "google/gemma-3-12b-it", label: "Gemma 3 12B" },
+  { value: "anthropic/claude-3.5-sonnet", label: "Claude 3.5 Sonnet" },
+  { value: "anthropic/claude-3-haiku", label: "Claude 3 Haiku" },
+  { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
+  { value: "openai/gpt-4o", label: "GPT-4o" },
+  { value: "meta-llama/llama-3.1-8b-instruct:free", label: "Llama 3.1 8B (Free)" },
+];
+
+const MODEL_FIELDS: FieldSchema[] = [
+  {
+    name: "model",
+    label: "AI Model",
+    type: "combobox",
+    required: false,
+    placeholder: "google/gemma-3-27b-it:free",
+    description: "Primary OpenRouter model ID (leave empty for default)",
+    options: MODEL_OPTIONS,
+  },
+  {
+    name: "fallbackModel",
+    label: "Fallback AI Model",
+    type: "combobox",
+    required: false,
+    placeholder: "google/gemma-3-27b-it",
+    description: "Fallback model used when the primary model fails",
+    options: MODEL_OPTIONS,
+  },
+];
+
 export const STRATEGY_SCHEMAS: StrategySchema[] = [
   {
     id: "standard",
@@ -198,23 +231,26 @@ export const STRATEGY_SCHEMAS: StrategySchema[] = [
         placeholder: "You are a helpful assistant that summarizes news...",
         description: "The system prompt for AI processing of articles",
       },
+      ...MODEL_FIELDS,
+    ],
+    supportsFilters: false,
+    supportsGeoFilters: false,
+  },
+  {
+    id: "standard-rss",
+    name: "DerStandard News with AI",
+    description: "Fetch and process news articles from derstandard.at with AI",
+    category: "news",
+    fields: [
       {
-        name: "model",
-        label: "AI Model",
-        type: "combobox",
-        required: false,
-        placeholder: "google/gemma-3-27b-it:free",
-        description: "OpenRouter model ID (leave empty for default)",
-        options: [
-          { value: "google/gemma-3-27b-it:free", label: "Gemma 3 27B (Free)" },
-          { value: "google/gemma-3-27b-it", label: "Gemma 3 27B" },
-          { value: "anthropic/claude-3.5-sonnet", label: "Claude 3.5 Sonnet" },
-          { value: "anthropic/claude-3-haiku", label: "Claude 3 Haiku" },
-          { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
-          { value: "openai/gpt-4o", label: "GPT-4o" },
-          { value: "meta-llama/llama-3.1-8b-instruct:free", label: "Llama 3.1 8B (Free)" },
-        ],
+        name: "systemPrompt",
+        label: "AI System Prompt",
+        type: "textarea",
+        required: true,
+        placeholder: "You are a helpful assistant that summarizes news...",
+        description: "The system prompt for AI processing of articles",
       },
+      ...MODEL_FIELDS,
     ],
     supportsFilters: false,
     supportsGeoFilters: false,

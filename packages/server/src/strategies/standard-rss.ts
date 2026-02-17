@@ -1,14 +1,15 @@
 import { Runner } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
+import RSSParser from "rss-parser";
 import { parse } from "node-html-parser";
 import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
 import { createLogger } from "../utils/logger.js";
 import { fetchViaProxy } from "../utils/request.js";
 
-const logger = createLogger("klix-rss");
+const logger = createLogger("standard-rss");
 
-const KLIX_NAJNOVIJE_URL = "https://www.klix.ba/najnovije";
+const RSS_URL = "https://www.derstandard.at/rss";
 
 export const ResultSchema = Type.Object({
   id: Type.String(),
@@ -42,27 +43,17 @@ export const run: Runner<Params, Article> = async (params) => {
 };
 
 async function fetchArticleList(): Promise<RawArticle[]> {
-  logger.info(`Fetching article list from ${KLIX_NAJNOVIJE_URL}`);
+  logger.info(`Fetching RSS feed from ${RSS_URL}`);
 
-  const response = await fetchViaProxy(KLIX_NAJNOVIJE_URL);
-  const html = response.data as string;
-  const root = parse(html);
+  const parser = new RSSParser();
+  const feed = await parser.parseURL(RSS_URL);
 
-  const articles = root.querySelectorAll("article");
-
-  return articles.map((article) => {
-    const anchorTag = article.querySelector("a");
-    const href = anchorTag?.getAttribute("href") || "";
-    const id = href.split("/").pop() || "";
-    const title = anchorTag?.getAttribute("title") || "";
-
-    return {
-      id,
-      title,
-      url: `https://www.klix.ba${href}`,
-      date: new Date().toISOString(),
-    };
-  });
+  return (feed.items ?? []).map((item) => ({
+    id: item.guid || item.link || "",
+    title: item.title || "",
+    url: item.link || "",
+    date: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+  }));
 }
 
 async function fetchArticleTexts(
@@ -89,15 +80,13 @@ async function fetchArticleText(url: string): Promise<string> {
   const html = response.data as string;
   const root = parse(html);
 
-  const textElement = root.querySelector("#tekst");
-  const excerpt = textElement?.querySelector("#excerpt > span")?.innerText;
   const paragraphs =
-    textElement
-      ?.querySelectorAll("#text > p")
+    root
+      .querySelectorAll("div.article-body p")
       ?.map((p) => p.innerText)
       .filter(Boolean) ?? [];
 
-  const text = [excerpt, ...paragraphs].join("\n");
+  const text = paragraphs.join("\n");
 
   if (!text) {
     throw new Error(`No text found for article ${url}`);
