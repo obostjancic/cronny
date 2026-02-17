@@ -38,7 +38,7 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
   const browser = await chromium.launch({
     headless: isProd,
   });
-  sleep(1000);
+  await sleep(1000);
 
   const page = await browser.newPage();
   try {
@@ -54,7 +54,8 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
     logger.error("Error fetching grill areas", e);
     throw e;
   } finally {
-    page.close();
+    await page.close();
+    await browser.close();
   }
 }
 
@@ -222,7 +223,7 @@ const fillDate = async (dateElement: ElementHandle, targetDate: Date) => {
 
 const toDate = (dayStr: string) => {
   const parsedDay = parse(dayStr, "dd. LLLL", 0, { locale: de });
-  parsedDay.setFullYear(2024);
+  parsedDay.setFullYear(new Date().getFullYear());
 
   return parsedDay;
 };
@@ -235,39 +236,10 @@ const splitIntoNumAndLocation = (str: string) => {
   };
 };
 
-const numOfDaysAvailable = (str: string) => {
-  const splitStr = str.split("möglich");
-
-  const extractedDays = splitStr[0]
-    ? splitStr[0].match(/\d+|\./g)?.join("")
-    : "";
-
-  if (extractedDays?.includes("2024")) {
-    return 1;
-  }
-  return Number(extractedDays);
-};
-
 const text = async (promise: Promise<any>) =>
   promise.then((el) => el?.innerText());
 
 const toString = (date: Date) => format(date, "dd.MM.yyyy", { locale: de });
-
-const groupBy = <T>(array: T[], key: keyof T) => {
-  return array.reduce((acc, item) => {
-    (acc[item[key]] = acc[item[key]] || []).push(item);
-    return acc;
-  }, {} as any);
-};
-
-const mergeResults = (results: any[][]) => {
-  const grouped: Record<string, any[]> = groupBy(results.flat(), "id");
-
-  return Object.values(grouped).map((areaResults): any => ({
-    id: areaResults[0].id,
-    days: areaResults.reduce((acc, curr) => [...acc, ...curr.days], []),
-  }));
-};
 
 const datesForMonth = (month: string) => {
   const currentYear = new Date().getFullYear();
@@ -294,10 +266,6 @@ const datesForMonth = (month: string) => {
     from: new Date(`${currentYear}-${monthNumber}-01`),
     to: new Date(`${currentYear}-${monthNumber}-${daysInMonth}`),
   };
-};
-
-const padLeft = (str: string, length = 6, pad = " "): string => {
-  return str.length >= length ? str : padLeft(pad + str, length, pad);
 };
 
 const getMonthNamesInInterval = (start: Date, end: Date) => {

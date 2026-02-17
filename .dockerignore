@@ -21,9 +21,10 @@ blob-report
 playwright/.cache
 
 # Development
-.env.development
-.env.local
-.env.test
+.env
+.env.*
+packages/*/.env
+packages/*/.env.*
 *.log
 logs
 

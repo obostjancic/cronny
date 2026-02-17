@@ -1,0 +1,1 @@
+ALTER TABLE `jobs` ADD `maxResults` integer DEFAULT 100 NOT NULL;

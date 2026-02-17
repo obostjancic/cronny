@@ -26,7 +26,7 @@ export async function executeRun(job: Job, runner: Runner): Promise<Run> {
     logger.error(`Error running job ${job.name}`);
     logger.error(e);
   } finally {
-    const res = await finishRun(run.id, results);
+    const res = await finishRun(run.id, results, job.maxResults);
     run = res.run;
     resultDiff = res.resultDiff;
   }
@@ -48,9 +48,11 @@ async function startRun(job: Job) {
 
 async function finishRun(
   runId: number,
-  results: JSONObject[] | null
+  results: JSONObject[] | null,
+  maxResults: number = 100
 ): Promise<{ run: Run; resultDiff: number }> {
   const isSuccess = !!results;
+  const cappedResults = results?.slice(0, maxResults) ?? null;
 
   const savedRun = await updateRun(runId, {
     end: iso(),
@@ -59,7 +61,7 @@ async function finishRun(
 
   const newlyAddedActiveResults = await updateJobResultState(
     savedRun,
-    results ?? []
+    cappedResults ?? []
   );
 
   return { run: savedRun, resultDiff: newlyAddedActiveResults.length };

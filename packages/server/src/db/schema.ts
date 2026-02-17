@@ -36,6 +36,7 @@ export const Jobs = sqliteTable("jobs", {
   cron: text("cron").notNull(),
   params: blob("params", { mode: "json" }).$type<JSONObject>(),
   notify: blob("notify", { mode: "json" }).$type<Notify>(),
+  maxResults: integer("maxResults").notNull().default(100),
 });
 
 export const Runs = sqliteTable(

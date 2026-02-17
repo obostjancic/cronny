@@ -13,6 +13,7 @@ import {
   Divider,
   Group,
   JsonInput,
+  NumberInput,
   Stack,
   Switch,
   Text,
@@ -51,6 +52,7 @@ interface FormValues {
   polygonPoints: [number, number][];
   radiusCenter: [number, number] | null;
   radius: number;
+  maxResults: number;
   notifyConfigs: NotifyConfig[];
 }
 
@@ -113,6 +115,7 @@ function parseInitialValues(
     name: initialValues?.name || "",
     enabled: initialValues?.enabled || false,
     cron: initialValues?.cron || "",
+    maxResults: initialValues?.maxResults ?? 100,
     strategyParams,
     dataFilters,
     geoFilterType,
@@ -172,6 +175,7 @@ function transformToJobPayload(
     cron: values.cron,
     params: Object.keys(params).length > 0 ? params : null,
     notify,
+    maxResults: values.maxResults,
   };
 }
 
@@ -252,6 +256,7 @@ export function JobFormV2({
           cron: values.cron,
           params: rawParams ? JSON.parse(rawParams) : null,
           notify: rawNotify ? JSON.parse(rawNotify) : null,
+          maxResults: values.maxResults,
         };
       } catch {
         notifications.show({
@@ -344,6 +349,14 @@ export function JobFormV2({
           description="Standard cron expression (minute hour day month weekday)"
           required
           {...form.getInputProps("cron")}
+        />
+
+        <NumberInput
+          label="Max Results"
+          description="Maximum number of results to keep per run"
+          min={1}
+          max={1000}
+          {...form.getInputProps("maxResults")}
         />
 
         <Divider label="Strategy Parameters" labelPosition="left" />

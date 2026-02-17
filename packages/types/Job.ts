@@ -10,6 +10,7 @@ export type UnsavedJob = {
   cron: string;
   params: JSONObject | null;
   notify: Notify | null;
+  maxResults: number;
 };
 
 export type Notify = {

@@ -113,6 +113,7 @@ jobsRoutes.delete("/:id/runs", async (c) => {
   if (!job) return c.notFound();
 
   await deleteJobResults(job.id);
+  await deleteJobRuns(job.id);
 
   return c.body(null, 204);
 });

@@ -26,11 +26,7 @@ export function cached(fn: Function, key?: string) {
 }
 
 function createKey(args: any[]) {
-  for (let arg of args) {
-    if (typeof arg === "object") {
-      arg = stringify(arg);
-    }
-  }
-
-  return JSON.stringify(args);
+  return JSON.stringify(
+    args.map((arg) => (typeof arg === "object" ? stringify(arg) : arg))
+  );
 }

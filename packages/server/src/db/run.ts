@@ -47,17 +47,6 @@ export async function getLastRun(jobId: number): Promise<Run | undefined> {
   return savedRuns[0];
 }
 
-export async function getPreviousRun(runId: number): Promise<Run | undefined> {
-  const savedRuns = await db
-    .select()
-    .from(Runs)
-    .where(eq(Runs.jobId, runId))
-    .orderBy(desc(Runs.start))
-    .limit(2);
-
-  return savedRuns[1];
-}
-
 export async function deleteJobRuns(jobId: number): Promise<void> {
   await db.delete(Runs).where(eq(Runs.jobId, jobId));
 }
