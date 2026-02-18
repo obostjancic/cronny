@@ -30,23 +30,34 @@ type RawArticle = {
 };
 
 const categoryMap: Record<string, string> = {
-  inland: "domestic",
   international: "world",
+  inland: "domestic",
   wirtschaft: "business",
-  sport: "sport",
   web: "tech",
+  sport: "sport",
   panorama: "panorama",
   kultur: "culture",
+  etat: "media",
   wissenschaft: "science",
   lifestyle: "lifestyle",
-  etat: "media",
+  zukunft: "future",
+  gesundheit: "health",
+  recht: "law",
+  familie: "family",
+  bildung: "education",
+  reisen: "travel",
+  diestandard: "diestandard",
+  karriere: "career",
+  immobilien: "real estate",
+  "mobilität": "mobility",
 };
 
 function extractCategoryFromTitle(titleTag: string): string {
-  const parts = titleTag.split(" - ");
-  if (parts.length < 2) return "unknown";
-  const segment = parts[parts.length - 2].trim().toLowerCase();
-  return categoryMap[segment] ?? segment;
+  const parts = titleTag.split(" - ").map((p) => p.trim().toLowerCase());
+  for (const part of parts) {
+    if (categoryMap[part]) return categoryMap[part];
+  }
+  return "unknown";
 }
 
 type Params = {
