@@ -15,6 +15,7 @@ export const ResultSchema = Type.Object({
   title: Type.String(),
   url: Type.String(),
   date: Type.String(),
+  category: Type.String(),
   text: Type.Optional(Type.String()),
 });
 
@@ -25,7 +26,23 @@ type RawArticle = {
   title: string;
   url: string;
   date: string;
+  category: string;
 };
+
+const categoryMap: Record<string, string> = {
+  vijesti: "news",
+  sport: "sport",
+  biznis: "business",
+  magazin: "entertainment",
+  lifestyle: "lifestyle",
+  scitech: "science & tech",
+  auto: "auto",
+};
+
+function extractCategory(href: string): string {
+  const segment = href.split("/").filter(Boolean)[0] ?? "";
+  return categoryMap[segment] ?? segment;
+}
 
 type Params = {
   systemPrompt: string;
@@ -61,6 +78,7 @@ async function fetchArticleList(): Promise<RawArticle[]> {
       title,
       url: `https://www.klix.ba${href}`,
       date: new Date().toISOString(),
+      category: extractCategory(href),
     };
   });
 }

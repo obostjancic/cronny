@@ -16,6 +16,7 @@ export const ResultSchema = Type.Object({
   title: Type.String(),
   url: Type.String(),
   date: Type.String(),
+  category: Type.String(),
   text: Type.Optional(Type.String()),
 });
 
@@ -27,6 +28,26 @@ type RawArticle = {
   url: string;
   date: string;
 };
+
+const categoryMap: Record<string, string> = {
+  inland: "domestic",
+  international: "world",
+  wirtschaft: "business",
+  sport: "sport",
+  web: "tech",
+  panorama: "panorama",
+  kultur: "culture",
+  wissenschaft: "science",
+  lifestyle: "lifestyle",
+  etat: "media",
+};
+
+function extractCategoryFromTitle(titleTag: string): string {
+  const parts = titleTag.split(" - ");
+  if (parts.length < 2) return "unknown";
+  const segment = parts[parts.length - 2].trim().toLowerCase();
+  return categoryMap[segment] ?? segment;
+}
 
 type Params = {
   systemPrompt: string;
@@ -65,8 +86,12 @@ async function fetchArticleTexts(
     logger.info(`Fetching article: ${rawArticle.title}`);
 
     try {
-      const text = await cached(fetchArticleText)(rawArticle.url);
-      articles.push({ ...rawArticle, text });
+      const content = await cached(fetchArticleText)(rawArticle.url);
+      if (typeof content === "string") {
+        articles.push({ ...rawArticle, text: content, category: "unknown" });
+      } else {
+        articles.push({ ...rawArticle, ...content });
+      }
     } catch (error) {
       logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
     }
@@ -75,7 +100,7 @@ async function fetchArticleTexts(
   return articles;
 }
 
-async function fetchArticleText(url: string): Promise<string> {
+async function fetchArticleText(url: string): Promise<{ text: string; category: string }> {
   const response = await fetchViaProxy(url);
   const html = response.data as string;
   const root = parse(html);
@@ -92,7 +117,10 @@ async function fetchArticleText(url: string): Promise<string> {
     throw new Error(`No text found for article ${url}`);
   }
 
-  return text;
+  const titleTag = root.querySelector("title")?.innerText ?? "";
+  const category = extractCategoryFromTitle(titleTag);
+
+  return { text, category };
 }
 
 async function processArticles(

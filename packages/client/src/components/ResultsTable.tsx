@@ -37,6 +37,7 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
     "url",
     "area",
     "day",
+    "category",
     "title",
     "createdAt",
     "size",
