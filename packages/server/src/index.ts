@@ -10,7 +10,7 @@ import { jobsRoutes } from "./routes/jobs.js";
 import { publicRoutes } from "./routes/public.js";
 import { resultRoutes } from "./routes/results.js";
 import { strategiesRoutes } from "./routes/strategies.js";
-import { scheduleRuns } from "./schedule.js";
+import { scheduleRuns, stopRuns } from "./schedule.js";
 import { getEnv } from "./utils/env.js";
 
 const app = new Hono();
@@ -64,8 +64,16 @@ if (fs.existsSync(clientDistPath)) {
   });
 }
 
-serve({
+const server = serve({
   port: Number(port),
   fetch: app.fetch,
 });
 scheduleRuns();
+
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received, shutting down gracefully");
+  stopRuns();
+  server.close(() => {
+    process.exit(0);
+  });
+});

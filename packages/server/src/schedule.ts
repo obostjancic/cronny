@@ -37,7 +37,7 @@ export async function getRunner(job: Job): Promise<Runner> {
   throw new Error(`Strategy ${job.strategy} not found`);
 }
 
-function stopRuns(): void {
+export function stopRuns(): void {
   logger.info("Stopping all scheduled jobs");
   schedule.forEach((job) => {
     job.stop();
