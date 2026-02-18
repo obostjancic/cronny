@@ -16,7 +16,7 @@ export const ResultSchema = Type.Object({
   title: Type.String(),
   url: Type.String(),
   date: Type.String(),
-  category: Type.String(),
+  category: Type.Optional(Type.String()),
   text: Type.Optional(Type.String()),
 });
 
@@ -52,12 +52,12 @@ const categoryMap: Record<string, string> = {
   "mobilität": "mobility",
 };
 
-function extractCategoryFromTitle(titleTag: string): string {
+function extractCategoryFromTitle(titleTag: string): string | null {
   const parts = titleTag.split(" - ").map((p) => p.trim().toLowerCase());
   for (const part of parts) {
     if (categoryMap[part]) return categoryMap[part];
   }
-  return "unknown";
+  return null;
 }
 
 type Params = {
@@ -100,9 +100,10 @@ async function fetchArticleTexts(
     try {
       const content = await cached(fetchArticleText)(rawArticle.url);
       if (typeof content === "string") {
-        articles.push({ ...rawArticle, text: content, category: "unknown" });
+        articles.push({ ...rawArticle, text: content });
       } else {
-        articles.push({ ...rawArticle, ...content });
+        const { category, ...rest } = content;
+        articles.push({ ...rawArticle, ...rest, ...(category ? { category } : {}) });
       }
     } catch (error) {
       logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
@@ -112,7 +113,7 @@ async function fetchArticleTexts(
   return articles;
 }
 
-async function fetchArticleText(url: string): Promise<{ text: string; category: string }> {
+async function fetchArticleText(url: string): Promise<{ text: string; category: string | null }> {
   const response = await fetchViaProxy(url);
   const html = response.data as string;
   const root = parse(html);
@@ -147,7 +148,7 @@ async function processArticles(
         article,
         params,
       );
-      result.push(simplified);
+      result.push({ ...simplified, ...(article.category ? { category: article.category } : {}) });
     } catch (error) {
       logger.error(`Failed to process article ${article.id}: ${error}`);
     }
