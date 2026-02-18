@@ -21,7 +21,7 @@ export async function executeRun(job: Job, runner: Runner): Promise<Run> {
   let results = null;
   let resultDiff = 0;
   try {
-    results = await runner(job.params);
+    results = await runner(job.params, { maxResults: job.maxResults });
   } catch (e) {
     logger.error(`Error running job ${job.name}`);
     logger.error(e);

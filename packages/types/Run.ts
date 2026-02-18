@@ -10,6 +10,11 @@ export type UnsavedRun = {
 
 export type Run = UnsavedRun & { id: number };
 
+export type RunnerOptions = {
+  maxResults?: number;
+};
+
 export type Runner<TParams = JSONObject, TResult = JSONObject> = (
-  params: TParams | null
+  params: TParams | null,
+  options?: RunnerOptions
 ) => Promise<TResult[] | null>;

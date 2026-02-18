@@ -1,4 +1,4 @@
-import { Runner } from "@cronny/types";
+import { Runner, RunnerOptions } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
 import RSSParser from "rss-parser";
 import { parse } from "node-html-parser";
@@ -55,9 +55,10 @@ type Params = {
   fallbackModel?: string;
 };
 
-export const run: Runner<Params, Article> = async (params) => {
+export const run: Runner<Params, Article> = async (params, options) => {
   const rawArticles = await fetchArticleList();
-  const articlesWithText = await fetchArticleTexts(rawArticles);
+  const limited = options?.maxResults ? rawArticles.slice(0, options.maxResults) : rawArticles;
+  const articlesWithText = await fetchArticleTexts(limited);
   const processedArticles = await processArticles(articlesWithText, params!);
 
   return processedArticles;
