@@ -137,7 +137,7 @@ async function processArticles(
         article,
         params,
       );
-      result.push(simplified);
+      result.push({ ...simplified, category: article.category });
     } catch (error) {
       logger.error(`Failed to process article ${article.id}: ${error}`);
     }
