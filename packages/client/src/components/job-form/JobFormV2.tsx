@@ -10,12 +10,12 @@ import {
   Accordion,
   Button,
   Checkbox,
-  Divider,
   Group,
   JsonInput,
   NumberInput,
+  Paper,
+  SegmentedControl,
   Stack,
-  Switch,
   Text,
   TextInput,
 } from "@mantine/core";
@@ -307,179 +307,179 @@ export function JobFormV2({
 
   return (
     <form onSubmit={form.onSubmit(handleFormSubmit)}>
-      <Stack gap="md">
-        <Group justify="space-between">
-          <Text size="sm" fw={500}>
-            Form Mode
-          </Text>
-          <Switch
-            label="Advanced (JSON)"
-            checked={advancedMode}
-            onChange={(e) => setAdvancedMode(e.currentTarget.checked)}
+      <Stack gap="lg">
+        <Group justify="flex-end">
+          <SegmentedControl
+            size="xs"
+            value={advancedMode ? "json" : "ui"}
+            onChange={(v) => setAdvancedMode(v === "json")}
+            data={[
+              { label: "UI", value: "ui" },
+              { label: "JSON", value: "json" },
+            ]}
           />
         </Group>
 
-        <Divider />
-
-        <StrategySelector
-          value={form.values.strategy}
-          onChange={(value) => {
-            form.setFieldValue("strategy", value);
-            form.setFieldValue("strategyParams", {});
-          }}
-          error={form.errors.strategy as string}
-        />
-
-        <TextInput
-          label="Name"
-          placeholder="Job name"
-          required
-          {...form.getInputProps("name")}
-        />
-
-        <Checkbox
-          label="Paused"
-          checked={!form.values.enabled}
-          onChange={(e) => form.setFieldValue("enabled", !e.currentTarget.checked)}
-        />
-
-        <TextInput
-          label="Cron Expression"
-          placeholder="0 9 * * *"
-          description="Standard cron expression (minute hour day month weekday)"
-          required
-          {...form.getInputProps("cron")}
-        />
-
-        <NumberInput
-          label="Max Results"
-          description="Maximum number of results to keep per run"
-          min={1}
-          max={1000}
-          {...form.getInputProps("maxResults")}
-        />
-
-        <Divider label="Strategy Parameters" labelPosition="left" />
-
-        {advancedMode ? (
-          <>
-            <JsonInput
-              label="Params (JSON)"
-              placeholder="{}"
-              formatOnBlur
-              autosize
-              minRows={4}
-              maxRows={15}
-              value={rawParams}
-              onChange={setRawParams}
+        <Paper p="md">
+          <Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="sm">
+            Job Configuration
+          </Text>
+          <Stack gap="md">
+            <StrategySelector
+              value={form.values.strategy}
+              onChange={(value) => {
+                form.setFieldValue("strategy", value);
+                form.setFieldValue("strategyParams", {});
+              }}
+              error={form.errors.strategy as string}
             />
-            <JsonInput
-              label="Notify (JSON)"
-              placeholder="{}"
-              formatOnBlur
-              autosize
-              minRows={4}
-              maxRows={10}
-              value={rawNotify}
-              onChange={setRawNotify}
+            <TextInput
+              label="Name"
+              placeholder="Job name"
+              required
+              {...form.getInputProps("name")}
             />
-          </>
-        ) : (
-          <>
-            {selectedSchema ? (
-              <StrategyParamsForm
-                schema={selectedSchema}
-                values={form.values.strategyParams}
-                onChange={(values) =>
-                  form.setFieldValue("strategyParams", values)
-                }
-                onUrlExtracted={supportsGeo ? handleUrlExtracted : undefined}
+            <Checkbox
+              label="Paused"
+              checked={!form.values.enabled}
+              onChange={(e) => form.setFieldValue("enabled", !e.currentTarget.checked)}
+            />
+            <TextInput
+              label="Cron Expression"
+              placeholder="0 9 * * *"
+              description="Standard cron expression (minute hour day month weekday)"
+              required
+              {...form.getInputProps("cron")}
+            />
+            <NumberInput
+              label="Max Results"
+              description="Maximum number of results to keep per run"
+              min={1}
+              max={1000}
+              {...form.getInputProps("maxResults")}
+            />
+          </Stack>
+        </Paper>
+
+        <Paper p="md">
+          <Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="sm">
+            Strategy Parameters
+          </Text>
+          {advancedMode ? (
+            <Stack gap="md">
+              <JsonInput
+                label="Params (JSON)"
+                placeholder="{}"
+                formatOnBlur
+                autosize
+                minRows={4}
+                maxRows={15}
+                value={rawParams}
+                onChange={setRawParams}
               />
-            ) : (
-              <Text size="sm" c="dimmed">
-                Select a strategy to configure parameters
-              </Text>
+              <JsonInput
+                label="Notify (JSON)"
+                placeholder="{}"
+                formatOnBlur
+                autosize
+                minRows={4}
+                maxRows={10}
+                value={rawNotify}
+                onChange={setRawNotify}
+              />
+            </Stack>
+          ) : (
+            <>
+              {selectedSchema ? (
+                <StrategyParamsForm
+                  schema={selectedSchema}
+                  values={form.values.strategyParams}
+                  onChange={(values) => form.setFieldValue("strategyParams", values)}
+                  onUrlExtracted={supportsGeo ? handleUrlExtracted : undefined}
+                />
+              ) : (
+                <Text size="sm" c="dimmed">
+                  Select a strategy to configure parameters
+                </Text>
+              )}
+            </>
+          )}
+        </Paper>
+
+        {!advancedMode && selectedSchema && (supportsFilters || supportsGeo) && (
+          <Accordion variant="separated" defaultValue="">
+            {supportsFilters && (
+              <Accordion.Item value="filters">
+                <Accordion.Control>Data Filters</Accordion.Control>
+                <Accordion.Panel>
+                  <DataFilterBuilder
+                    filters={form.values.dataFilters}
+                    onChange={(filters) => form.setFieldValue("dataFilters", filters)}
+                  />
+                </Accordion.Panel>
+              </Accordion.Item>
             )}
 
-            {selectedSchema && (supportsFilters || supportsGeo) && (
-              <Accordion variant="separated" defaultValue="">
-                {supportsFilters && (
-                  <Accordion.Item value="filters">
-                    <Accordion.Control>Data Filters</Accordion.Control>
-                    <Accordion.Panel>
-                      <DataFilterBuilder
-                        filters={form.values.dataFilters}
-                        onChange={(filters) =>
-                          form.setFieldValue("dataFilters", filters)
-                        }
-                      />
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                )}
-
-                {supportsGeo && (
-                  <Accordion.Item value="geo">
-                    <Accordion.Control>Geographic Filter</Accordion.Control>
-                    <Accordion.Panel>
-                      <GeoFilterSection
-                        filterType={form.values.geoFilterType}
-                        polygonPoints={form.values.polygonPoints}
-                        radiusCenter={form.values.radiusCenter}
-                        radius={form.values.radius}
-                        onFilterTypeChange={(type) =>
-                          form.setFieldValue("geoFilterType", type)
-                        }
-                        onPolygonChange={(points) =>
-                          form.setFieldValue("polygonPoints", points)
-                        }
-                        onRadiusCenterChange={(center) =>
-                          form.setFieldValue("radiusCenter", center)
-                        }
-                        onRadiusChange={(radius) =>
-                          form.setFieldValue("radius", radius)
-                        }
-                      />
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                )}
-
-                <Accordion.Item value="notify">
-                  <Accordion.Control>Notifications</Accordion.Control>
-                  <Accordion.Panel>
-                    <NotifyConfigForm
-                      value={form.values.notifyConfigs}
-                      onChange={(configs) =>
-                        form.setFieldValue("notifyConfigs", configs)
-                      }
-                    />
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
+            {supportsGeo && (
+              <Accordion.Item value="geo">
+                <Accordion.Control>Geographic Filter</Accordion.Control>
+                <Accordion.Panel>
+                  <GeoFilterSection
+                    filterType={form.values.geoFilterType}
+                    polygonPoints={form.values.polygonPoints}
+                    radiusCenter={form.values.radiusCenter}
+                    radius={form.values.radius}
+                    onFilterTypeChange={(type) => form.setFieldValue("geoFilterType", type)}
+                    onPolygonChange={(points) => form.setFieldValue("polygonPoints", points)}
+                    onRadiusCenterChange={(center) => form.setFieldValue("radiusCenter", center)}
+                    onRadiusChange={(radius) => form.setFieldValue("radius", radius)}
+                  />
+                </Accordion.Panel>
+              </Accordion.Item>
             )}
 
-            {selectedSchema && !supportsFilters && !supportsGeo && (
-              <Accordion variant="separated" defaultValue="">
-                <Accordion.Item value="notify">
-                  <Accordion.Control>Notifications</Accordion.Control>
-                  <Accordion.Panel>
-                    <NotifyConfigForm
-                      value={form.values.notifyConfigs}
-                      onChange={(configs) =>
-                        form.setFieldValue("notifyConfigs", configs)
-                      }
-                    />
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
-            )}
-          </>
+            <Accordion.Item value="notify">
+              <Accordion.Control>Notifications</Accordion.Control>
+              <Accordion.Panel>
+                <NotifyConfigForm
+                  value={form.values.notifyConfigs}
+                  onChange={(configs) => form.setFieldValue("notifyConfigs", configs)}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
         )}
 
-        <Group mt="md">
-          <Button disabled={isLoading} type="submit">
-            {isEdit ? "Save" : "Create Job"}
-          </Button>
-        </Group>
+        {!advancedMode && selectedSchema && !supportsFilters && !supportsGeo && (
+          <Accordion variant="separated" defaultValue="">
+            <Accordion.Item value="notify">
+              <Accordion.Control>Notifications</Accordion.Control>
+              <Accordion.Panel>
+                <NotifyConfigForm
+                  value={form.values.notifyConfigs}
+                  onChange={(configs) => form.setFieldValue("notifyConfigs", configs)}
+                />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        )}
+
+        <Paper
+          p="md"
+          style={{
+            position: "sticky",
+            bottom: 0,
+            zIndex: 10,
+            borderTop: "1px solid var(--mantine-color-dark-4)",
+            backgroundColor: "var(--mantine-color-dark-7)",
+          }}
+        >
+          <Group justify="flex-end">
+            <Button disabled={isLoading} type="submit">
+              {isEdit ? "Save Changes" : "Create Job"}
+            </Button>
+          </Group>
+        </Paper>
       </Stack>
     </form>
   );
