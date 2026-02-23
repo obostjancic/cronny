@@ -24,14 +24,15 @@ const adjustParams = (params: GrillAreaParams | null): GrillAreaParams => {
     throw new Error("No params provided");
   }
 
+  const adjusted = { ...params };
   const tomorrow = startOfTomorrow();
 
   if (new Date(params.from) < tomorrow) {
     logger.warn("From date is in the past, adjusting to tomorrow");
-    params.from = tomorrow;
+    adjusted.from = tomorrow;
   }
 
-  return params;
+  return adjusted;
 };
 
 export async function fetchCurrentGrillareaState(params: GrillAreaParams) {

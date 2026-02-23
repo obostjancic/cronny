@@ -14,6 +14,10 @@ export async function clientAuthMiddleware(c: Context, next: Next) {
     return c.json({ error: "Invalid API key" }, 401);
   }
 
+  if (!client.enabled) {
+    return c.json({ error: "Client is disabled" }, 403);
+  }
+
   c.set("client", client);
 
   return next();

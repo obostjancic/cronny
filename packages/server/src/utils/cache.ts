@@ -12,14 +12,14 @@ const cache = new FlatCache({
 
 export function cached(fn: Function, key?: string) {
   return async (...args: any[]) => {
-    key = key ?? createKey(args);
+    const cacheKey = key ?? createKey(args);
 
-    if (cache.getKey(key) !== undefined) {
-      return cache.get(key);
+    if (cache.getKey(cacheKey) !== undefined) {
+      return cache.get(cacheKey);
     }
 
     const result = await fn(...args);
-    cache.set(key, result);
+    cache.set(cacheKey, result);
 
     return result;
   };

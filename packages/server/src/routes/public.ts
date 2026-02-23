@@ -13,13 +13,13 @@ publicRoutes.get("/health", (c) => {
 publicRoutes.get("/results", clientAuthMiddleware, async (c) => {
   const client = c.get("client");
 
-  const res = await Promise.all(
+  const results = await Promise.all(
     client.allowedJobs?.map(async (jobId) => {
       return await getJobResults(jobId);
     }) ?? []
   );
 
-  return c.json(res);
+  return c.json(results.flat());
 });
 
 export { publicRoutes };

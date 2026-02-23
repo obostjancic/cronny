@@ -1,1 +1,1 @@
-export const PUBLIC_PATHS = ["/api/auth/login", "/api/public/*"];
+export const PUBLIC_PATHS = ["/api/auth/login", "/api/public/"];

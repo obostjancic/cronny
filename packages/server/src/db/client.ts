@@ -107,10 +107,10 @@ export async function updateClient(id: number, input: UpdateClientInput) {
 
     const existingJobIds = existingJobs.map((j) => j.jobId);
     const jobsToAdd = input.allowedJobs.filter(
-      (id) => !existingJobIds.includes(id)
+      (jobId) => !existingJobIds.includes(jobId)
     );
     const jobsToRemove = existingJobIds.filter(
-      (id) => !input.allowedJobs.includes(id)
+      (jobId) => !input.allowedJobs.includes(jobId)
     );
 
     if (jobsToRemove.length > 0) {

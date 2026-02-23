@@ -100,9 +100,9 @@ jobsRoutes.post("/:id/runs", async (c) => {
   if (!job) return c.notFound();
 
   const runner = await getRunner(job);
-  const run = await executeRun(job, runner);
+  executeRun(job, runner);
 
-  return c.json(run);
+  return c.json({ message: "Run started" }, 202);
 });
 
 jobsRoutes.delete("/:id/runs", async (c) => {
@@ -135,7 +135,7 @@ jobsRoutes.get("/:id/runs/:runId", async (c) => {
   return c.json(run);
 });
 
-jobsRoutes.get("/:id/results/", async (c) => {
+jobsRoutes.get("/:id/results", async (c) => {
   const jobId = parseId(c.req.param("id"));
   if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
 

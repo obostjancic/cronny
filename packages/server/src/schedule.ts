@@ -45,7 +45,19 @@ export function stopRuns(): void {
   schedule = [];
 }
 
+let pendingInvalidation: Promise<void> | null = null;
+
 export async function invalidateSchedule(): Promise<void> {
-  stopRuns();
-  await scheduleRuns();
+  if (pendingInvalidation) {
+    await pendingInvalidation;
+  }
+  pendingInvalidation = (async () => {
+    stopRuns();
+    await scheduleRuns();
+  })();
+  try {
+    await pendingInvalidation;
+  } finally {
+    pendingInvalidation = null;
+  }
 }

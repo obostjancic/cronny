@@ -149,7 +149,7 @@ export function toResult(
   return {
     jobId,
     runId,
-    internalId: `${data.id}`,
+    internalId: data.id != null ? `${data.id}` : "",
     data,
     status: (data.status ?? "active") as ResultStatus,
     isHidden: false,
