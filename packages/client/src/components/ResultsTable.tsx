@@ -105,9 +105,21 @@ export function ResultsTable({ rows, label }: ResultsTableProps) {
                     );
                   }
                   if (column === "title") {
+                    const url = row["url"] as string | undefined;
                     return (
                       <Table.Td key={column}>
-                        <Text size="sm">{row[column]?.toString()}</Text>
+                        {url ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: "inherit", textDecoration: "none" }}
+                          >
+                            <Text size="sm">{row[column]?.toString()}</Text>
+                          </a>
+                        ) : (
+                          <Text size="sm">{row[column]?.toString()}</Text>
+                        )}
                         {row["text"] && (
                           <Text size="xs" c="dimmed" lineClamp={1}>
                             {row["text"]?.toString()}

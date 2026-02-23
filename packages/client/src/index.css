@@ -9,8 +9,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Tighter table rows globally */
-.mantine-Table-td,
-.mantine-Table-th {
-  padding-block: 0.5rem !important;
+/* Visited links show browser default visited color */
+a:visited {
+  color: #b8a9c9;
 }
