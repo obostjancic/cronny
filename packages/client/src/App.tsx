@@ -3,7 +3,6 @@ import { Notifications } from "@mantine/notifications";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import "./App.css";
 import { withErrorBoundary } from "./components/ErrorBoundary";
 import { routeTree } from "./routeTree.gen";
 import { initializeAuth, isInitialized, setAuthPassword } from "./utils/auth";
@@ -49,8 +48,9 @@ function AppContent() {
     const password = prompt("Enter Password");
     if (password) {
       setAuthPassword(password);
+      window.location.reload();
     }
-    window.location.reload();
+    return <div>Authentication required. Reload to try again.</div>;
   }
 
   return (

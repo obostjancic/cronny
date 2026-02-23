@@ -73,7 +73,6 @@ function JobDetailsPage() {
 
   return (
     <Container fluid p={0}>
-      <a href="/">Jobs</a>
       <Flex gap="md" pb="xs" align="center" wrap="wrap">
         <h3>Job {job.name}</h3>
         <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>

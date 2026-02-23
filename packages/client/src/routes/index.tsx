@@ -17,7 +17,7 @@ function Index() {
   const openJSONInNewTab = useOpenJSONInNewTab();
 
   return (
-    <div className="p-2">
+    <div>
       <Flex justify="space-between" align="center" mb="md">
         <h2>Jobs</h2>
         <Button variant="transparent" component={Link} to="/jobs/new">

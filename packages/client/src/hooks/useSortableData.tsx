@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface SortConfig<T> {
   key: keyof T;
@@ -11,18 +11,21 @@ const useSortableData = <T,>(
 ) => {
   const [sortConfig, setSortConfig] = useState<SortConfig<T> | null>(config);
 
-  const sortedItems = [...items];
-  if (sortConfig !== null) {
-    sortedItems.sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "ascending" ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "ascending" ? 1 : -1;
-      }
-      return 0;
-    });
-  }
+  const sortedItems = useMemo(() => {
+    const sorted = [...items];
+    if (sortConfig !== null) {
+      sorted.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sorted;
+  }, [items, sortConfig]);
 
   const requestSort = (key: keyof T) => {
     let direction: "ascending" | "descending" = "ascending";

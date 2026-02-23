@@ -4,10 +4,9 @@ import { queryClient } from "../utils/queryClient";
 import { fetchJson } from "./utils";
 
 const JOBS_URL = "/api/jobs";
-const RESULTS_URL = "/api/jobs";
 
 export function invalidateGetResults(jobId: number | string) {
-  queryClient.invalidateQueries({ queryKey: [RESULTS_URL, jobId, "results"] });
+  queryClient.invalidateQueries({ queryKey: [JOBS_URL, jobId, "results"] });
 }
 
 export function invalidateGetJobs() {
@@ -29,7 +28,7 @@ export function useGetJobs() {
 
 export function useGetJob(jobId: number | string) {
   return useSuspenseQuery({
-    queryKey: [JOBS_URL, jobId],
+    queryKey: [JOBS_URL, String(jobId)],
     queryFn: async (): Promise<JobDetails> => {
       return (await fetchJson(`${JOBS_URL}/${jobId}`)) as JobDetails;
     },

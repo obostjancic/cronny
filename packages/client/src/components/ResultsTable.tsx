@@ -31,8 +31,6 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
     return <Flex p="md">No results</Flex>;
   }
 
-  const firstRow = rows[0];
-
   const allColumns = [
     "url",
     "area",
@@ -44,7 +42,9 @@ export function ResultsTable({ rows }: { rows: (Result & JSONObject)[] }) {
     "price",
   ];
 
-  const columns = allColumns.filter((column) => firstRow[column] !== undefined);
+  const columns = allColumns.filter((column) =>
+    rows.some((row) => row[column] !== undefined)
+  );
   return (
     <Container p={0} pt="xs" fluid>
       <Table stickyHeader highlightOnHover>

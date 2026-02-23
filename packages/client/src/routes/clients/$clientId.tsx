@@ -20,7 +20,6 @@ function ClientDetailsPage() {
 
   return (
     <Container fluid p={0}>
-      <a href="/clients">Clients</a>
       <Flex gap="md" pb="xs" align="center" wrap="wrap">
         <h3>Client {client.name}</h3>
         <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>

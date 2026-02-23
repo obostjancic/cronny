@@ -24,13 +24,6 @@ class HttpClient {
       },
     });
 
-    // Add response interceptor for error handling
-    this.instance.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
   }
 
   async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {

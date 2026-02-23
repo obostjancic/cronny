@@ -1,4 +1,3 @@
-import { Client } from "@cronny/types";
 import {
   Button,
   Card,
@@ -13,7 +12,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconCancel, IconCheck, IconPlus } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
 import { useGetClients } from "../../api/useClients";
 import { useGetJobs } from "../../api/useJobs";
 import { EditClientForm } from "../../components/EditClientForm";
@@ -26,7 +24,6 @@ const iconStyle = { width: rem(16), height: rem(16) };
 
 function Clients() {
   const [opened, { open, close }] = useDisclosure(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const { data: clients = [] } = useGetClients();
   const { data: jobs = [] } = useGetJobs();
   return (
@@ -85,14 +82,11 @@ function Clients() {
 
       <Modal
         opened={opened}
-        onClose={() => {
-          close();
-          setEditingClient(null);
-        }}
-        title={editingClient ? `Client ${editingClient.name}` : "New Client"}
+        onClose={close}
+        title="New Client"
         size="lg"
       >
-        <EditClientForm initialValues={editingClient} onSubmit={close} />
+        <EditClientForm initialValues={null} onSubmit={close} />
       </Modal>
     </Container>
   );
