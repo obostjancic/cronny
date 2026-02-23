@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { JobFormV2 } from "../../components/job-form";
+import { JobForm } from "../../components/job-form";
 import { PageHeader } from "../../components/PageHeader";
 
 export const Route = createFileRoute("/jobs/new")({
@@ -21,7 +21,7 @@ function NewJobPage() {
           { label: "New Job" },
         ]}
       />
-      <JobFormV2 onSubmit={handleSubmit} isEdit={false} />
+      <JobForm onSubmit={handleSubmit} isEdit={false} />
     </div>
   );
 }

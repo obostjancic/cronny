@@ -30,7 +30,7 @@ import { NotifyConfigForm } from "./NotifyConfigForm";
 import { StrategyParamsForm } from "./StrategyParamsForm";
 import { StrategySelector } from "./StrategySelector";
 
-interface JobFormV2Props {
+interface JobFormProps {
   initialValues?: Partial<JobDetails>;
   onSubmit: () => void;
   isEdit?: boolean;
@@ -179,11 +179,11 @@ function transformToJobPayload(
   };
 }
 
-export function JobFormV2({
+export function JobForm({
   initialValues,
   onSubmit,
   isEdit = false,
-}: JobFormV2Props) {
+}: JobFormProps) {
   const [advancedMode, setAdvancedMode] = useState(false);
   const [rawParams, setRawParams] = useState(
     formatJSON(initialValues?.params)

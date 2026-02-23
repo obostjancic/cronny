@@ -1,4 +1,4 @@
-export { JobFormV2 } from "./JobFormV2";
+export { JobForm } from "./JobForm";
 export { StrategySelector } from "./StrategySelector";
 export { StrategyParamsForm } from "./StrategyParamsForm";
 export { DataFilterBuilder } from "./DataFilterBuilder";

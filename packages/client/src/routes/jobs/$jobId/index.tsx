@@ -41,7 +41,7 @@ const shortFormatter: Formatter = (value, unit, suffix) => {
 import { useDeleteJob, useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
-import { JobFormV2 } from "../../../components/job-form";
+import { JobForm } from "../../../components/job-form";
 import { PageHeader } from "../../../components/PageHeader";
 import { ResultsTable } from "../../../components/ResultsTable";
 import { StatCard } from "../../../components/StatCard";
@@ -229,7 +229,7 @@ function JobDetailsPage() {
       </Paper>
 
       <Modal opened={opened} onClose={close} title={`Edit: ${job.name}`} size="90%">
-        <JobFormV2 initialValues={job} onSubmit={close} isEdit={true} />
+        <JobForm initialValues={job} onSubmit={close} isEdit={true} />
       </Modal>
     </div>
   );
