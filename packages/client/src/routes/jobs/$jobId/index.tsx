@@ -1,11 +1,15 @@
 import { Result } from "@cronny/types";
 import {
+  ActionIcon,
+  Badge,
   Button,
-  Container,
   Flex,
+  Group,
   Modal,
+  Paper,
   rem,
   Tabs,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -14,7 +18,6 @@ import {
   IconEyeOff,
   IconFilterOff,
   IconPencil,
-  IconPlayerPause,
   IconPlayerPlay,
   IconTrash,
 } from "@tabler/icons-react";
@@ -32,13 +35,16 @@ const shortFormatter: Formatter = (value, unit, suffix) => {
     year: "y",
   };
   const short = unitMap[unit] || unit;
-  return suffix === "ago" ? `${value}${short} ago` : `${value}${short} from now`;
+  return suffix === "ago" ? `${value}${short} ago` : `${value}${short}`;
 };
+
 import { useDeleteJob, useGetJob } from "../../../api/useJobs";
 import { useDeleteResults } from "../../../api/useResults";
 import { usePostRun } from "../../../api/useRuns";
 import { JobFormV2 } from "../../../components/job-form";
+import { PageHeader } from "../../../components/PageHeader";
 import { ResultsTable } from "../../../components/ResultsTable";
+import { StatCard } from "../../../components/StatCard";
 
 export const Route = createFileRoute("/jobs/$jobId/")({
   component: () => <JobDetailsPage />,
@@ -71,157 +77,160 @@ function JobDetailsPage() {
     }
   };
 
+  const activeResults = results.filter((r: Result) => !r.isHidden && r.status === "active");
+  const hiddenResults = results.filter((r: Result) => r.isHidden);
+  const filteredResults = results.filter((r: Result) => !r.isHidden && r.status === "filtered");
+  const expiredResults = results.filter((r: Result) => !r.isHidden && r.status === "expired");
+
   return (
-    <Container fluid p={0}>
-      <Flex gap="md" pb="xs" align="center" wrap="wrap">
-        <h3>Job {job.name}</h3>
-        <Button variant="transparent" size="sm" pl={0} pr={0} onClick={open}>
-          <IconPencil style={iconStyle} /> Edit
-        </Button>
-        <Button variant="transparent" size="sm" pl={0} pr={0} color="red" onClick={handleDelete}>
-          <IconTrash style={iconStyle} /> Delete
-        </Button>
-      </Flex>
-
-      <Flex gap="md" pb="xs" align="center" wrap="wrap" justify="space-between">
-        <Flex align="center" gap="xs">
-          {job.enabled ? (
-            <>
-              <IconPlayerPlay style={iconStyle} color="green" />
-              Active
-            </>
-          ) : (
-            <>
-              <IconPlayerPause style={iconStyle} color="orange" />
-              Paused
-            </>
-          )}
-        </Flex>
-
-        <div>Strategy: {job.strategy}</div>
-        <div>Schedule: {job.cron}</div>
-        <div>
-          Last run: {runs[0]?.start ? <ReactTimeago date={runs[0].start} formatter={shortFormatter} /> : "Never"}
-          {jobDetails.nextRun && (
-            <> | Next: <ReactTimeago date={jobDetails.nextRun} formatter={shortFormatter} /></>
-          )}
-          <Button
-            variant="transparent"
-            size="sm"
-            pr={0}
-            loading={postRun.isPending}
-            onClick={() => {
-              postRun.mutate(job.id, {
-                onSuccess: () => {
-                  notifications.show({
-                    title: "Success",
-                    message: "Run has been started",
-                    autoClose: 2000,
-                  });
-                },
-                onError: (error) => {
-                  notifications.show({
-                    title: "Error",
-                    message: error.message || "Failed to start run",
-                    color: "red",
-                  });
-                },
-              });
-            }}
-          >
-            Run
-          </Button>
-          <Button
-            variant="transparent"
-            size="sm"
-            pr={0}
-            loading={deleteResults.isPending}
-            onClick={() => {
-              if (confirm("Are you sure you want to clear the results?")) {
-                deleteResults.mutate(job.id, {
+    <div>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Jobs", to: "/" },
+          { label: job.name },
+        ]}
+        actions={
+          <Group gap="xs">
+            <Tooltip label="Edit job">
+              <ActionIcon variant="subtle" size="md" onClick={open}>
+                <IconPencil style={iconStyle} />
+              </ActionIcon>
+            </Tooltip>
+            <Button
+              size="compact-sm"
+              leftSection={<IconPlayerPlay size={14} />}
+              loading={postRun.isPending}
+              onClick={() => {
+                postRun.mutate(job.id, {
                   onSuccess: () => {
                     notifications.show({
                       title: "Success",
-                      message: "Cleared results",
+                      message: "Run has been started",
                       autoClose: 2000,
                     });
                   },
                   onError: (error) => {
                     notifications.show({
                       title: "Error",
-                      message: error.message || "Failed to clear results",
+                      message: error.message || "Failed to start run",
                       color: "red",
                     });
                   },
                 });
-              }
-            }}
-          >
-            Clear
-          </Button>
-        </div>
+              }}
+            >
+              Run Now
+            </Button>
+            <Button
+              size="compact-sm"
+              variant="subtle"
+              loading={deleteResults.isPending}
+              onClick={() => {
+                if (confirm("Are you sure you want to clear the results?")) {
+                  deleteResults.mutate(job.id, {
+                    onSuccess: () => {
+                      notifications.show({
+                        title: "Success",
+                        message: "Cleared results",
+                        autoClose: 2000,
+                      });
+                    },
+                    onError: (error) => {
+                      notifications.show({
+                        title: "Error",
+                        message: error.message || "Failed to clear results",
+                        color: "red",
+                      });
+                    },
+                  });
+                }
+              }}
+            >
+              Clear Results
+            </Button>
+            <Tooltip label="Delete job">
+              <ActionIcon variant="subtle" color="red" size="md" onClick={handleDelete}>
+                <IconTrash style={iconStyle} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+        }
+      />
+
+      {/* Stat cards */}
+      <Flex gap="md" mb="lg" wrap="wrap">
+        <StatCard label="Status">
+          {job.enabled ? (
+            <Badge color="green">Active</Badge>
+          ) : (
+            <Badge color="orange">Paused</Badge>
+          )}
+        </StatCard>
+        <StatCard label="Strategy">
+          <Badge>{job.strategy}</Badge>
+        </StatCard>
+        <StatCard label="Schedule">
+          {job.cron}
+        </StatCard>
+        <StatCard label="Last Run">
+          {runs[0]?.start ? (
+            <ReactTimeago date={runs[0].start} formatter={shortFormatter} />
+          ) : (
+            "Never"
+          )}
+        </StatCard>
+        {jobDetails.nextRun && (
+          <StatCard label="Next Run">
+            <ReactTimeago date={jobDetails.nextRun} formatter={shortFormatter} />
+          </StatCard>
+        )}
       </Flex>
 
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={`Job ${job.name}`}
-        size="90%"
-      >
-        <JobFormV2 initialValues={job} onSubmit={close} isEdit={true} />
-      </Modal>
-
+      {/* Active results */}
       <ResultsTable
-        rows={results
-          .filter((r: Result) => !r.isHidden && r.status === "active")
-          .map((r: Result) => ({ ...r.data, ...r }))}
+        rows={activeResults.map((r: Result) => ({ ...r.data, ...r }))}
+        label="Active Results"
       />
-      <Container fluid p={0} pt="xl">
+
+      {/* Secondary results tabs */}
+      <Paper p={0} mt="xl" style={{ overflow: "hidden" }}>
         <Tabs defaultValue="hidden">
           <Tabs.List>
             <Tabs.Tab
               value="hidden"
               leftSection={<IconEyeOff style={iconStyle} />}
             >
-              Hidden
+              Hidden ({hiddenResults.length})
             </Tabs.Tab>
             <Tabs.Tab
               value="filtered"
               leftSection={<IconFilterOff style={iconStyle} />}
             >
-              Filtered
+              Filtered ({filteredResults.length})
             </Tabs.Tab>
             <Tabs.Tab
               value="expired"
               leftSection={<IconClockCancel style={iconStyle} />}
             >
-              Expired
+              Expired ({expiredResults.length})
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="hidden">
-            <ResultsTable
-              rows={results
-                .filter((r: Result) => r.isHidden)
-                .map((r: Result) => ({ ...r.data, ...r }))}
-            />
+          <Tabs.Panel value="hidden" p="sm">
+            <ResultsTable rows={hiddenResults.map((r: Result) => ({ ...r.data, ...r }))} />
           </Tabs.Panel>
-          <Tabs.Panel value="filtered">
-            <ResultsTable
-              rows={results
-                .filter((r: Result) => !r.isHidden && r.status === "filtered")
-                .map((r: Result) => ({ ...r.data, ...r }))}
-            />
+          <Tabs.Panel value="filtered" p="sm">
+            <ResultsTable rows={filteredResults.map((r: Result) => ({ ...r.data, ...r }))} />
           </Tabs.Panel>
-          <Tabs.Panel value="expired">
-            <ResultsTable
-              rows={results
-                .filter((r: Result) => !r.isHidden && r.status === "expired")
-                .map((r: Result) => ({ ...r.data, ...r }))}
-            />
+          <Tabs.Panel value="expired" p="sm">
+            <ResultsTable rows={expiredResults.map((r: Result) => ({ ...r.data, ...r }))} />
           </Tabs.Panel>
         </Tabs>
-      </Container>
-    </Container>
+      </Paper>
+
+      <Modal opened={opened} onClose={close} title={`Edit: ${job.name}`} size="90%">
+        <JobFormV2 initialValues={job} onSubmit={close} isEdit={true} />
+      </Modal>
+    </div>
   );
 }
