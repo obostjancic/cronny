@@ -1,6 +1,6 @@
-import { Container, Flex } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { JobFormV2 } from "../../components/job-form";
+import { PageHeader } from "../../components/PageHeader";
 
 export const Route = createFileRoute("/jobs/new")({
   component: () => <NewJobPage />,
@@ -14,13 +14,14 @@ function NewJobPage() {
   };
 
   return (
-    <Container fluid p={0}>
-      <a href="/">Jobs</a>
-      <Flex gap="md" pb="xs" align="center" wrap="wrap">
-        <h3>Create New Job</h3>
-      </Flex>
-
+    <div>
+      <PageHeader
+        breadcrumbs={[
+          { label: "Jobs", to: "/" },
+          { label: "New Job" },
+        ]}
+      />
       <JobFormV2 onSubmit={handleSubmit} isEdit={false} />
-    </Container>
+    </div>
   );
 }
