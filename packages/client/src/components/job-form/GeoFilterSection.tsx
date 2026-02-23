@@ -1,5 +1,5 @@
 import { GeoFilterType } from "@cronny/types";
-import { Paper, SegmentedControl, Text } from "@mantine/core";
+import { SegmentedControl, Text } from "@mantine/core";
 import { Suspense, lazy } from "react";
 
 const MapPolygonDrawer = lazy(() =>
@@ -31,11 +31,7 @@ export function GeoFilterSection({
   onRadiusChange,
 }: GeoFilterSectionProps) {
   return (
-    <Paper p="md" withBorder>
-      <Text fw={500} size="sm" mb="sm">
-        Geographic Filter
-      </Text>
-
+    <div>
       <SegmentedControl
         value={filterType}
         onChange={(value) => onFilterTypeChange(value as GeoFilterType)}
@@ -78,7 +74,7 @@ export function GeoFilterSection({
           )}
         </Suspense>
       )}
-    </Paper>
+    </div>
   );
 }
 

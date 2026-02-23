@@ -44,11 +44,8 @@ export function NotifyConfigForm({ value, onChange }: NotifyConfigFormProps) {
   };
 
   return (
-    <Paper p="md" withBorder>
-      <Group justify="space-between" mb="sm">
-        <Text fw={500} size="sm">
-          Notifications
-        </Text>
+    <div>
+      <Group justify="flex-end" mb="sm">
         <Button
           variant="light"
           size="xs"
@@ -75,7 +72,7 @@ export function NotifyConfigForm({ value, onChange }: NotifyConfigFormProps) {
           />
         ))}
       </div>
-    </Paper>
+    </div>
   );
 }
 

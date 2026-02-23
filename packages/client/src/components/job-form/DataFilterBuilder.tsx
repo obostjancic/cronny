@@ -5,7 +5,6 @@ import {
   Checkbox,
   Group,
   NumberInput,
-  Paper,
   Select,
   Text,
   TextInput,
@@ -44,11 +43,8 @@ export function DataFilterBuilder({
   };
 
   return (
-    <Paper p="md" withBorder>
-      <Group justify="space-between" mb="sm">
-        <Text fw={500} size="sm">
-          Data Filters
-        </Text>
+    <div>
+      <Group justify="flex-end" mb="sm">
         <Button
           variant="light"
           size="xs"
@@ -75,7 +71,7 @@ export function DataFilterBuilder({
           />
         ))}
       </div>
-    </Paper>
+    </div>
   );
 }
 
