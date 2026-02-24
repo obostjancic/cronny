@@ -63,7 +63,7 @@ export function ResultsTable({ rows, label }: ResultsTableProps) {
           <Text size="xs" c="dimmed">({rows.length})</Text>
         </Group>
       )}
-      <Paper p={0} style={{ overflow: "hidden" }}>
+      <Paper p={0} style={{ overflowX: "auto" }}>
         <Table>
           <Table.Thead>
             <Table.Tr>

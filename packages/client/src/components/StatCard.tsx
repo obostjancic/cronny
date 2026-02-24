@@ -8,7 +8,7 @@ interface StatCardProps {
 
 export function StatCard({ label, children }: StatCardProps) {
   return (
-    <Paper p="sm" style={{ flex: 1, minWidth: 140 }}>
+    <Paper p="sm">
       <Text size="xs" c="dimmed" tt="uppercase" fw={500} mb={4}>
         {label}
       </Text>

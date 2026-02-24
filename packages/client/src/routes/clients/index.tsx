@@ -42,7 +42,7 @@ function Clients() {
         }
       />
 
-      <Paper p={0} style={{ overflow: "hidden" }}>
+      <Paper p={0} style={{ overflowX: "auto" }}>
         <Table>
           <Table.Thead>
             <Table.Tr>

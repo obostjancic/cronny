@@ -17,6 +17,8 @@ export function PageHeader({ breadcrumbs, actions }: PageHeaderProps) {
     <Flex
       justify="space-between"
       align="center"
+      wrap="wrap"
+      gap="sm"
       pb="lg"
       mb="lg"
       style={{ borderBottom: "1px solid var(--mantine-color-dark-4)" }}
@@ -46,7 +48,7 @@ export function PageHeader({ breadcrumbs, actions }: PageHeaderProps) {
           )
         )}
       </Breadcrumbs>
-      {actions && <Group gap="xs">{actions}</Group>}
+      {actions && <Group gap="xs" wrap="wrap">{actions}</Group>}
     </Flex>
   );
 }

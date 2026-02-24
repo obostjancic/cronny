@@ -3,7 +3,6 @@ import {
   ActionIcon,
   Badge,
   Button,
-  Flex,
   Group,
   Modal,
   Paper,
@@ -65,6 +64,46 @@ function JobDetailsPage() {
 
   const [opened, { open, close }] = useDisclosure(false);
 
+  const handleRunNow = () => {
+    postRun.mutate(job.id, {
+      onSuccess: () => {
+        notifications.show({
+          title: "Success",
+          message: "Run has been started",
+          autoClose: 2000,
+        });
+      },
+      onError: (error) => {
+        notifications.show({
+          title: "Error",
+          message: error.message || "Failed to start run",
+          color: "red",
+        });
+      },
+    });
+  };
+
+  const handleClearResults = () => {
+    if (confirm("Are you sure you want to clear the results?")) {
+      deleteResults.mutate(job.id, {
+        onSuccess: () => {
+          notifications.show({
+            title: "Success",
+            message: "Cleared results",
+            autoClose: 2000,
+          });
+        },
+        onError: (error) => {
+          notifications.show({
+            title: "Error",
+            message: error.message || "Failed to clear results",
+            color: "red",
+          });
+        },
+      });
+    }
+  };
+
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete "${job.name}"? This cannot be undone.`)) {
       await deleteJob.mutateAsync(job.id);
@@ -100,54 +139,41 @@ function JobDetailsPage() {
               size="compact-sm"
               leftSection={<IconPlayerPlay size={14} />}
               loading={postRun.isPending}
-              onClick={() => {
-                postRun.mutate(job.id, {
-                  onSuccess: () => {
-                    notifications.show({
-                      title: "Success",
-                      message: "Run has been started",
-                      autoClose: 2000,
-                    });
-                  },
-                  onError: (error) => {
-                    notifications.show({
-                      title: "Error",
-                      message: error.message || "Failed to start run",
-                      color: "red",
-                    });
-                  },
-                });
-              }}
+              visibleFrom="sm"
+              onClick={handleRunNow}
             >
               Run Now
             </Button>
+            <Tooltip label="Run Now" hiddenFrom="sm">
+              <ActionIcon
+                size="md"
+                loading={postRun.isPending}
+                hiddenFrom="sm"
+                onClick={handleRunNow}
+              >
+                <IconPlayerPlay style={iconStyle} />
+              </ActionIcon>
+            </Tooltip>
             <Button
               size="compact-sm"
               variant="subtle"
               loading={deleteResults.isPending}
-              onClick={() => {
-                if (confirm("Are you sure you want to clear the results?")) {
-                  deleteResults.mutate(job.id, {
-                    onSuccess: () => {
-                      notifications.show({
-                        title: "Success",
-                        message: "Cleared results",
-                        autoClose: 2000,
-                      });
-                    },
-                    onError: (error) => {
-                      notifications.show({
-                        title: "Error",
-                        message: error.message || "Failed to clear results",
-                        color: "red",
-                      });
-                    },
-                  });
-                }
-              }}
+              visibleFrom="sm"
+              onClick={handleClearResults}
             >
               Clear Results
             </Button>
+            <Tooltip label="Clear Results" hiddenFrom="sm">
+              <ActionIcon
+                variant="subtle"
+                size="md"
+                loading={deleteResults.isPending}
+                hiddenFrom="sm"
+                onClick={handleClearResults}
+              >
+                <IconFilterOff style={iconStyle} />
+              </ActionIcon>
+            </Tooltip>
             <Tooltip label="Delete job">
               <ActionIcon variant="subtle" color="red" size="md" onClick={handleDelete}>
                 <IconTrash style={iconStyle} />
@@ -158,7 +184,7 @@ function JobDetailsPage() {
       />
 
       {/* Stat cards */}
-      <Flex gap="md" mb="lg" wrap="wrap">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--mantine-spacing-md)", marginBottom: "var(--mantine-spacing-lg)" }}>
         <StatCard label="Status">
           {job.enabled ? (
             <Badge color="green">Active</Badge>
@@ -184,7 +210,7 @@ function JobDetailsPage() {
             <ReactTimeago date={jobDetails.nextRun} formatter={shortFormatter} />
           </StatCard>
         )}
-      </Flex>
+      </div>
 
       {/* Active results */}
       <ResultsTable
@@ -193,9 +219,9 @@ function JobDetailsPage() {
       />
 
       {/* Secondary results tabs */}
-      <Paper p={0} mt="xl" style={{ overflow: "hidden" }}>
+      <Paper p={0} mt="xl" style={{ overflowX: "auto" }}>
         <Tabs defaultValue="hidden">
-          <Tabs.List>
+          <Tabs.List style={{ flexWrap: "nowrap" }}>
             <Tabs.Tab
               value="hidden"
               leftSection={<IconEyeOff style={iconStyle} />}
