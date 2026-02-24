@@ -113,9 +113,9 @@ export function ResultsTable({ rows, label }: ResultsTableProps) {
                             href={url}
                             target="_blank"
                             rel="noreferrer"
-                            style={{ color: "inherit", textDecoration: "none" }}
+                            className="result-link"
                           >
-                            <Text size="sm">{row[column]?.toString()}</Text>
+                            {row[column]?.toString()}
                           </a>
                         ) : (
                           <Text size="sm">{row[column]?.toString()}</Text>

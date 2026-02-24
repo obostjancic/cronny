@@ -9,7 +9,17 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Visited links show browser default visited color */
-a:visited {
-  color: #b8a9c9;
+/* Result listing links */
+.result-link {
+  color: var(--mantine-color-teal-4);
+  text-decoration: none;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.result-link:hover {
+  text-decoration: underline;
+}
+
+.result-link:visited {
+  color: var(--mantine-color-dimmed);
 }
