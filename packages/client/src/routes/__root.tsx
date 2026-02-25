@@ -32,14 +32,14 @@ function NavLink({ to, label }: { to: string; label: string }) {
 
 function RootLayout() {
   return (
-    <AppShell header={{ height: 48 }} padding="xl">
+    <AppShell header={{ height: 48 }} padding={{ base: "md", sm: "xl" }}>
       <AppShell.Header
         style={{
           backgroundColor: "var(--mantine-color-dark-8)",
           borderBottom: "1px solid var(--mantine-color-dark-4)",
         }}
       >
-        <Flex h="100%" align="center" px="xl" gap="lg">
+        <Flex h="100%" align="center" px={{ base: "md", sm: "xl" }} gap="lg">
           <Text fw={700} size="sm" c="teal.4" mr="md">
             CRONNY
           </Text>
