@@ -25,6 +25,8 @@ services:
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
+    environment:
+      - PORT=8191
     ports:
       - "8191:8191"
     restart: unless-stopped
