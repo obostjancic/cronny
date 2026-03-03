@@ -10,6 +10,7 @@ Sentry.init({
   enabled: isProd,
   environment: getEnv("NODE_ENV"),
   integrations: [
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
     Sentry.pinoIntegration(),
     Sentry.honoIntegration(),
     Sentry.vercelAIIntegration({
@@ -17,4 +18,5 @@ Sentry.init({
       recordOutputs: true,
     }),
   ],
+  enableLogs: true,
 });
