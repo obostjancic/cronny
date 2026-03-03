@@ -47,7 +47,7 @@
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",
     "migrate": "node dist/migrate.js",
     "predev": "drizzle-kit generate && drizzle-kit push",
-    "start": "node dist/index.js",
+    "start": "node --import ./dist/instrument.js dist/index.js",
     "studio": "drizzle-kit studio",
     "test": "vitest"
   },
