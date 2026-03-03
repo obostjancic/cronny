@@ -4,7 +4,7 @@ import { parse } from "node-html-parser";
 import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
 import { createLogger } from "../utils/logger.js";
-import { fetchViaProxy } from "../utils/request.js";
+import { fetchViaFlareSolverr, fetchViaProxy } from "../utils/request.js";
 
 const logger = createLogger("klix-rss");
 
@@ -104,8 +104,8 @@ async function fetchArticleTexts(
 }
 
 async function fetchArticleText(url: string): Promise<string> {
-  const response = await fetchViaProxy(url);
-  const html = response.data as string;
+  const response = await fetchViaFlareSolverr(url);
+  const html = response.data;
   const root = parse(html);
 
   const textElement = root.querySelector("#tekst");

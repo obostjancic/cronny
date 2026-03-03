@@ -51,3 +51,15 @@ export async function fetchViaProxy(
 ) {
   return axios.get(`${proxyUrl}/?url=${encodeURIComponent(url)}`, config);
 }
+
+export async function fetchViaFlareSolverr(
+  url: string,
+  flareSolverrUrl = process.env.FLARESOLVERR_URL ?? "http://localhost:8191",
+): Promise<{ data: string }> {
+  const response = await axios.post(`${flareSolverrUrl}/v1`, {
+    cmd: "request.get",
+    url,
+    maxTimeout: 60000,
+  });
+  return { data: response.data.solution.response };
+}
