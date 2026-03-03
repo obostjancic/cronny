@@ -96,7 +96,7 @@ async function fetchArticleTexts(
       const text = await cached(fetchArticleText)(rawArticle.url);
       articles.push({ ...rawArticle, text });
     } catch (error) {
-      logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
+      logger.error(`Failed to fetch article ${rawArticle.id}`, error);
     }
   }
 
@@ -139,7 +139,7 @@ async function processArticles(
       );
       result.push({ ...simplified, category: article.category });
     } catch (error) {
-      logger.error(`Failed to process article ${article.id}: ${error}`);
+      logger.error(`Failed to process article ${article.id}`, error);
     }
   }
 

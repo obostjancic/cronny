@@ -106,7 +106,7 @@ async function fetchArticleTexts(
         articles.push({ ...rawArticle, ...rest, ...(category ? { category } : {}) });
       }
     } catch (error) {
-      logger.error(`Failed to fetch article ${rawArticle.id}: ${error}`);
+      logger.error(`Failed to fetch article ${rawArticle.id}`, error);
     }
   }
 
@@ -150,7 +150,7 @@ async function processArticles(
       );
       result.push({ ...simplified, ...(article.category ? { category: article.category } : {}) });
     } catch (error) {
-      logger.error(`Failed to process article ${article.id}: ${error}`);
+      logger.error(`Failed to process article ${article.id}`, error);
     }
   }
 

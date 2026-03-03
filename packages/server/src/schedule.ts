@@ -22,7 +22,7 @@ export async function scheduleRuns(): Promise<void> {
 
       schedule.push(cron(job, runner));
     } catch (error) {
-      logger.error(`Failed to schedule ${job.name}: ${error}`);
+      logger.error(`Failed to schedule ${job.name}`, error);
     }
   }
 }

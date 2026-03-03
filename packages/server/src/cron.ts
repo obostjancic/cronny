@@ -14,7 +14,7 @@ export function cron(job: Job, runner: Runner): CronJob {
     cronTime: job.cron,
     onTick: function () {
       executeRun(job, runner).catch((error) => {
-        logger.error(`Unhandled error in cron job ${job.name}: ${error}`);
+        logger.error(`Unhandled error in cron job ${job.name}`, error);
       });
     },
     start: true,
