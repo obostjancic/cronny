@@ -1,5 +1,6 @@
 import { FieldSchema, StrategySchema } from "@cronny/types";
 import {
+  Autocomplete,
   MultiSelect,
   NumberInput,
   Select,
@@ -176,17 +177,15 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
 
     case "combobox":
       return (
-        <Select
+        <Autocomplete
           label={field.label}
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value || null}
+          value={value || ""}
           onChange={(val) => onChange(val)}
           error={error}
-          data={field.options?.map((o) => ({ value: o.value, label: o.label })) || []}
-          searchable
-          clearable
+          data={field.options?.map((o) => ({ value: o.value, label: `${o.label} (${o.value})` })) || []}
         />
       );
 
