@@ -1,4 +1,3 @@
-import "./instrument.js";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import fs from "fs";
