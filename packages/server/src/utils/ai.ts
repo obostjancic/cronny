@@ -4,6 +4,10 @@ import { createLogger } from "./logger.js";
 
 const logger = createLogger("ai");
 
+const noReasoningSettings = {
+  extraBody: { reasoning: { effort: "none" } },
+};
+
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
@@ -14,7 +18,7 @@ export async function runPrompt(
 
   try {
     const { text } = await generateText({
-      model: openrouter(model),
+      model: openrouter(model, noReasoningSettings),
       prompt,
       system: systemPrompt,
     });
@@ -22,6 +26,19 @@ export async function runPrompt(
     return text ?? "";
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const isReasoningError = errorMessage.includes("reasoning");
+
+    // Retry without reasoning settings if the model doesn't support them
+    if (isReasoningError) {
+      logger.warn(`Model ${model} doesn't support reasoning settings, retrying without`);
+      const { text } = await generateText({
+        model: openrouter(model),
+        prompt,
+        system: systemPrompt,
+      });
+      return text ?? "";
+    }
+
     const fallback = fallbackModel ?? (model.includes(":free") ? model.replace(":free", "") : undefined);
 
     if (fallback) {
@@ -30,7 +47,7 @@ export async function runPrompt(
       );
 
       const { text } = await generateText({
-        model: openrouter(fallback),
+        model: openrouter(fallback, noReasoningSettings),
         prompt,
         system: systemPrompt,
       });
