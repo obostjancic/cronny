@@ -167,7 +167,8 @@ async function simplifyArticle(
     params.model,
     params.fallbackModel,
   );
-  const [title, ...text] = purified.split(";");
+  const separator = purified.includes(";") ? ";" : ".";
+  const [title, ...text] = purified.split(separator);
 
   return {
     ...article,
