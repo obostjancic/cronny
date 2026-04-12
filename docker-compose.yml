@@ -8,11 +8,21 @@ services:
     volumes:
       # Persist SQLite database
       - cronny-data:/app/packages/server/.data
+    env_file:
+      - path: packages/server/.env
+        required: false
     environment:
       - NODE_ENV=production
       - PORT=3030
       - DATABASE_PATH=/app/packages/server/.data/db.sqlite
       - FLARESOLVERR_URL=http://flaresolverr:8191
+      - API_SECRET
+      - API_PASSWORD
+      - GEOCODE_API_KEY
+      - OPENROUTER_API_KEY
+      - WHATSAPP_PHONE
+      - WHATSAPP_API_KEY
+      - BASE_URL
     depends_on:
       - flaresolverr
     restart: unless-stopped
