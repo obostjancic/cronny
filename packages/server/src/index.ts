@@ -45,7 +45,7 @@ app.route("/api/results", resultRoutes);
 app.route("/api/clients", clientRoutes);
 app.route("/api/strategies", strategiesRoutes);
 
-const port = getEnv("PORT") || 3000;
+const port = getEnv("PORT") || 3030;
 console.log(`Server is running on port ${port}`);
 
 // Serve static files if client dist exists

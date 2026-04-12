@@ -9,7 +9,7 @@ Cronny is a web scraping and job scheduling platform for real estate websites (A
 ## Development Commands
 
 ### Core Development
-- `pnpm dev` - Run both client and server in development mode (client on :5174, server on :3000)
+- `pnpm dev` - Run both client and server in development mode (client on :5174, server on :3030)
 - `pnpm debug` - Run client + server with Node.js debugger attached
 - `pnpm build` - Build both packages for production
 - `pnpm start:prod` - Run database migrations + start production server
@@ -93,11 +93,11 @@ Supports Slack, WhatsApp, and file-based notifications. Configuration is handled
 ## Development Setup
 
 ### Environment Variables
-In development, the client uses `VITE_API_URL=http://localhost:3000` to connect directly to the server. Copy `packages/client/.env.example` to `packages/client/.env.development` if needed.
+In development, the client uses `VITE_API_URL=http://localhost:3030` to connect directly to the server. Copy `packages/client/.env.example` to `packages/client/.env.development` if needed.
 
 ### API Communication
 The client uses a centralized HTTP client (`packages/client/src/api/client.ts`) that:
-- In development: Makes direct requests to server at `http://localhost:3000`
+- In development: Makes direct requests to server at `http://localhost:3030`
 - In production: Uses relative URLs (served from same origin)
 - Handles authentication tokens automatically
 - Provides axios-based methods (get, post, put, delete)

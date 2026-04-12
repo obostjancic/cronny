@@ -45,7 +45,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
 
 # Set production environment variables
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=3030
 
 WORKDIR /app
 
@@ -70,11 +70,11 @@ COPY packages/server/drizzle ./packages/server/drizzle
 RUN mkdir -p /app/packages/server/.data
 
 # Expose server port
-EXPOSE 3000
+EXPOSE 3030
 
-# Health check (uses PORT env var, defaults to 3000)
+# Health check (uses PORT env var, defaults to 3030)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 3000) + '/api/public/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 3030) + '/api/public/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start the application (runs migrations via start:prod)
 CMD ["pnpm", "start:prod"]

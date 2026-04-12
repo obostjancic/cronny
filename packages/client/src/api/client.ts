@@ -4,7 +4,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 const getApiUrl = (): string => {
   // In development, use the server URL directly
   if (import.meta.env.DEV) {
-    return import.meta.env.VITE_API_URL || "http://localhost:3000";
+    return import.meta.env.VITE_API_URL || "http://localhost:3030";
   }
   
   // In production, use relative paths (served from same origin)
