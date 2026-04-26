@@ -145,6 +145,34 @@ export const STRATEGY_SCHEMAS: StrategySchema[] = [
     supportsGeoFilters: true,
   },
   {
+    id: "appointments",
+    name: "ID Austria Appointments",
+    description:
+      "Monitor open appointment slots at id-austria.info (passport, police, Finanzamt)",
+    category: "utility",
+    fields: [
+      {
+        name: "provider",
+        label: "Provider",
+        type: "select",
+        required: false,
+        defaultValue: "finanzamt",
+        description: "Which agency's appointments to track",
+        options: [
+          { value: "all", label: "All providers" },
+          { value: "magistrate", label: "Magistrate (Vienna Passservice)" },
+          { value: "police", label: "Police (Polizeikommissariat)" },
+          {
+            value: "finanzamt",
+            label: "Finanzamt (tax office — for foreigners)",
+          },
+        ],
+      },
+    ],
+    supportsFilters: true,
+    supportsGeoFilters: false,
+  },
+  {
     id: "immo",
     name: "Multi-Source Immo",
     description:
