@@ -15,6 +15,7 @@ export type AppointmentParams = {
 
 export type AppointmentResult = {
   id: string;
+  title: string;
   provider: Provider;
   locationId: string;
   locationName: string;
@@ -27,6 +28,17 @@ export type AppointmentResult = {
   url: string;
   status?: "active" | "filtered";
 };
+
+const titleFormatter = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Vienna",
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+function formatTitle(appointmentTime: string, locationName: string): string {
+  const when = titleFormatter.format(new Date(appointmentTime));
+  return `${when} — ${locationName}`;
+}
 
 type ApiAppointment = {
   id: string;
@@ -81,6 +93,7 @@ export const run: Runner<AppointmentParams, AppointmentResult> = async (
     const loc = locMap.get(`${a.provider}:${a.location_id}`);
     return {
       id: a.id,
+      title: formatTitle(a.appointment_time, a.location_name),
       provider: a.provider,
       locationId: a.location_id,
       locationName: a.location_name,

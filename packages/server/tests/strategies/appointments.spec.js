@@ -24,6 +24,7 @@ describe("Appointments Strategy", () => {
     );
     expect(results[0].forForeigners).toBe(true);
     expect(results[0].status).toBe("active");
+    expect(results[0].title).toBe("2026-06-12 15:00 — Finanzamt Wien-Kagran");
   });
 
   it("returns all appointments when provider is omitted", async () => {
