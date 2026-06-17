@@ -11,7 +11,7 @@ const noReasoningSettings = {
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
-  model = "google/gemma-3-27b-it:free",
+  model = "poolside/laguna-xs.2:free",
   fallbackModel?: string,
 ): Promise<string> {
   logger.info(`Running prompt ${prompt.slice(0, 25)}...`);

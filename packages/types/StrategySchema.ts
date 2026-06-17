@@ -39,6 +39,7 @@ export interface StrategySchema {
 }
 
 const MODEL_OPTIONS: SelectOption[] = [
+  { value: "poolside/laguna-xs.2:free", label: "Poolside Laguna XS.2 (Free)" },
   { value: "google/gemma-3-27b-it:free", label: "Gemma 3 27B (Free)" },
   { value: "google/gemma-3-27b-it", label: "Gemma 3 27B" },
   { value: "google/gemma-3-12b-it:free", label: "Gemma 3 12B (Free)" },
@@ -56,7 +57,7 @@ const MODEL_FIELDS: FieldSchema[] = [
     label: "AI Model",
     type: "combobox",
     required: false,
-    placeholder: "google/gemma-3-27b-it:free",
+    placeholder: "poolside/laguna-xs.2:free",
     description: "Primary OpenRouter model ID (leave empty for default)",
     options: MODEL_OPTIONS,
   },
