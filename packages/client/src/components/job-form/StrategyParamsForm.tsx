@@ -8,6 +8,7 @@ import {
   Textarea,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import type { StrategyParamValue, StrategyParamValues } from "./types";
 import { ExtractedFilters, ParsedGeoData, parseAndCleanUrl } from "./urlGeoParser";
 
 interface UrlExtractionResult {
@@ -20,10 +21,17 @@ interface UrlExtractionResult {
 
 interface StrategyParamsFormProps {
   schema: StrategySchema;
-  values: Record<string, any>;
-  onChange: (values: Record<string, any>) => void;
+  values: StrategyParamValues;
+  onChange: (values: StrategyParamValues) => void;
   onUrlExtracted?: (result: UrlExtractionResult) => void;
   errors?: Record<string, string>;
+}
+
+interface FieldInputProps {
+  field: FieldSchema;
+  value: StrategyParamValue;
+  onChange: (value: StrategyParamValue) => void;
+  error?: string;
 }
 
 export function StrategyParamsForm({
@@ -33,11 +41,11 @@ export function StrategyParamsForm({
   onUrlExtracted,
   errors,
 }: StrategyParamsFormProps) {
-  const handleFieldChange = (fieldName: string, value: any, fieldType: string) => {
+  const handleFieldChange = (fieldName: string, value: StrategyParamValue, fieldType: string) => {
     onChange({ ...values, [fieldName]: value });
 
     // Try to extract data from URL fields and clean the URL
-    if (fieldType === "url" && value && onUrlExtracted) {
+    if (fieldType === "url" && typeof value === "string" && value && onUrlExtracted) {
       const result = parseAndCleanUrl(value);
       if (result && result.extractedParams.length > 0) {
         onUrlExtracted({
@@ -66,13 +74,6 @@ export function StrategyParamsForm({
   );
 }
 
-interface FieldInputProps {
-  field: FieldSchema;
-  value: any;
-  onChange: (value: any) => void;
-  error?: string;
-}
-
 function FieldInput({ field, value, onChange, error }: FieldInputProps) {
   switch (field.type) {
     case "url":
@@ -82,7 +83,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value || ""}
+          value={getStringValue(value)}
           onChange={(e) => onChange(e.currentTarget.value)}
           error={error}
           type="url"
@@ -96,7 +97,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value || ""}
+          value={getStringValue(value)}
           onChange={(e) => onChange(e.currentTarget.value)}
           error={error}
         />
@@ -109,7 +110,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value || ""}
+          value={getStringValue(value)}
           onChange={(e) => onChange(e.currentTarget.value)}
           error={error}
           autosize
@@ -125,7 +126,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value ?? ""}
+          value={getNumberValue(value)}
           onChange={(val) => onChange(val)}
           error={error}
           min={field.min}
@@ -140,7 +141,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value ? new Date(value) : null}
+          value={getDateValue(value)}
           onChange={(date) => onChange(date?.toISOString())}
           error={error}
         />
@@ -153,7 +154,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder || "Select an option"}
           description={field.description}
           required={field.required}
-          value={value || null}
+          value={getStringValue(value) || null}
           onChange={(val) => onChange(val)}
           error={error}
           data={field.options || []}
@@ -168,7 +169,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder || "Select options"}
           description={field.description}
           required={field.required}
-          value={value || []}
+          value={getStringArrayValue(value)}
           onChange={(vals) => onChange(vals)}
           error={error}
           data={field.options || []}
@@ -182,7 +183,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           placeholder={field.placeholder}
           description={field.description}
           required={field.required}
-          value={value || ""}
+          value={getStringValue(value)}
           onChange={(val) => onChange(val)}
           error={error}
           data={field.options?.map((o) => ({ value: o.value, label: `${o.label} (${o.value})` })) || []}
@@ -192,4 +193,27 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
     default:
       return null;
   }
+}
+
+function getStringValue(value: StrategyParamValue): string {
+  return typeof value === "string" ? value : "";
+}
+
+function getNumberValue(value: StrategyParamValue): string | number {
+  if (typeof value === "number" || typeof value === "string") return value;
+  return "";
+}
+
+function getStringArrayValue(value: StrategyParamValue): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item) => typeof item === "string");
+}
+
+function getDateValue(value: StrategyParamValue): Date | null {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date;
 }

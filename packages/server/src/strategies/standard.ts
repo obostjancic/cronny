@@ -3,7 +3,6 @@ import axios from "axios";
 import { parse, type HTMLElement } from "node-html-parser";
 import { cached } from "../utils/cache.js";
 import { geocode } from "../utils/coordinates.js";
-import { createLogger } from "../utils/logger.js";
 import { fetchMultiplePages } from "../utils/request.js";
 import { sanitize } from "../utils/string.js";
 import { replaceURLParams } from "../utils/url.js";
@@ -11,8 +10,6 @@ import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 
 const MAX_ROWS = 15;
 const MAX_PAGES = 5;
-
-const logger = createLogger("standard");
 
 type RawStandardResult = {
   id: number;

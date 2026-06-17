@@ -1,4 +1,4 @@
-import { Runner, RunnerOptions } from "@cronny/types";
+import { Runner } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
 import RSSParser from "rss-parser";
 import { parse } from "node-html-parser";

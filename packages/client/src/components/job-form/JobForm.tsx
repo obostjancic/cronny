@@ -3,6 +3,9 @@ import {
   GeoFilterType,
   getStrategySchema,
   JobDetails,
+  JSONObject,
+  JSONValue,
+  NotificationConfig,
   Notify,
   UnsavedJob,
 } from "@cronny/types";
@@ -28,7 +31,9 @@ import { DataFilterBuilder } from "./DataFilterBuilder";
 import { GeoFilterSection } from "./GeoFilterSection";
 import { NotifyConfigForm } from "./NotifyConfigForm";
 import { StrategyParamsForm } from "./StrategyParamsForm";
+import type { NotifyConfig, StrategyParamValue, StrategyParamValues } from "./types";
 import { StrategySelector } from "./StrategySelector";
+import type { ExtractedFilters, ParsedGeoData } from "./urlGeoParser";
 
 interface JobFormProps {
   initialValues?: Partial<JobDetails>;
@@ -36,17 +41,12 @@ interface JobFormProps {
   isEdit?: boolean;
 }
 
-interface NotifyConfig {
-  type: string;
-  [key: string]: any;
-}
-
 interface FormValues {
   strategy: string;
   name: string;
   enabled: boolean;
   cron: string;
-  strategyParams: Record<string, any>;
+  strategyParams: StrategyParamValues;
   dataFilters: DataFilter[];
   geoFilterType: GeoFilterType;
   polygonPoints: [number, number][];
@@ -56,38 +56,49 @@ interface FormValues {
   notifyConfigs: NotifyConfig[];
 }
 
+interface UrlExtractionResult {
+  geo?: ParsedGeoData;
+  cleanedUrl: string;
+  fieldName: string;
+  extractedParams: string[];
+  extractedFilters?: ExtractedFilters;
+}
+
 function parseInitialValues(
   initialValues?: Partial<JobDetails>
 ): FormValues {
-  const params = (initialValues?.params || {}) as Record<string, any>;
+  const params = initialValues?.params ?? {};
   const filtersRaw = params.filters;
-  const filters = Array.isArray(filtersRaw) ? filtersRaw : [];
+  const filters = Array.isArray(filtersRaw) ? filtersRaw.filter(isJSONObject) : [];
 
   const coordsFilter = filters.find(
-    (f: any) => f.prop === "coordinates"
+    (filter) => filter.prop === "coordinates"
   );
-  const dataFilters = filters.filter(
-    (f: any) => f.prop !== "coordinates"
-  ) as DataFilter[];
+  const dataFilters = filters
+    .filter((filter) => filter.prop !== "coordinates")
+    .map(toDataFilter)
+    .filter(isDefined);
 
   let geoFilterType: GeoFilterType = "none";
   let polygonPoints: [number, number][] = [];
   let radiusCenter: [number, number] | null = null;
   let radius = 5;
 
-  if (coordsFilter?.value) {
-    if ("points" in coordsFilter.value) {
+  if (isJSONObject(coordsFilter?.value)) {
+    const points = toPointList(coordsFilter.value.points);
+    const center = toPoint(coordsFilter.value.center);
+
+    if (points) {
       geoFilterType = "polygon";
-      polygonPoints = coordsFilter.value.points;
-    } else if ("center" in coordsFilter.value) {
+      polygonPoints = points;
+    } else if (center) {
       geoFilterType = "radius";
-      radiusCenter = coordsFilter.value.center;
-      radius = coordsFilter.value.radius;
+      radiusCenter = center;
+      radius = typeof coordsFilter.value.radius === "number" ? coordsFilter.value.radius : radius;
     }
   }
 
-  const strategyParams: Record<string, any> = { ...params };
-  delete strategyParams.filters;
+  const strategyParams = toStrategyParamValues(params);
 
   const notify = initialValues?.notify;
   const notifyConfigs: NotifyConfig[] = [];
@@ -129,7 +140,7 @@ function parseInitialValues(
 function transformToJobPayload(
   values: FormValues
 ): Omit<UnsavedJob, "id"> {
-  const filters: any[] = [...values.dataFilters];
+  const filters: JSONObject[] = values.dataFilters.map(toDataFilterParam);
 
   if (values.geoFilterType === "polygon" && values.polygonPoints.length >= 3) {
     filters.push({
@@ -143,7 +154,7 @@ function transformToJobPayload(
     });
   }
 
-  const params: Record<string, any> = { ...values.strategyParams };
+  const params = toJsonObject(values.strategyParams);
 
   if (filters.length > 0) {
     params.filters = filters;
@@ -155,10 +166,10 @@ function transformToJobPayload(
     notify = {};
     for (const config of values.notifyConfigs) {
       const { type, trigger, onResultChangeOnly, ...rest } = config;
-      const notificationConfig = {
-        transport: type as any,
-        params: rest,
-        ...(onResultChangeOnly && { onResultChangeOnly }),
+      const notificationConfig: NotificationConfig = {
+        transport: type,
+        params: toJsonObject(rest),
+        ...(onResultChangeOnly === true && { onResultChangeOnly }),
       };
       if (trigger === "onFailure") {
         notify.onFailure = notificationConfig;
@@ -208,13 +219,7 @@ export function JobForm({
   const patchJob = usePatchJob(initialValues?.id ?? "");
   const postJob = usePostJob();
 
-  const handleUrlExtracted = (result: {
-    geo?: { type: "polygon" | "radius"; polygon?: [number, number][]; center?: [number, number]; radius?: number };
-    cleanedUrl: string;
-    fieldName: string;
-    extractedParams: string[];
-    extractedFilters?: { priceMin?: number; priceMax?: number; sizeMin?: number; sizeMax?: number; roomsMin?: number; roomsMax?: number };
-  }) => {
+  const handleUrlExtracted = (result: UrlExtractionResult) => {
     // URL is kept as-is (not cleaned) - platform will filter by its params
     // We just notify the user about detected filters
     const detectedItems: string[] = [];
@@ -245,7 +250,7 @@ export function JobForm({
   };
 
   const handleFormSubmit = async (values: FormValues) => {
-    let payload: any;
+    let payload: Omit<UnsavedJob, "id">;
 
     if (advancedMode) {
       try {
@@ -254,8 +259,8 @@ export function JobForm({
           name: values.name,
           enabled: values.enabled,
           cron: values.cron,
-          params: rawParams ? JSON.parse(rawParams) : null,
-          notify: rawNotify ? JSON.parse(rawNotify) : null,
+          params: parseOptionalJsonObject(rawParams),
+          notify: parseOptionalNotify(rawNotify),
           maxResults: values.maxResults,
         };
       } catch {
@@ -291,7 +296,7 @@ export function JobForm({
     if (isEdit && initialValues?.id) {
       patchJob.mutate(payload, mutationCallbacks);
     } else {
-      postJob.mutate(payload as UnsavedJob, mutationCallbacks);
+      postJob.mutate(payload, mutationCallbacks);
     }
   };
 
@@ -483,4 +488,126 @@ export function JobForm({
       </Stack>
     </form>
   );
+}
+
+function toDataFilter(filter: JSONObject): DataFilter | null {
+  if (typeof filter.prop !== "string") return null;
+
+  const dataFilter: DataFilter = { prop: filter.prop };
+
+  if (isDataFilterValue(filter.value)) {
+    dataFilter.value = filter.value;
+  }
+  if (typeof filter.min === "number") {
+    dataFilter.min = filter.min;
+  }
+  if (typeof filter.max === "number") {
+    dataFilter.max = filter.max;
+  }
+  if (typeof filter.negate === "boolean") {
+    dataFilter.negate = filter.negate;
+  }
+
+  return dataFilter;
+}
+
+function toDataFilterParam(filter: DataFilter): JSONObject {
+  const param: JSONObject = { prop: filter.prop };
+
+  if (filter.value !== undefined) {
+    param.value = filter.value;
+  }
+  if (filter.min !== undefined) {
+    param.min = filter.min;
+  }
+  if (filter.max !== undefined) {
+    param.max = filter.max;
+  }
+  if (filter.negate !== undefined) {
+    param.negate = filter.negate;
+  }
+
+  return param;
+}
+
+function toStrategyParamValues(params: JSONObject): StrategyParamValues {
+  const values: StrategyParamValues = {};
+
+  for (const [key, value] of Object.entries(params)) {
+    if (key === "filters") continue;
+    if (isStrategyParamValue(value)) {
+      values[key] = value;
+    }
+  }
+
+  return values;
+}
+
+function toJsonObject(values: Record<string, JSONValue | undefined>): JSONObject {
+  const object: JSONObject = {};
+
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== undefined) {
+      object[key] = value;
+    }
+  }
+
+  return object;
+}
+
+function parseOptionalJsonObject(value: string): JSONObject | null {
+  if (!value.trim()) return null;
+
+  const parsed: unknown = JSON.parse(value);
+  if (!isJSONObject(parsed)) {
+    throw new Error("Expected JSON object");
+  }
+
+  return parsed;
+}
+
+function parseOptionalNotify(value: string): Notify | null {
+  if (!value.trim()) return null;
+  return JSON.parse(value) as Notify;
+}
+
+function isStrategyParamValue(value: JSONValue): value is Exclude<StrategyParamValue, undefined> {
+  if (typeof value === "string") return true;
+  if (typeof value === "number") return true;
+  if (typeof value === "boolean") return true;
+  if (value === null) return true;
+
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isDataFilterValue(value: unknown): value is DataFilter["value"] {
+  if (typeof value === "string") return true;
+  if (typeof value === "number") return true;
+
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isJSONObject(value: unknown): value is JSONObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toPoint(value: JSONValue | undefined): [number, number] | null {
+  if (!Array.isArray(value)) return null;
+  if (value.length !== 2) return null;
+
+  const [lat, lng] = value;
+  if (typeof lat !== "number" || typeof lng !== "number") return null;
+
+  return [lat, lng];
+}
+
+function toPointList(value: JSONValue | undefined): [number, number][] | null {
+  if (!Array.isArray(value)) return null;
+
+  const points = value.map(toPoint).filter(isDefined);
+  return points.length === value.length ? points : null;
+}
+
+function isDefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }

@@ -1,4 +1,4 @@
-import { Runner, RunnerOptions } from "@cronny/types";
+import { Runner } from "@cronny/types";
 import { Type, type Static } from "@sinclair/typebox";
 import { parse } from "node-html-parser";
 import { runPrompt } from "../utils/ai.js";

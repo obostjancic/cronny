@@ -135,8 +135,8 @@ export function equalResults(a: UnsavedResult, b: UnsavedResult) {
     return true;
   }
 
-  const { id, ...restA } = a.data;
-  const { id: _, ...restB } = b.data;
+  const { id: _idA, ...restA } = a.data;
+  const { id: _idB, ...restB } = b.data;
 
   return equal(restA, restB);
 }

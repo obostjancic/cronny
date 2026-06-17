@@ -64,17 +64,21 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
-interface ErrorBoundaryProps {
+interface ErrorBoundaryClassProps {
   children: React.ReactNode;
   onReset: () => void;
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
 }
 
 interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundaryClass extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+class ErrorBoundaryClass extends React.Component<ErrorBoundaryClassProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryClassProps) {
     super(props);
     this.state = { error: null };
   }
@@ -101,16 +105,12 @@ class ErrorBoundaryClass extends React.Component<ErrorBoundaryProps, ErrorBounda
   }
 }
 
-export function withErrorBoundary<P extends object>(
-  Component: React.ComponentType<P>
-) {
-  return function WithErrorBoundaryWrapper(props: P) {
-    const { reset } = useQueryErrorResetBoundary();
+export function ErrorBoundary({ children }: ErrorBoundaryProps) {
+  const { reset } = useQueryErrorResetBoundary();
 
-    return (
-      <ErrorBoundaryClass onReset={reset}>
-        <Component {...props} />
-      </ErrorBoundaryClass>
-    );
-  };
+  return (
+    <ErrorBoundaryClass onReset={reset}>
+      {children}
+    </ErrorBoundaryClass>
+  );
 }

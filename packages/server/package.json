@@ -26,12 +26,16 @@
   },
   "description": "",
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "@playwright/test": "^1.48.1",
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.14.12",
     "drizzle-kit": "^0.24.1",
+    "eslint": "^9.9.0",
+    "globals": "^15.9.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1",
     "vitest": "^2.0.5"
   },
   "engines": {
@@ -42,6 +46,7 @@
   "name": "@cronny/server",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint .",
     "db:push": "drizzle-kit push",
     "debug": "NODE_ENV=development tsx --env-file=.env --inspect src/index.ts",
     "dev": "NODE_ENV=development tsx --env-file=.env --watch src/index.ts",

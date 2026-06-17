@@ -67,7 +67,7 @@ jobsRoutes.patch("/:id", async (c) => {
   const jobId = parseId(c.req.param("id"));
   if (!jobId) return c.json({ error: "Invalid job ID" }, 400);
 
-  const { id, ...patch } = await c.req.json<Partial<Job>>();
+  const { id: _id, ...patch } = await c.req.json<Partial<Job>>();
   const job = await updateJob(jobId, patch);
 
   await invalidateSchedule();

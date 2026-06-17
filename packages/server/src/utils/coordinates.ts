@@ -8,7 +8,7 @@ export function parseCoordinates(coordinates: string): Coordinates | null {
   try {
     const [latitude, longitude] = coordinates.split(",").map(Number);
     return [latitude, longitude];
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 }

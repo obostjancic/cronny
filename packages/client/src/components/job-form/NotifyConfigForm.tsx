@@ -1,18 +1,19 @@
 import { ActionIcon, Button, Checkbox, Group, Paper, Select, Text, TextInput } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-
-interface NotifyConfig {
-  type: string;
-  trigger?: string;
-  [key: string]: any;
-}
+import type { NotifyConfig, NotifyConfigValue, NotifyTransport, NotifyTrigger } from "./types";
 
 interface NotifyConfigFormProps {
   value: NotifyConfig[];
   onChange: (configs: NotifyConfig[]) => void;
 }
 
-const NOTIFY_TYPES = [
+interface NotifyConfigRowProps {
+  config: NotifyConfig;
+  onChange: (updates: Partial<NotifyConfig>) => void;
+  onRemove: () => void;
+}
+
+const NOTIFY_TYPES: { value: NotifyTransport; label: string }[] = [
   { value: "slack", label: "Slack" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "file", label: "File" },
@@ -21,7 +22,7 @@ const NOTIFY_TYPES = [
   { value: "webhook", label: "Webhook" },
 ];
 
-const TRIGGER_OPTIONS = [
+const TRIGGER_OPTIONS: { value: NotifyTrigger; label: string }[] = [
   { value: "onSuccess", label: "On Success" },
   { value: "onFailure", label: "On Failure" },
 ];
@@ -76,12 +77,6 @@ export function NotifyConfigForm({ value, onChange }: NotifyConfigFormProps) {
   );
 }
 
-interface NotifyConfigRowProps {
-  config: NotifyConfig;
-  onChange: (updates: Partial<NotifyConfig>) => void;
-  onRemove: () => void;
-}
-
 function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
   return (
     <Paper p="sm" withBorder style={{ backgroundColor: "var(--mantine-color-dark-7)" }}>
@@ -90,14 +85,14 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
           <Select
             size="xs"
             value={config.type}
-            onChange={(value) => onChange({ type: value || "slack" })}
+            onChange={(value) => onChange({ type: toNotifyTransport(value) })}
             data={NOTIFY_TYPES}
             w={120}
           />
           <Select
             size="xs"
             value={config.trigger || "onSuccess"}
-            onChange={(value) => onChange({ trigger: value || "onSuccess" })}
+            onChange={(value) => onChange({ trigger: toNotifyTrigger(value) })}
             data={TRIGGER_OPTIONS}
             w={120}
           />
@@ -105,7 +100,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             <Checkbox
               size="xs"
               label="Only on new results"
-              checked={config.onResultChangeOnly || false}
+              checked={config.onResultChangeOnly === true}
               onChange={(e) => onChange({ onResultChangeOnly: e.currentTarget.checked })}
             />
           )}
@@ -120,7 +115,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
           size="xs"
           label="Webhook URL"
           placeholder="https://hooks.slack.com/services/..."
-          value={config.webhook || ""}
+          value={getTextValue(config.webhook)}
           onChange={(e) => onChange({ webhook: e.currentTarget.value })}
         />
       )}
@@ -131,7 +126,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="Phone Number"
             placeholder="+43..."
-            value={config.phone || ""}
+            value={getTextValue(config.phone)}
             onChange={(e) => onChange({ phone: e.currentTarget.value })}
             mb="xs"
           />
@@ -139,7 +134,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="API Key"
             placeholder="Your WhatsApp API key"
-            value={config.apiKey || ""}
+            value={getTextValue(config.apiKey)}
             onChange={(e) => onChange({ apiKey: e.currentTarget.value })}
           />
         </>
@@ -150,7 +145,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
           size="xs"
           label="File Path"
           placeholder="/path/to/output.json"
-          value={config.path || ""}
+          value={getTextValue(config.path)}
           onChange={(e) => onChange({ path: e.currentTarget.value })}
         />
       )}
@@ -161,7 +156,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="To Email"
             placeholder="user@example.com"
-            value={config.to || ""}
+            value={getTextValue(config.to)}
             onChange={(e) => onChange({ to: e.currentTarget.value })}
             mb="xs"
           />
@@ -169,7 +164,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="Subject"
             placeholder="Job notification"
-            value={config.subject || ""}
+            value={getTextValue(config.subject)}
             onChange={(e) => onChange({ subject: e.currentTarget.value })}
           />
         </>
@@ -181,7 +176,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="Chat ID"
             placeholder="123456789"
-            value={config.chatId || ""}
+            value={getTextValue(config.chatId)}
             onChange={(e) => onChange({ chatId: e.currentTarget.value })}
             mb="xs"
           />
@@ -189,7 +184,7 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
             size="xs"
             label="Bot Token"
             placeholder="Your Telegram bot token"
-            value={config.botToken || ""}
+            value={getTextValue(config.botToken)}
             onChange={(e) => onChange({ botToken: e.currentTarget.value })}
           />
         </>
@@ -200,10 +195,32 @@ function NotifyConfigRow({ config, onChange, onRemove }: NotifyConfigRowProps) {
           size="xs"
           label="Webhook URL"
           placeholder="https://..."
-          value={config.url || ""}
+          value={getTextValue(config.url)}
           onChange={(e) => onChange({ url: e.currentTarget.value })}
         />
       )}
     </Paper>
   );
+}
+
+function toNotifyTransport(value: string | null): NotifyTransport {
+  switch (value) {
+    case "email":
+    case "file":
+    case "slack":
+    case "telegram":
+    case "whatsapp":
+    case "webhook":
+      return value;
+    default:
+      return "slack";
+  }
+}
+
+function toNotifyTrigger(value: string | null): NotifyTrigger {
+  return value === "onFailure" ? "onFailure" : "onSuccess";
+}
+
+function getTextValue(value: NotifyConfigValue): string {
+  return typeof value === "string" ? value : "";
 }

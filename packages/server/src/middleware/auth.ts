@@ -21,7 +21,7 @@ export async function authMiddleware(c: Context, next: Next) {
   try {
     await verify(token, getEnv("API_SECRET"), "HS256");
     return next();
-  } catch (e) {
+  } catch (_e) {
     return c.json({ error: "Invalid token" }, 401);
   }
 }

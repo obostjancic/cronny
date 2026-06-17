@@ -1,9 +1,6 @@
 import { Coordinates, Runner } from "@cronny/types";
 import axios from "axios";
-import { createLogger } from "../utils/logger.js";
 import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
-
-const logger = createLogger("immoscout");
 
 export interface ImmoscoutResult {
   displayType: string;
@@ -20,7 +17,7 @@ export interface ImmoscoutResult {
   primaryArea: number;
   numberOfRooms: number;
   headline: string;
-  imageBadges: any[];
+  imageBadges: unknown[];
   links: Links;
   mainKeyFacts: LabelValue[];
   dateCreated: Date;
@@ -58,8 +55,29 @@ export const run: Runner<BaseImmoParams, BaseImmoResult> = async (params) => {
   return filterResults(results, params.filters);
 };
 
+interface ImmoscoutSearchResponse {
+  data: {
+    findPropertiesByParams: {
+      hits: ImmoscoutResult[];
+    };
+  };
+}
+
+interface ImmoscoutLocationResponse {
+  data: {
+    location: {
+      map: {
+        center: {
+          lat: number;
+          lng: number;
+        };
+      };
+    };
+  };
+}
+
 export async function fetchImmoscoutSearch({ url }: BaseImmoParams) {
-  const { data } = await axios.get(url);
+  const { data } = await axios.get<ImmoscoutSearchResponse>(url);
 
   const results = data.data.findPropertiesByParams.hits;
 
@@ -79,7 +97,7 @@ export async function fetchImmoscoutSearch({ url }: BaseImmoParams) {
 async function fetchImmoscoutCoordinates(
   exposeId: string
 ): Promise<Coordinates> {
-  const { data } = await axios.post(
+  const { data } = await axios.post<ImmoscoutLocationResponse>(
     "https://www.immobilienscout24.at/expose/graphql",
     {
       operationName: "location",

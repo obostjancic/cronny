@@ -4,7 +4,7 @@ import { theme } from "./theme";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { withErrorBoundary } from "./components/ErrorBoundary";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { routeTree } from "./routeTree.gen";
 import { initializeAuth, isInitialized, setAuthPassword } from "./utils/auth";
 import { queryClient } from "./utils/queryClient";
@@ -57,4 +57,12 @@ function AppContent() {
   );
 }
 
-export default withErrorBoundary(AppContent);
+function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
+export default App;

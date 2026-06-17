@@ -14,7 +14,13 @@ type GrillAreaParams = {
   areas: number[];
 };
 
-export const run: Runner<GrillAreaParams, any> = async (params) => {
+type GrillAreaResult = {
+  id: number;
+  day: Date;
+  area: number;
+};
+
+export const run: Runner<GrillAreaParams, GrillAreaResult> = async (params) => {
   const data = await fetchCurrentGrillareaState(adjustParams(params));
   return data;
 };
@@ -44,13 +50,13 @@ export async function fetchCurrentGrillareaState(params: GrillAreaParams) {
   const page = await browser.newPage();
   try {
     logger.debug("Fetching https://mein.wien.gv.at/grillplatz");
-    const results = [];
+    const results: GrillAreaResult[] = [];
 
     for (const month of getMonthNamesInInterval(params.from, params.to)) {
       const areaResults = await checkAreas(params.areas, page, month);
-      results.push(areaResults);
+      results.push(...areaResults);
     }
-    return results.flat();
+    return results;
   } catch (e) {
     logger.error("Error fetching grill areas", e);
     throw e;
@@ -147,7 +153,7 @@ async function collectAreaResults(page: Page) {
   );
   await sleep();
 
-  let results: any[] = [];
+  let results: GrillAreaResult[] = [];
   for (const areaOptIdx of areaOpts.map((_, i) => i)) {
     await sleep();
     await page.waitForLoadState("networkidle");
@@ -194,6 +200,10 @@ async function collectAreaResults(page: Page) {
       "tbody > tr > td > a[style*='color:Black']"
     );
 
+    if (!selectedArea) {
+      throw new Error("No selected area found");
+    }
+
     const { areaNumber } = splitIntoNumAndLocation(selectedArea);
 
     const daysArr = await Promise.all(
@@ -237,7 +247,7 @@ const splitIntoNumAndLocation = (str: string) => {
   };
 };
 
-const text = async (promise: Promise<any>) =>
+const text = async (promise: Promise<ElementHandle<HTMLElement | SVGElement> | null>) =>
   promise.then((el) => el?.innerText());
 
 const toString = (date: Date) => format(date, "dd.MM.yyyy", { locale: de });

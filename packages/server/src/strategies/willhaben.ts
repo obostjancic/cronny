@@ -1,13 +1,10 @@
 import type { Runner } from "@cronny/types";
 import { parse } from "node-html-parser";
-import { createLogger } from "../utils/logger.js";
 import { fetchMultiplePages, fetchViaProxy } from "../utils/request.js";
 import { replaceURLParams } from "../utils/url.js";
 
 const MAX_ROWS = 90;
 const MAX_PAGES = 5;
-
-const logger = createLogger("willhaben");
 
 type WillhabenParams = {
   url: string;
@@ -18,7 +15,7 @@ export type WillhabenResult = {
   title: string;
   price: number;
   url: string;
-} & Record<string, any>;
+} & Record<string, string | number>;
 
 type AdvertSummary = {
   id: string;
@@ -86,8 +83,8 @@ function extractResultList(html: string): WillhabenResult[] {
   });
 }
 
-const reduceAttributes = (list: any[]) => {
-  return list.reduce((acc, curr) => {
+const reduceAttributes = (list: AdvertSummary[number]["attributes"]["attribute"]): Record<string, string> => {
+  return list.reduce<Record<string, string>>((acc, curr) => {
     acc[curr.name] = curr.values.join(" ");
     return acc;
   }, {});

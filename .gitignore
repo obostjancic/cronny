@@ -19,6 +19,7 @@ packages/server/dist
 packages/types/dist
 packages/client/dist
 *.tsbuildinfo
+.DS_Store
 
 # Docker
 docker-compose.override.yml

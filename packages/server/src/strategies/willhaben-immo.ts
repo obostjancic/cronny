@@ -1,11 +1,8 @@
 import type { Runner } from "@cronny/types";
 import { geocode, parseCoordinates } from "../utils/coordinates.js";
-import { createLogger } from "../utils/logger.js";
 import { BaseImmoParams, BaseImmoResult, filterResults } from "./immo.base.js";
 import { run as fetchWillhabenResults, WillhabenResult } from "./willhaben.js";
 import { cached } from "../utils/cache.js";
-
-const logger = createLogger("willhaben-immo");
 
 type WillhabenImmoResult = WillhabenResult & {
   ADDRESS: string;
@@ -76,12 +73,16 @@ function toImmoResult(
 
   return {
     id: result.id,
-    title: `${result.HEADING}`,
-    price: Number(result.PRICE),
-    address: `${result.ADDRESS}`,
-    rooms: Number(result.NUMBER_OF_ROOMS),
-    coordinates: parseCoordinates(result.COORDINATES),
+    title: getAttributeText(result, "HEADING"),
+    price: Number(getAttributeText(result, "PRICE")),
+    address: getAttributeText(result, "ADDRESS"),
+    rooms: Number(getAttributeText(result, "NUMBER_OF_ROOMS")),
+    coordinates: parseCoordinates(getAttributeText(result, "COORDINATES")),
     size: Number(size),
     url: `https://www.willhaben.at/iad/object?adId=${result.id}`,
   };
+}
+
+function getAttributeText(result: WillhabenResult, key: string): string {
+  return `${result[key]}`;
 }
