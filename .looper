@@ -1,0 +1,17 @@
+defaultBranch = "main"
+setup = "pnpm install --frozen-lockfile"
+keepWarm = [
+  "node_modules",
+  "packages/client/node_modules",
+  "packages/server/node_modules",
+  "packages/types/node_modules"
+]
+
+[gates]
+lint = "pnpm --filter @cronny/client lint"
+typecheck = "pnpm run build"
+test = "pnpm test"
+
+[budget]
+wallClockMinutes = 30
+maxUsd = 5
