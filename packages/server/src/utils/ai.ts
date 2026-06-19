@@ -8,6 +8,25 @@ const noReasoningSettings = {
   extraBody: { reasoning: { effort: "none" } },
 };
 
+const MODEL_ALIASES: Record<string, string> = {
+  "poolside laguna": "poolside/laguna-xs.2:free",
+  "poolside laguna xs.2": "poolside/laguna-xs.2:free",
+  "poolside laguna xs.2 free": "poolside/laguna-xs.2:free",
+  "poolside laguna xs2": "poolside/laguna-xs.2:free",
+  "poolside laguna xs2 free": "poolside/laguna-xs.2:free",
+  "poolside/laguna-xs.2": "poolside/laguna-xs.2:free",
+};
+
+export function normalizeModelName(model?: string): string {
+  const normalized = model?.trim();
+
+  if (!normalized) {
+    return "poolside/laguna-xs.2:free";
+  }
+
+  return MODEL_ALIASES[normalized.toLowerCase()] ?? normalized;
+}
+
 export async function runPrompt(
   systemPrompt: string,
   prompt: string,
@@ -16,9 +35,12 @@ export async function runPrompt(
 ): Promise<string> {
   logger.info(`Running prompt ${prompt.slice(0, 25)}...`);
 
+  const normalizedModel = normalizeModelName(model);
+  const normalizedFallbackModel = fallbackModel ? normalizeModelName(fallbackModel) : undefined;
+
   try {
     const { text } = await generateText({
-      model: openrouter(model, noReasoningSettings),
+      model: openrouter(normalizedModel, noReasoningSettings),
       prompt,
       system: systemPrompt,
     });
@@ -30,20 +52,21 @@ export async function runPrompt(
 
     // Retry without reasoning settings if the model doesn't support them
     if (isReasoningError) {
-      logger.warn(`Model ${model} doesn't support reasoning settings, retrying without`);
+      logger.warn(`Model ${normalizedModel} doesn't support reasoning settings, retrying without`);
       const { text } = await generateText({
-        model: openrouter(model),
+        model: openrouter(normalizedModel),
         prompt,
         system: systemPrompt,
       });
       return text ?? "";
     }
 
-    const fallback = fallbackModel ?? (model.includes(":free") ? model.replace(":free", "") : undefined);
+    const fallback = normalizedFallbackModel
+      ?? (normalizedModel.includes(":free") ? normalizedModel.replace(":free", "") : undefined);
 
     if (fallback) {
       logger.warn(
-        `Model ${model} failed (${errorMessage}), retrying with fallback ${fallback}`,
+        `Model ${normalizedModel} failed (${errorMessage}), retrying with fallback ${fallback}`,
       );
 
       const { text } = await generateText({
