@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>default-char-output-length-news-strategies</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #101014;
+    color: #b4b4b4;
+    font-size: 15px;
+    line-height: 1.55;
+    padding: 48px 56px;
+    max-width: 860px;
+  }
+
+  /* --- Header --- */
+  .header { margin-bottom: 40px; }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ececec;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .header .meta {
+    font-size: 13px;
+    color: #6b6b6b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header .status {
+    color: #eab308;
+    font-weight: 500;
+  }
+
+  /* --- Sections --- */
+  .section {
+    margin-bottom: 36px;
+  }
+  .section-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b6b6b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  /* --- Stamps --- */
+  .stamp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 14px;
+  }
+
+  /* --- Badges & dots --- */
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* --- Artifacts --- */
+  details {
+    border: 1px solid #1e1e24;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: #16161a;
+  }
+  details[open] {
+    background: #16161a;
+  }
+  details summary {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    list-style: none;
+    user-select: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: '›';
+    color: #4a4a4a;
+    font-size: 14px;
+    font-weight: 600;
+    width: 10px;
+    transition: transform 0.15s ease;
+  }
+  details[open] summary::before {
+    transform: rotate(90deg);
+  }
+  .artifact-body {
+    padding: 16px 20px 20px;
+    border-top: 1px solid #1e1e24;
+    color: #9a9a9a;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .artifact-body h1 { font-size: 17px; color: #ececec; font-weight: 600; margin: 20px 0 8px; }
+  .artifact-body h2 { font-size: 16px; color: #d0d0d0; font-weight: 600; margin: 18px 0 6px; }
+  .artifact-body h3 { font-size: 15px; color: #c0c0c0; font-weight: 600; margin: 14px 0 4px; }
+  .artifact-body h4 { font-size: 14px; color: #b0b0b0; font-weight: 600; margin: 10px 0 4px; }
+  .artifact-body p { margin: 6px 0; }
+  .artifact-body ul { padding-left: 20px; margin: 6px 0; }
+  .artifact-body li { margin: 3px 0; }
+  .artifact-body pre {
+    background: #111115;
+    border: 1px solid #1e1e24;
+    border-radius: 4px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .artifact-body code {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+    font-size: 13px;
+  }
+  .artifact-body p code {
+    background: #1c1c22;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .artifact-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .artifact-body th,
+  .artifact-body td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid #1e1e24;
+  }
+  .artifact-body th {
+    color: #7a7a7a;
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .artifact-body strong { color: #d0d0d0; }
+
+  /* --- Audit trail --- */
+  .audit-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .audit-row .ts {
+    color: #4a4a4a;
+    width: 68px;
+    flex-shrink: 0;
+  }
+  .audit-row .skill {
+    color: #7a7a8a;
+    width: 72px;
+    flex-shrink: 0;
+  }
+  .audit-row .action {
+    color: #9a9aaa;
+    width: 130px;
+    flex-shrink: 0;
+  }
+
+  /* --- Shared --- */
+  .mono {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+    font-size: 13px;
+  }
+  .muted { color: #6b6b6b; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>default-char-output-length-news-strategies</h1>
+  <div class="meta">
+    <span>2026-06-19 22-36</span>
+    <span>·</span>
+    <span class="status">awaiting approval</span>
+    <span>·</span>
+    <span>1 artifacts</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Review</div>
+  <div class="stamp-row"><span class="dot" style="background:#22c55e;"></span> <span class="mono">summary.md</span> <span class="muted">— Concise summary with clear motivation and meaningful changes</span></div>
+
+</div>
+
+<div class="section">
+  <div class="section-label">Artifacts</div>
+  <details>
+<summary><span class="dot" style="background:#22c55e;"></span> <span class='mono'>summary.md</span></summary>
+<div class='artifact-body'><h1>Summary: add optional output length limits to news AI strategies</h1>
+<p><strong>Date:</strong> 2026-06-19</p>
+<h2>What Changed</h2>
+<ul>
+<li>Added an optional <code>charOutputLength</code> strategy param to <code>klix-rss</code> and <code>standard-rss</code>.</li>
+<li>Enforced the limit in <code>packages/server/src/utils/ai.ts</code> by validating generated output length after each model response.</li>
+<li>Kept the default as no limit by leaving the param unset unless the user enters a value.</li>
+<li>Preserved per-item failure behavior: if one generated output exceeds the limit, that article is skipped and the rest continue.</li>
+<li>Updated the job form schema and number input handling so the new field is an integer-only input in the UI.</li>
+<li>Added tests for the output-length validation helper.</li>
+<li>Installed workspace packages to sync dependencies before the final build.</li>
+</ul>
+<h2>Why</h2>
+<p>We needed a simple way to cap AI-generated output for the click sources and standard sources news strategies without introducing a global default. Invalid outputs should fail only that item, not the whole run.</p>
+<h2>Key Decisions</h2>
+<ul>
+<li>Enforce the limit in the shared AI utility instead of duplicating checks in each strategy.</li>
+<li>Treat an empty UI value as no limit rather than inventing a default.</li>
+<li>Fail fast on overlong generated output and let the existing per-item strategy error handling skip that item.</li>
+</ul>
+<h2>Files Changed</h2>
+<ul>
+<li><code>packages/types/StrategySchema.ts</code></li>
+<li><code>packages/client/src/components/job-form/StrategyParamsForm.tsx</code></li>
+<li><code>packages/server/src/utils/ai.ts</code></li>
+<li><code>packages/server/src/strategies/klix-rss.ts</code></li>
+<li><code>packages/server/src/strategies/standard-rss.ts</code></li>
+<li><code>packages/server/tests/utils/ai.spec.ts</code></li>
+</ul></div>
+</details>
+
+</div>
+
+<div class="section">
+  <div class="section-label">Audit trail</div>
+  <div class="audit-row"><span class="mono ts">20:36:07</span><span class="skill">start</span><span class="action">triage</span> <span class='muted'>quick_fix</span></div>
+<div class="audit-row"><span class="mono ts">20:50:52'</span><span class="skill">start</span><span class="action">artifact_written</span> <span class='muted'>installing packages per user request after build mismatch</span></div>
+<div class="audit-row"><span class="mono ts">20:52:15'</span><span class="skill">done</span><span class="action">artifact_written</span> <span class='muted'>summary.md</span></div>
+<div class="audit-row"><span class="mono ts">20:52:20</span><span class="skill">reviewer</span><span class="action">review</span> <span class="dot" style="background:#22c55e;"></span> summary.md</div>
+<div class="audit-row"><span class="mono ts">20:54:08'</span><span class="skill">done</span><span class="action">validation_started</span></div>
+
+</div>
+
+
+<div class="section">
+  <div class="section-label">Approval</div>
+  
+  <div style="display:flex;gap:10px;">
+    <a href="/approve" style="padding:10px 28px;background:#22c55e;color:#000;border-radius:6px;font-weight:600;font-size:14px;text-decoration:none;cursor:pointer;">Approve</a>
+    <a href="/reject" style="padding:10px 28px;background:#1e1e24;color:#b4b4b4;border:1px solid #2a2a30;border-radius:6px;font-weight:600;font-size:14px;text-decoration:none;cursor:pointer;">Reject</a>
+  </div>
+</div>
+
+</body>
+</html>

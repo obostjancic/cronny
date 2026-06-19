@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeModelName } from "../../src/utils/ai.js";
+import { ensureOutputLength, normalizeModelName } from "../../src/utils/ai.js";
 import { normalizeJobParams } from "../../src/utils/model.js";
 
 describe("normalizeModelName", () => {
@@ -40,5 +40,30 @@ describe("normalizeJobParams", () => {
         model: "openai/gpt-4o-mini",
       },
     });
+  });
+});
+
+describe("ensureOutputLength", () => {
+  it("returns trimmed text when no limit is set", () => {
+    expect(ensureOutputLength("  hello  ")).toBe("hello");
+  });
+
+  it("returns text within the configured limit", () => {
+    expect(ensureOutputLength("hello", 5)).toBe("hello");
+  });
+
+  it("throws when the generated output exceeds the limit", () => {
+    expect(() => ensureOutputLength("hello!", 5)).toThrow(
+      "Generated output exceeded maxOutputLength (6/5)"
+    );
+  });
+
+  it("throws for invalid limits", () => {
+    expect(() => ensureOutputLength("hello", 0)).toThrow(
+      "maxOutputLength must be a positive integer"
+    );
+    expect(() => ensureOutputLength("hello", 1.5)).toThrow(
+      "maxOutputLength must be a positive integer"
+    );
   });
 });

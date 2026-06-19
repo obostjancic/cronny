@@ -127,10 +127,13 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           description={field.description}
           required={field.required}
           value={getNumberValue(value)}
-          onChange={(val) => onChange(val)}
+          onChange={(val) => onChange(normalizeNumberValue(val))}
           error={error}
           min={field.min}
           max={field.max}
+          step={field.integer ? 1 : undefined}
+          allowDecimal={!field.integer}
+          decimalScale={field.integer ? 0 : undefined}
         />
       );
 
@@ -202,6 +205,14 @@ function getStringValue(value: StrategyParamValue): string {
 function getNumberValue(value: StrategyParamValue): string | number {
   if (typeof value === "number" || typeof value === "string") return value;
   return "";
+}
+
+function normalizeNumberValue(value: string | number): StrategyParamValue {
+  if (value === "") return undefined;
+  if (typeof value === "number") return value;
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function getStringArrayValue(value: StrategyParamValue): string[] {

@@ -23,6 +23,7 @@ export interface FieldSchema {
   options?: SelectOption[];
   min?: number;
   max?: number;
+  integer?: boolean;
   defaultValue?: string | number | boolean | string[];
 }
 
@@ -260,6 +261,16 @@ export const STRATEGY_SCHEMAS: StrategySchema[] = [
         placeholder: "You are a helpful assistant that summarizes news...",
         description: "The system prompt for AI processing of articles",
       },
+      {
+        name: "charOutputLength",
+        label: "Character Output Length",
+        type: "number",
+        required: false,
+        min: 1,
+        integer: true,
+        placeholder: "280",
+        description: "Maximum character length for the generated output, leave empty for no limit. Items that exceed it are skipped",
+      },
       ...MODEL_FIELDS,
     ],
     supportsFilters: false,
@@ -278,6 +289,16 @@ export const STRATEGY_SCHEMAS: StrategySchema[] = [
         required: true,
         placeholder: "You are a helpful assistant that summarizes news...",
         description: "The system prompt for AI processing of articles",
+      },
+      {
+        name: "charOutputLength",
+        label: "Character Output Length",
+        type: "number",
+        required: false,
+        min: 1,
+        integer: true,
+        placeholder: "280",
+        description: "Maximum character length for the generated output, leave empty for no limit. Items that exceed it are skipped",
       },
       ...MODEL_FIELDS,
     ],

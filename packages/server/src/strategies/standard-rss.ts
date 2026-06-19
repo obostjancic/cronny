@@ -62,6 +62,7 @@ function extractCategoryFromTitle(titleTag: string): string | null {
 
 type Params = {
   systemPrompt: string;
+  charOutputLength?: number;
   model?: string;
   fallbackModel?: string;
 };
@@ -166,6 +167,7 @@ async function simplifyArticle(
     article.text ?? "",
     params.model,
     params.fallbackModel,
+    params.charOutputLength,
   );
   const separator = purified.includes(";") ? ";" : ".";
   const [title, ...text] = purified.split(separator);

@@ -1,0 +1,6 @@
+{"ts":"2026-06-19T20:36:07","skill":"workflow-start","action":"triage","detail":"quick_fix"}
+{"ts":"2026-06-19T20:50:52'","skill":"workflow-start","action":"artifact_written","detail":"installing packages per user request after build mismatch"}
+{"ts":"2026-06-19T20:52:15'","skill":"workflow-done","action":"artifact_written","detail":"summary.md"}
+{"ts":"2026-06-19T20:52:20","skill":"workflow-reviewer","action":"review","detail":"summary.md GREEN"}
+{"ts":"2026-06-19T20:54:08'","skill":"workflow-done","action":"validation_started","detail":""}
+{"ts":"2026-06-19T20:54:42'","skill":"workflow-done","action":"validation_passed","detail":""}
