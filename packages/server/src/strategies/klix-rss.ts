@@ -5,7 +5,6 @@ import { runPrompt } from "../utils/ai.js";
 import { cached } from "../utils/cache.js";
 import { createLogger } from "../utils/logger.js";
 import { fetchViaFlareSolverr, fetchViaProxy } from "../utils/request.js";
-import { buildArticleSummaryPrompt, parseArticleSummaryOutput } from "./article-summary.js";
 
 const logger = createLogger("klix-rss");
 
@@ -49,7 +48,6 @@ type Params = {
   systemPrompt: string;
   model?: string;
   fallbackModel?: string;
-  charOutputLength?: number;
 };
 
 export const run: Runner<Params, Article> = async (params, options) => {
@@ -153,16 +151,39 @@ async function simplifyArticle(
   params: Params,
 ): Promise<Article> {
   const purified = await runPrompt(
-    buildArticleSummaryPrompt(params.systemPrompt, params.charOutputLength),
+    params.systemPrompt,
     article.text ?? "",
     params.model,
     params.fallbackModel,
   );
-  const { title, text } = parseArticleSummaryOutput(purified, params.charOutputLength);
+  const separator = purified.includes(";") ? ";" : ".";
+  const [title, ...text] = purified.split(separator);
 
   return {
     ...article,
-    text,
-    title,
+    text: sanitizeText(text.join(". ")),
+    title: sanitizeTitle(title),
   };
+}
+
+function sanitizeText(text: string): string {
+  return text
+    .trim()
+    .replaceAll("'. '", "")
+    .replaceAll(" . ", "")
+    .replaceAll("..", ".")
+    .replaceAll("  ", " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"');
+}
+
+function sanitizeTitle(title: string): string {
+  return title
+    .replaceAll("## ", "")
+    .replaceAll("##", "")
+    .replaceAll("*", "")
+    .replaceAll("[", "")
+    .replaceAll("]", "")
+    .trim();
 }
