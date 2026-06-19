@@ -14,6 +14,7 @@ export const initSentry = () => {
 
     environment: import.meta.env.MODE,
     enabled: import.meta.env.MODE === "production",
+    streamGenAiSpans: true,
   });
 };
 

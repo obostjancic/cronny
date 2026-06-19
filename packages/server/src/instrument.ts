@@ -8,6 +8,7 @@ Sentry.init({
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
 
   enabled: isProd,
+  streamGenAiSpans: true,
   environment: getEnv("NODE_ENV"),
   integrations: [
     Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
