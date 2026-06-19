@@ -186,7 +186,7 @@ function FieldInput({ field, value, onChange, error }: FieldInputProps) {
           value={getStringValue(value)}
           onChange={(val) => onChange(val)}
           error={error}
-          data={field.options?.map((o) => ({ value: o.value, label: `${o.label} (${o.value})` })) || []}
+          data={field.options?.map((option) => option.value) || []}
         />
       );
 

@@ -1,6 +1,7 @@
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
 import { createLogger } from "./logger.js";
+import { normalizeModelSlug } from "./model.js";
 
 const logger = createLogger("ai");
 
@@ -8,23 +9,8 @@ const noReasoningSettings = {
   extraBody: { reasoning: { effort: "none" } },
 };
 
-const MODEL_ALIASES: Record<string, string> = {
-  "poolside laguna": "poolside/laguna-xs.2:free",
-  "poolside laguna xs.2": "poolside/laguna-xs.2:free",
-  "poolside laguna xs.2 free": "poolside/laguna-xs.2:free",
-  "poolside laguna xs2": "poolside/laguna-xs.2:free",
-  "poolside laguna xs2 free": "poolside/laguna-xs.2:free",
-  "poolside/laguna-xs.2": "poolside/laguna-xs.2:free",
-};
-
 export function normalizeModelName(model?: string): string {
-  const normalized = model?.trim();
-
-  if (!normalized) {
-    return "poolside/laguna-xs.2:free";
-  }
-
-  return MODEL_ALIASES[normalized.toLowerCase()] ?? normalized;
+  return normalizeModelSlug(model);
 }
 
 export async function runPrompt(

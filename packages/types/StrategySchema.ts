@@ -39,35 +39,35 @@ export interface StrategySchema {
 }
 
 const MODEL_OPTIONS: SelectOption[] = [
-  { value: "poolside/laguna-xs.2:free", label: "Poolside Laguna XS.2 (Free)" },
-  { value: "google/gemma-3-27b-it:free", label: "Gemma 3 27B (Free)" },
-  { value: "google/gemma-3-27b-it", label: "Gemma 3 27B" },
-  { value: "google/gemma-3-12b-it:free", label: "Gemma 3 12B (Free)" },
-  { value: "google/gemma-3-12b-it", label: "Gemma 3 12B" },
-  { value: "anthropic/claude-3.5-sonnet", label: "Claude 3.5 Sonnet" },
-  { value: "anthropic/claude-3-haiku", label: "Claude 3 Haiku" },
-  { value: "openai/gpt-4o-mini", label: "GPT-4o Mini" },
-  { value: "openai/gpt-4o", label: "GPT-4o" },
-  { value: "meta-llama/llama-3.1-8b-instruct:free", label: "Llama 3.1 8B (Free)" },
+  { value: "poolside/laguna-xs.2:free", label: "poolside/laguna-xs.2:free" },
+  { value: "google/gemma-3-27b-it:free", label: "google/gemma-3-27b-it:free" },
+  { value: "google/gemma-3-27b-it", label: "google/gemma-3-27b-it" },
+  { value: "google/gemma-3-12b-it:free", label: "google/gemma-3-12b-it:free" },
+  { value: "google/gemma-3-12b-it", label: "google/gemma-3-12b-it" },
+  { value: "anthropic/claude-3.5-sonnet", label: "anthropic/claude-3.5-sonnet" },
+  { value: "anthropic/claude-3-haiku", label: "anthropic/claude-3-haiku" },
+  { value: "openai/gpt-4o-mini", label: "openai/gpt-4o-mini" },
+  { value: "openai/gpt-4o", label: "openai/gpt-4o" },
+  { value: "meta-llama/llama-3.1-8b-instruct:free", label: "meta-llama/llama-3.1-8b-instruct:free" },
 ];
 
 const MODEL_FIELDS: FieldSchema[] = [
   {
     name: "model",
-    label: "AI Model",
+    label: "Model Slug",
     type: "combobox",
     required: false,
     placeholder: "poolside/laguna-xs.2:free",
-    description: "Primary OpenRouter model ID (leave empty for default)",
+    description: "Primary OpenRouter model slug, leave empty for the default",
     options: MODEL_OPTIONS,
   },
   {
     name: "fallbackModel",
-    label: "Fallback AI Model",
+    label: "Fallback Model Slug",
     type: "combobox",
     required: false,
     placeholder: "google/gemma-3-27b-it",
-    description: "Fallback model used when the primary model fails",
+    description: "Fallback OpenRouter model slug used when the primary model fails",
     options: MODEL_OPTIONS,
   },
 ];
